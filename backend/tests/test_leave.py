@@ -1,9 +1,10 @@
 import pytest
+from sqlalchemy import select
 
 from app.api.routers import attendance
 from app.core.security import hash_password
 from app.db import SessionLocal
-from app.models import Librarian, Parent, SchoolClass, Section, Student, Subject, Teacher
+from app.models import Librarian, Parent, SchoolClass, Section, StaffAttendance, Student, Subject, Teacher
 from tests.conftest import PASSWORD, YEAR, login
 
 WEEK = {"from_date": "2026-03-02", "to_date": "2026-03-06"}  # Monday to Friday
@@ -131,3 +132,20 @@ def test_summary_and_anonymous(client, as_role):
     assert body["year"] == YEAR and body["people"] == [{"role": "student", "id": 1, "name": "Kid One", "days": 5, "requests": 1}]
     assert client.get("/api/leave/summary", headers=as_role("teacher")).status_code == 403
     assert client.get("/api/leave/mine").status_code == 401
+
+
+def test_approved_staff_leave_marks_staff_attendance(client, as_role):
+    r = client.post(
+        "/api/leave", headers=as_role("teacher"),
+        json={"kind": "sick", "from_date": "2026-03-09", "to_date": "2026-03-10", "reason": "Flu"},
+    )  # fmt: skip
+    assert r.status_code == 201, r.text
+    with SessionLocal() as db:
+        assert db.scalars(select(StaffAttendance)).all() == []
+    assert client.post(f"/api/leave/{r.json()['leave_id']}/decision", headers=as_role("admin"), json={"approve": True}).status_code == 200
+    with SessionLocal() as db:
+        rows = db.scalars(select(StaffAttendance).order_by(StaffAttendance.date)).all()
+    assert [(a.staff_role, a.staff_id, a.date.isoformat(), a.status) for a in rows] == [
+        ("teacher", 1, "2026-03-09", "leave"),
+        ("teacher", 1, "2026-03-10", "leave"),
+    ]

@@ -18,6 +18,7 @@ from app.services.access import children_ids, current_enroll
 from app.services.accounts import get_account, ref_name
 from app.services.jobs import enqueue
 from app.services.notify import send_email, send_sms, sms_enabled
+from app.services.payroll import record_staff_leave
 from app.services.school_calendar import working_days
 from app.services.settings import running_year
 
@@ -211,6 +212,12 @@ def count_days(d_from: date = Query(alias="from"), d_to: date = Query(alias="to"
     return {"days": working_days(db, d_from, d_to)}
 
 
+def _mark_staff_attendance(db: Session, row: LeaveRequest) -> None:
+    """Approved staff leave shows as "leave" on the staff attendance sheet (and is paid in payroll)."""
+    if row.staff_role and row.staff_id:
+        record_staff_leave(db, row.staff_role, row.staff_id, row.from_date, row.to_date, row.decided_by)
+
+
 @router.post("", response_model=LeaveOut, status_code=201)
 def apply(body: LeaveIn, user: Me, db: DB):
     student_id, staff_role, staff_id = _resolve_person(db, user, body)
@@ -232,6 +239,7 @@ def apply(body: LeaveIn, user: Me, db: DB):
         raise HTTPException(status.HTTP_409_CONFLICT, "There is already a pending or approved leave request for these dates")
     if user.role == "admin":
         row.status, row.decided_by, row.decided_at = "approved", user.ref, _now()
+        _mark_staff_attendance(db, row)
     db.add(row)
     db.commit()
     return _out(db, user, [row])[0]
@@ -301,6 +309,8 @@ def decide(leave_id: int, body: DecisionIn, user: Me, tasks: BackgroundTasks, db
     row.status = "approved" if body.approve else "rejected"
     row.decided_by, row.decided_at = user.ref, _now()
     row.decision_note = (body.note or "").strip() or None
+    if row.status == "approved":
+        _mark_staff_attendance(db, row)
     db.commit()
     _notify_decision(db, tasks, row)
     return _out(db, user, [row])[0]
