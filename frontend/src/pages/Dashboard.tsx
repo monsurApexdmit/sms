@@ -23,6 +23,7 @@ import { useGet } from "../api/hooks";
 import { useUser } from "../auth/AuthContext";
 import { PageHeader } from "../components/PageHeader";
 import { EmptyState } from "../components/states";
+import { TransportExpiryAlert } from "../components/TransportExpiryAlert";
 import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Skeleton } from "../components/ui/skeleton";
@@ -169,6 +170,7 @@ export function DashboardPage() {
       <PageHeader title={`Welcome, ${user.name}`} subtitle={data ? `Academic year ${data.running_year}` : undefined} />
       <div className="space-y-6">
         {isLoading && <StatSkeletons />}
+        {user.role === "admin" && <TransportExpiryAlert />}
         {data?.counts && (
           <div className={cn("grid gap-4 sm:grid-cols-2", GRID_COLS[Math.min(countKeys.length, 5)])}>
             {Object.entries(data.counts).map(([k, v]) => {

@@ -240,3 +240,90 @@ export interface SchoolYear {
   is_current: boolean;
   terms: { term_id: number; name: string; start_date: string | null; end_date: string | null }[];
 }
+
+// --- transport ---
+
+export interface RouteStop {
+  stop_id: number;
+  route_id: number;
+  name: string;
+  sequence: number;
+  pickup_time: string | null;
+  drop_time: string | null;
+  fare: string | null;
+}
+
+export interface Vehicle {
+  vehicle_id: number;
+  registration_no: string;
+  model: string | null;
+  capacity: number;
+  route_id: number | null;
+  route_name: string | null;
+  driver_id: number | null;
+  driver_name: string | null;
+  driver_phone: string | null;
+  insurance_expiry: string | null;
+  fitness_expiry: string | null;
+  notes: string | null;
+  active: boolean;
+}
+
+export interface RouteCapacity {
+  assigned: number;
+  capacity: number;
+  over_capacity: boolean;
+}
+
+export interface TransportRoute extends RouteCapacity {
+  transport_id: number;
+  route_name: string | null;
+  route_fare: string | null;
+  description: string | null;
+  stops: RouteStop[];
+  vehicles: Vehicle[];
+}
+
+export interface TransportAssignment {
+  student_id: number;
+  name: string | null;
+  roll: number | null;
+  class_name: string | null;
+  section_name: string | null;
+  route_id: number | null;
+  route_name: string | null;
+  stop_id: number | null;
+  stop_name: string | null;
+  pickup: boolean;
+  drop: boolean;
+  parent_phone: string | null;
+}
+
+export interface TransportRoster extends RouteCapacity {
+  transport_id: number;
+  route_name: string | null;
+  vehicles: Vehicle[];
+  stops: { stop: RouteStop | null; students: TransportAssignment[] }[];
+}
+
+export interface TransportExpiry {
+  kind: "insurance" | "fitness" | "licence";
+  label: string;
+  item_id: number;
+  expires_on: string;
+  days_left: number;
+}
+
+export interface MyTransport {
+  student_id: number;
+  student_name: string | null;
+  route_id: number | null;
+  route_name: string | null;
+  route_description: string | null;
+  stop: RouteStop | null;
+  pickup: boolean;
+  drop: boolean;
+  fare: string | null;
+  since: string | null;
+  vehicles: { registration_no: string; model: string | null; driver_name: string | null; driver_phone: string | null }[];
+}

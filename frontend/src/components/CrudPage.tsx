@@ -36,6 +36,8 @@ export interface FieldDef {
   createOnlyRequired?: boolean;
   render?: (row: Record<string, unknown>) => ReactNode;
   placeholder?: string;
+  /** switch fields: start switched on when creating */
+  defaultOn?: boolean;
 }
 
 interface CrudPageProps {
@@ -57,7 +59,7 @@ interface CrudPageProps {
 type Values = Record<string, unknown>;
 
 function emptyValue(f: FieldDef) {
-  if (f.type === "switch") return false;
+  if (f.type === "switch") return f.defaultOn ?? false;
   if (f.type === "select") return null;
   return "";
 }

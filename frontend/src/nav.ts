@@ -2,6 +2,7 @@ import {
   AwardIcon,
   BookOpenIcon,
   BuildingIcon,
+  BusFrontIcon,
   BusIcon,
   CalendarCogIcon,
   CalendarDaysIcon,
@@ -78,6 +79,7 @@ export const NAV: NavItem[] = [
   { label: "Income & expenses", path: "accounting", icon: ChartColumnIcon, roles: ["admin", "accountant"], group: "Finance" },
 
   { label: "Library", path: "library", icon: LibraryIcon, roles: ALL, group: "Campus" },
+  { label: "Transport", path: "transport", icon: BusFrontIcon, roles: ["admin", "teacher", "student", "parent"], group: "Campus" },
   { label: "Transport & dormitory", path: "facilities", icon: BusIcon, roles: ["admin", "student", "parent", "teacher"], group: "Campus" },
   { label: "Noticeboard", path: "notices", icon: MegaphoneIcon, roles: ALL, group: "Campus" },
   { label: "Messages", path: "messages", icon: MessagesSquareIcon, roles: ALL, group: "Campus" },

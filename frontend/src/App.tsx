@@ -51,6 +51,7 @@ const WebsitePage = page(() => import("./pages/Settings"), "WebsitePage");
 const IdCardsPage = page(() => import("./pages/Students"), "IdCardsPage");
 const PromotionPage = page(() => import("./pages/Students"), "PromotionPage");
 const StudentsPage = page(() => import("./pages/Students"), "StudentsPage");
+const TransportPage = page(() => import("./pages/Transport"), "TransportPage");
 const HomePage = page(() => import("./pages/public/Public"), "HomePage");
 const PublicAdmissionPage = page(() => import("./pages/public/Public"), "PublicAdmissionPage");
 const PublicContactPage = page(() => import("./pages/public/Public"), "PublicContactPage");
@@ -103,6 +104,7 @@ const APP_PAGES: [string, ReactNode][] = [
   ["my-invoices", <MyInvoicesPage />],
   ["accounting", <AccountingPage />],
   ["library", <LibraryPage />],
+  ["transport", <TransportPage />],
   ["facilities", <FacilitiesPage />],
   ["notices", <NoticesPage />],
   ["messages", <MessagesPage />],

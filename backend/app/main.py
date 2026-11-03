@@ -19,6 +19,7 @@ from app.api.routers import (
     online_exams,
     students,
     system,
+    transport,
     years,
 )
 from app.core.config import get_settings
@@ -56,6 +57,7 @@ for router in accounts.routers:
     api.include_router(router)
 api.include_router(cms.public)
 api.include_router(cms.admin)
+api.include_router(transport.router)
 
 
 @api.get("/health", tags=["system"])
