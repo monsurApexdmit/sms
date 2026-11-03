@@ -23,6 +23,7 @@ NEW_TABLES |= {"attendance_device", "attendance_punch", "id_card", "period_atten
 NEW_TABLES |= {"notification", "notification_preference", "push_subscription"}
 NEW_TABLES |= {"ai_request"}
 NEW_TABLES |= {"user_totp"}
+NEW_TABLES |= {"gateway_transaction"}
 
 
 def _table_of(diff) -> str | None:

@@ -25,6 +25,8 @@ export interface PublicSettings {
   system_email: string;
   stripe_enabled: boolean;
   paypal_enabled: boolean;
+  /** bKash / Nagad / SSLCommerz switched on (only when the currency is BDT) */
+  local_gateways?: LocalGateway[];
   logo_url: string | null;
   disable_frontend: string;
 }
@@ -1029,3 +1031,8 @@ export interface MfaEnrolledUser {
   email: string | null;
   confirmed_at: string | null;
 }
+
+export type LocalGateway = "bkash" | "nagad" | "sslcommerz";
+
+/** GET /payment-gateways/settings: secrets come back as "********" */
+export type LocalGatewaySettings = Record<LocalGateway, Record<string, string>> & { currency_is_bdt: boolean };

@@ -32,6 +32,7 @@ from app.models import (
 from app.services.access import children_ids, current_enroll
 from app.services.accounts import ROLES
 from app.services.files import media_url, safe_path, save_site_image
+from app.services.local_gateways import enabled_gateways
 from app.services.settings import (
     MASK,
     PAYPAL_FIELDS,
@@ -68,6 +69,7 @@ def public_settings(db: DB):
     stripe_cfg = get_stripe_config(db)
     data["stripe_enabled"] = stripe_cfg.get("active") == "1"
     data["paypal_enabled"] = paypal_enabled(db)
+    data["local_gateways"] = enabled_gateways(db)
     data["logo_url"] = media_url("site", get_setting(db, "system_logo") or None, 86400)
     return data
 
