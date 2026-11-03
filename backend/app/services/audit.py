@@ -21,6 +21,7 @@ AUDITED: tuple[type, ...] = (
     models.Enroll, models.Exam, models.Grade, models.Mark, models.OnlineExamResult, models.Attendance,
     models.Invoice, models.Payment, models.Setting, models.FrontendGeneralSetting,
 )  # fmt: skip
+AUDITED += (models.ExamSchedule, models.ExamWeight, models.ReportRemark)  # report cards
 
 SENSITIVE_COLUMNS = {"password", "authentication_key"}
 # Settings rows whose value is a credential (or a JSON blob holding one).

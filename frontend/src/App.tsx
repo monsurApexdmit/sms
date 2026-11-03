@@ -45,6 +45,8 @@ const ParentsPage = page(() => import("./pages/People"), "ParentsPage");
 const StaffPage = page(() => import("./pages/People"), "StaffPage");
 const TeachersPage = page(() => import("./pages/People"), "TeachersPage");
 const ProfilePage = page(() => import("./pages/Profile"), "ProfilePage");
+const ExamTimetablePage = page(() => import("./pages/ReportCards"), "ExamTimetablePage");
+const ReportCardsPage = page(() => import("./pages/ReportCards"), "ReportCardsPage");
 const AuditLogPage = page(() => import("./pages/Settings"), "AuditLogPage");
 const SystemSettingsPage = page(() => import("./pages/Settings"), "SystemSettingsPage");
 const WebsitePage = page(() => import("./pages/Settings"), "WebsitePage");
@@ -93,6 +95,8 @@ const APP_PAGES: [string, ReactNode][] = [
   ["marks", <MarksPage />],
   ["marksheet", <MarksheetPage />],
   ["tabulation", <TabulationPage />],
+  ["exam-timetable", <ExamTimetablePage />],
+  ["report-cards", <ReportCardsPage />],
   ["online-exams", <OnlineExamsPage />],
   ["my-online-exams", <MyOnlineExamsPage />],
   ["question-papers", <QuestionPapersPage />],
