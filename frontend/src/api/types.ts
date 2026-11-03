@@ -240,3 +240,65 @@ export interface SchoolYear {
   is_current: boolean;
   terms: { term_id: number; name: string; start_date: string | null; end_date: string | null }[];
 }
+
+export interface StaffMember {
+  staff_role: "teacher" | "librarian" | "accountant";
+  staff_id: number;
+  name: string;
+}
+
+export interface StaffAttendanceRow extends StaffMember {
+  status: "present" | "absent" | "late" | "half_day" | "leave" | null;
+  check_in: string | null;
+  check_out: string | null;
+  note: string | null;
+}
+
+export interface PayItem {
+  name: string;
+  amount: number;
+}
+
+export interface SalaryStructure extends Omit<StaffMember, "name"> {
+  salary_structure_id: number;
+  name: string | null;
+  basic: number;
+  allowances: PayItem[];
+  deductions: PayItem[];
+  effective_from: string;
+}
+
+export interface PayrollRun {
+  payroll_run_id: number;
+  month: string;
+  status: "draft" | "finalized" | "paid";
+  created_by: string | null;
+  created_at: string;
+  finalized_at: string | null;
+  paid_at: string | null;
+  staff: number;
+  gross: number;
+  net: number;
+}
+
+export interface Payslip {
+  payslip_id: number;
+  payroll_run_id: number;
+  month: string;
+  run_status: PayrollRun["status"];
+  staff_role: StaffMember["staff_role"];
+  staff_id: number;
+  name: string | null;
+  basic: number;
+  allowances: PayItem[];
+  deductions: PayItem[];
+  absence_deduction: number;
+  gross: number;
+  net: number;
+  working_days: number;
+  present_days: number;
+  absent_days: number;
+  leave_days: number;
+  paid_on: string | null;
+  payment_id: number | null;
+}

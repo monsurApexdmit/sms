@@ -48,6 +48,11 @@ const ProfilePage = page(() => import("./pages/Profile"), "ProfilePage");
 const AuditLogPage = page(() => import("./pages/Settings"), "AuditLogPage");
 const SystemSettingsPage = page(() => import("./pages/Settings"), "SystemSettingsPage");
 const WebsitePage = page(() => import("./pages/Settings"), "WebsitePage");
+const MyPayslipsPage = page(() => import("./pages/Hr"), "MyPayslipsPage");
+const PayrollPage = page(() => import("./pages/Hr"), "PayrollPage");
+const PayslipPage = page(() => import("./pages/Hr"), "PayslipPage");
+const SalaryStructuresPage = page(() => import("./pages/Hr"), "SalaryStructuresPage");
+const StaffAttendancePage = page(() => import("./pages/Hr"), "StaffAttendancePage");
 const IdCardsPage = page(() => import("./pages/Students"), "IdCardsPage");
 const PromotionPage = page(() => import("./pages/Students"), "PromotionPage");
 const StudentsPage = page(() => import("./pages/Students"), "StudentsPage");
@@ -102,6 +107,10 @@ const APP_PAGES: [string, ReactNode][] = [
   ["invoices", <InvoicesPage />],
   ["my-invoices", <MyInvoicesPage />],
   ["accounting", <AccountingPage />],
+  ["staff-attendance", <StaffAttendancePage />],
+  ["payroll", <PayrollPage />],
+  ["salary-structures", <SalaryStructuresPage />],
+  ["my-payslips", <MyPayslipsPage />],
   ["library", <LibraryPage />],
   ["facilities", <FacilitiesPage />],
   ["notices", <NoticesPage />],
@@ -163,6 +172,8 @@ export default function App() {
           <Route path="online-exams/:id/script" element={<Guard page="online-exams"><AnswerScriptPage /></Guard>} />
           <Route path="take-exam/:id" element={<Guard page="my-online-exams"><TakeExamPage /></Guard>} />
           <Route path="my-online-exams/:id/script" element={<Guard page="my-online-exams"><AnswerScriptPage /></Guard>} />
+          {/* admins and accountants reach payslips from Payroll, other staff from My payslips; the page checks the role */}
+          <Route path="payslip/:id" element={<PayslipPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="*" element={<NotFound />} />
