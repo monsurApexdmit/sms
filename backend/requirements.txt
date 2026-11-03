@@ -17,5 +17,7 @@ redis>=5
 rq>=2
 pywebpush>=2.0
 openpyxl>=3.1
+# error reporting, used only when SENTRY_DSN is set
+sentry-sdk==2.70.0
 pytest>=8
 fakeredis>=2.23

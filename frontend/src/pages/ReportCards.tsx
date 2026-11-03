@@ -444,9 +444,9 @@ function ReportCardView({ card, onRemark }: { card: ReportCard; onRemark?: () =>
         <CardContent className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3 lg:grid-cols-6 [print-color-adjust:exact] print:grid-cols-6">
           <Stat label="Result"><Badge className={cn("border-transparent", RESULT_STYLE[card.result])}>{card.result}</Badge></Stat>
           <Stat label={annual ? "CGPA" : "GPA"}>{card.gpa ?? "—"}</Stat>
-          <Stat label="Percentage">{card.percentage == null ? "—" : `${card.percentage}%`}</Stat>
-          <Stat label="Position in class">{card.position_class} of {card.class_size}</Stat>
-          <Stat label="Position in section">{card.position_section} of {card.section_size}</Stat>
+          <Stat label="Percentage">{card.percentage == null ? (card.result === "Incomplete" ? "Incomplete" : "—") : `${card.percentage}%`}</Stat>
+          <Stat label="Position in class">{card.position_class == null ? "—" : `${card.position_class} of ${card.class_size}`}</Stat>
+          <Stat label="Position in section">{card.position_section == null ? "—" : `${card.position_section} of ${card.section_size}`}</Stat>
           <Stat label="Attendance">
             {att.percent == null ? "—" : `${att.percent}%`}
             <span className="text-muted-foreground ml-1 text-xs font-normal">{att.present}/{att.working_days} days</span>

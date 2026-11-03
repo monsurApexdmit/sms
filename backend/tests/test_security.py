@@ -15,6 +15,7 @@ PUBLIC = {
     ("POST", "/api/auth/reset-password"),
     ("GET", "/api/settings/public"),
     ("GET", "/api/health"),
+    ("GET", "/api/health/ready"),
 }
 
 
