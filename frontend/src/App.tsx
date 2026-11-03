@@ -36,6 +36,9 @@ const AccountingPage = page(() => import("./pages/Finance"), "AccountingPage");
 const InvoicesPage = page(() => import("./pages/Finance"), "InvoicesPage");
 const MyInvoicesPage = page(() => import("./pages/Finance"), "MyInvoicesPage");
 const MessagesPage = page(() => import("./pages/Messages"), "MessagesPage");
+const BookMeetingPage = page(() => import("./pages/Meetings"), "BookMeetingPage");
+const MeetingSessionsPage = page(() => import("./pages/Meetings"), "MeetingSessionsPage");
+const MyMeetingsPage = page(() => import("./pages/Meetings"), "MyMeetingsPage");
 const AnswerScriptPage = page(() => import("./pages/OnlineExams"), "AnswerScriptPage");
 const MyOnlineExamsPage = page(() => import("./pages/OnlineExams"), "MyOnlineExamsPage");
 const OnlineExamDetailPage = page(() => import("./pages/OnlineExams"), "OnlineExamDetailPage");
@@ -106,6 +109,9 @@ const APP_PAGES: [string, ReactNode][] = [
   ["facilities", <FacilitiesPage />],
   ["notices", <NoticesPage />],
   ["messages", <MessagesPage />],
+  ["meetings", <MeetingSessionsPage />],
+  ["my-meetings", <MyMeetingsPage />],
+  ["book-meeting", <BookMeetingPage />],
   ["website", <WebsitePage />],
   ["settings", <SystemSettingsPage />],
   ["audit-log", <AuditLogPage />],

@@ -240,3 +240,49 @@ export interface SchoolYear {
   is_current: boolean;
   terms: { term_id: number; name: string; start_date: string | null; end_date: string | null }[];
 }
+
+export interface MeetingSession {
+  session_id: number;
+  title: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  slot_minutes: number;
+  location: string | null;
+  class_id: number | null;
+  class_name: string | null;
+  teacher_ids: number[];
+  slots: number;
+  booked: number;
+}
+
+export interface MeetingBooking {
+  booking_id: number;
+  slot_id: number;
+  status: "booked" | "cancelled" | "done" | "no_show";
+  note: string | null;
+  teacher_note?: string | null;
+  student_id: number;
+  student_name: string | null;
+  parent_id: number;
+  parent_name: string | null;
+  parent_phone: string | null;
+  teacher_id: number | null;
+  teacher_name: string | null;
+  session_id: number | null;
+  session_title: string | null;
+  date: string | null;
+  location: string | null;
+  start_time: string | null;
+  end_time: string | null;
+}
+
+export interface MeetingSlot {
+  slot_id: number;
+  teacher_id: number;
+  teacher_name: string | null;
+  start_time: string;
+  end_time: string;
+  status: "open" | "booked" | "blocked";
+  booking: MeetingBooking | null;
+}

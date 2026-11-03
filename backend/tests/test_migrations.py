@@ -9,7 +9,7 @@ from sqlalchemy import create_engine, inspect, text
 from app.db import Base
 
 BACKEND = Path(__file__).resolve().parents[1]
-NEW_TABLES = {"audit_log", "academic_year", "term", "calendar_event"}
+NEW_TABLES = {"audit_log", "academic_year", "term", "calendar_event", "meeting_session", "meeting_slot", "meeting_booking"}
 
 
 def _table_of(diff) -> str | None:
