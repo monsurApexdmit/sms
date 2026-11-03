@@ -143,6 +143,20 @@ Admins issue transfer, bonafide and character certificates from editable templat
 
 **People → Admissions** (admin; accountants can view). Online applications are off until an admin switches them on there and picks the admission year. While they are on, the public **Admission** page shows an application form (up to 5 documents: PDF, image or Word) next to the printable paper form; it is rate-limited per IP and uses the website's reCAPTCHA when a secret key is set. Applicants get a reference code and can look up the status with it and the phone number they gave (status only, no personal data). Staff review applications, record a decision (accepted/rejected emails the guardian when an email was given) and **enrol** accepted applicants: this creates the student account, links an existing parent with the given email or creates one, and enrols the student in the chosen section with the next free roll number. Paper forms and walk-ins are entered as office applications; enquiries (leads) have follow-up dates and can be turned into applications. The only public endpoints are `GET /api/public/admissions/options`, `POST /api/public/admissions` and `POST /api/public/admissions/status`.
 
+## Analytics
+
+**Analytics** (next to Dashboard) has five tabs for the running year: *At risk*, *Fees*, *Attendance*, *Exams* and *Workload*. Admins see everything; accountants only *Fees*; teachers see the classes they teach and only their own workload. Students and parents have no access. Admins also get two dashboard tiles (students at high risk, fees collected this month). Everything is computed from existing data; there are no analytics tables.
+
+- **At-risk score** (0–100; high at 50+, medium at 25+). The defaults can be changed per request with the query parameters in brackets:
+  - attendance below 75% (`min_attendance`) over the last 30 days (`days`): 30 points, or 40 when 15 or more points below. Only days that were marked count, so a section whose attendance isn't taken is not flagged.
+  - failing subjects (grade point 0) in the latest exam with marks: 20 + 5 per extra subject, at most 30
+  - a fall of 10+ percentage points (`drop`) from the previous exam: 15
+  - any overdue invoice: 10. Fee-plan invoices are due on their instalment's due date; other invoices 30 days (`invoice_due_days`) after they were created
+  - less than 60% (`min_homework`) of homework already due handed in, with at least 3 due: 10
+  - 10 or more days (`max_leave_days`) of approved leave this year: 5
+- **Fees:** billed vs collected for each of the last 12 months, the year's collection rate, outstanding by class, overdue amounts by days late (1–30, 31–60, 61–90, 90+), collection per fee-plan instalment, and a paged list of defaulters.
+- The at-risk and defaulters lists export to Excel.
+
 ## Docker
 
 ```bash

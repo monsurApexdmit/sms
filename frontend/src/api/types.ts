@@ -821,3 +821,112 @@ export interface AttendancePunchInfo {
   result: string;
   device_id: number | null;
 }
+
+export interface RiskStudent {
+  student_id: number;
+  name: string;
+  roll: number | null;
+  class_id: number | null;
+  section_id: number | null;
+  class_name: string;
+  section_name: string;
+  score: number;
+  level: "high" | "medium" | "low";
+  reasons: string[];
+  attendance_pct: number | null;
+  marked_days: number;
+  latest_exam_pct: number | null;
+  previous_exam_pct: number | null;
+  failing_subjects: number;
+  overdue_amount: number;
+  homework_rate: number | null;
+  homework_due: number;
+  leave_days: number;
+}
+
+export interface AtRiskPage extends Page<RiskStudent> {
+  counts: Record<"high" | "medium" | "low", number>;
+}
+
+export interface FeeAnalytics {
+  year: string;
+  billed: number;
+  collected: number;
+  outstanding: number;
+  collection_rate: number | null;
+  overdue: number;
+  monthly: { month: string; billed: number; collected: number }[];
+  by_class: { class_id: number; class_name: string; outstanding: number; students: number }[];
+  ageing: { bucket: string; amount: number; invoices: number }[];
+  instalments: {
+    fee_plan_id: number;
+    plan: string;
+    fee_instalment_id: number;
+    instalment: string;
+    due_date: string;
+    invoices: number;
+    billed: number;
+    collected: number;
+    rate: number | null;
+  }[];
+}
+
+export interface FeeDefaulter {
+  student_id: number;
+  name: string;
+  roll: number | null;
+  class_id: number | null;
+  class_name: string;
+  section_name: string;
+  amount: number;
+  invoices: number;
+  oldest_due: string;
+  days_overdue: number;
+  parent_phone: string | null;
+}
+
+export interface DefaulterPage extends Page<FeeDefaulter> {
+  amount: number;
+}
+
+export interface AttendanceAnalytics {
+  month: string;
+  rate: number | null;
+  threshold: number;
+  sections: { class_id: number; section_id: number; class_name: string; section_name: string; present: number; absent: number; rate: number | null }[];
+  today: { present: number; absent: number; not_marked: number; enrolled: number };
+  trend: { month: string; rate: number | null }[];
+  chronic: { student_id: number; name: string; class_name: string; section_name: string; present: number; absent: number; rate: number }[];
+}
+
+type RankedStudent = { student_id: number; name: string; class_name: string; percentage: number | null; gpa: number | null; result: string };
+
+export interface ExamAnalytics {
+  exams: { exam_id: number; name: string }[];
+  exam_id: number | null;
+  classes: { class_id: number; class_name: string; students: number; complete: number; average: number | null; pass_rate: number | null }[];
+  subjects: { class_id: number; class_name: string; subject_id: number; subject: string; marks: number; average: number; pass_rate: number | null }[];
+  grades: { grade: string; count: number }[];
+  top: RankedStudent[];
+  bottom: RankedStudent[];
+}
+
+export interface TeacherWorkload {
+  teacher_id: number;
+  name: string;
+  periods_per_week: number;
+  subjects: number;
+  classes: number;
+  homework_set: number;
+  ungraded: number;
+  meetings: number;
+  leave_days: number;
+  attendance_rate: number | null;
+}
+
+export interface AnalyticsSummary {
+  at_risk_high: number;
+  at_risk_medium: number;
+  billed_this_month: number;
+  collected_this_month: number;
+}
