@@ -1,6 +1,7 @@
 import {
   AwardIcon,
   BookCheckIcon,
+  BanknoteIcon,
   BookOpenIcon,
   BuildingIcon,
   BusIcon,
@@ -17,6 +18,7 @@ import {
   GlobeIcon,
   GraduationCapIcon,
   HandshakeIcon,
+  HandCoinsIcon,
   HistoryIcon,
   HouseIcon,
   IdCardIcon,
@@ -28,7 +30,9 @@ import {
   NotebookPenIcon,
   PlaneIcon,
   PresentationIcon,
+  ReceiptTextIcon,
   SettingsIcon,
+  UserCheckIcon,
   UserCogIcon,
   UserIcon,
   UsersIcon,
@@ -87,6 +91,11 @@ export const NAV: NavItem[] = [
   { label: "Payments", path: "my-invoices", icon: WalletIcon, roles: ["student", "parent"], group: "Finance" },
   { label: "Income & expenses", path: "accounting", icon: ChartColumnIcon, roles: ["admin", "accountant"], group: "Finance" },
   { label: "Fee setup", path: "fee-setup", icon: FileCogIcon, roles: ["admin", "accountant"], group: "Finance" },
+
+  { label: "Staff attendance", path: "staff-attendance", icon: UserCheckIcon, roles: ["admin"], group: "HR" },
+  { label: "Payroll", path: "payroll", icon: BanknoteIcon, roles: ["admin", "accountant"], group: "HR" },
+  { label: "Salary structures", path: "salary-structures", icon: HandCoinsIcon, roles: ["admin"], group: "HR" },
+  { label: "My payslips", path: "my-payslips", icon: ReceiptTextIcon, roles: ["teacher", "librarian", "accountant"], group: "HR" },
 
   { label: "Library", path: "library", icon: LibraryIcon, roles: ALL, group: "Campus" },
   { label: "Transport & dormitory", path: "facilities", icon: BusIcon, roles: ["admin", "student", "parent", "teacher"], group: "Campus" },

@@ -112,6 +112,12 @@ Students apply for their own leave, parents for their children, and teachers, li
 
 Admins plan a meeting day (**Campus → Parent-teacher meetings**): date, time window, minutes per meeting, an optional class, and the teachers taking part (default: every teacher of the class). Slots are generated per teacher and the day is added to the academic calendar for parents. Parents book one slot per teacher per child, only with teachers of that child's class and at least 2 hours ahead, and can cancel until the meeting starts; parent and teacher get an email for each booking and cancellation. Teachers see their own slots, can block free ones, and record whether the meeting took place with a private note parents never see. The day, times and teachers can change only while nothing is booked. The database enforces one active booking per slot (`meeting_booking.active_slot_id` is unique), so two parents clicking at once cannot both get it.
 
+## Staff HR and payroll
+
+**HR → Staff attendance** (admin) records each teacher, librarian and accountant per day as present, late, half day, absent or on leave. **Salary structures** (admin) hold basic pay, allowances and deductions with an effective date. **Payroll** (admin and accountant) creates a draft run for a month, which can be recalculated until it is finalized. Finalized payslips become visible to staff under **My payslips** and can be printed or saved as PDF.
+
+For each month, payroll uses the latest salary structure in effect. Working days exclude weekly days off and calendar holidays. Working days with no attendance recorded are paid. When **Deduct unpaid absences** is on (setting `payroll_deduct_absence`), pay drops by basic ÷ working days for each absent day, and by half that for a half day. Approved leave is paid. Marking a run as paid records one "Salary" expense per payslip in Income & expenses, and running it again records nothing new. The rules are in `backend/app/services/payroll.py`, together with `record_staff_leave` / `clear_staff_leave`, which mark approved staff leave on the attendance sheet.
+
 ## Docker
 
 ```bash

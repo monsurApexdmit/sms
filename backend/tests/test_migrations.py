@@ -17,6 +17,11 @@ NEW_TABLES |= {"exam_schedule", "exam_weight", "report_remark"}
 NEW_TABLES |= {"meeting_booking", "meeting_session", "meeting_slot"}
 
 
+    "audit_log", "academic_year", "term", "calendar_event",
+    "staff_attendance", "salary_structure", "payroll_run", "payslip",
+}  # fmt: skip
+
+
 def _table_of(diff) -> str | None:
     """Table name a compare_metadata entry is about."""
     if isinstance(diff, list):  # column modifications come grouped

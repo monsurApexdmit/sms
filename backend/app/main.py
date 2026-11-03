@@ -17,6 +17,7 @@ from app.api.routers import (
     finance,
     homework,
     leave,
+    hr,
     library,
     meetings,
     messages,
@@ -58,6 +59,7 @@ app.add_middleware(
 api = APIRouter(prefix="/api")
 for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar, homework, export):
 for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar, meetings):
+for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar, hr):
     api.include_router(module.router)
 api.include_router(leave.router)
 api.include_router(report_cards.router)

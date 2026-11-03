@@ -57,6 +57,11 @@ const ReportCardsPage = page(() => import("./pages/ReportCards"), "ReportCardsPa
 const AuditLogPage = page(() => import("./pages/Settings"), "AuditLogPage");
 const SystemSettingsPage = page(() => import("./pages/Settings"), "SystemSettingsPage");
 const WebsitePage = page(() => import("./pages/Settings"), "WebsitePage");
+const MyPayslipsPage = page(() => import("./pages/Hr"), "MyPayslipsPage");
+const PayrollPage = page(() => import("./pages/Hr"), "PayrollPage");
+const PayslipPage = page(() => import("./pages/Hr"), "PayslipPage");
+const SalaryStructuresPage = page(() => import("./pages/Hr"), "SalaryStructuresPage");
+const StaffAttendancePage = page(() => import("./pages/Hr"), "StaffAttendancePage");
 const IdCardsPage = page(() => import("./pages/Students"), "IdCardsPage");
 const PromotionPage = page(() => import("./pages/Students"), "PromotionPage");
 const StudentsPage = page(() => import("./pages/Students"), "StudentsPage");
@@ -116,6 +121,11 @@ const APP_PAGES: [string, ReactNode][] = [
   ["my-invoices", <MyInvoicesPage />],
   ["accounting", <AccountingPage />],
   ["fee-setup", <FeeSetupPage />],
+
+  ["staff-attendance", <StaffAttendancePage />],
+  ["payroll", <PayrollPage />],
+  ["salary-structures", <SalaryStructuresPage />],
+  ["my-payslips", <MyPayslipsPage />],
   ["library", <LibraryPage />],
   ["facilities", <FacilitiesPage />],
   ["notices", <NoticesPage />],
@@ -182,6 +192,8 @@ export default function App() {
           <Route path="my-online-exams/:id/script" element={<Guard page="my-online-exams"><AnswerScriptPage /></Guard>} />
           {/* staff, students and parents: the API decides which receipts each may see */}
           <Route path="receipts/:paymentId" element={<ReceiptPage />} />
+          {/* admins and accountants reach payslips from Payroll, other staff from My payslips; the page checks the role */}
+          <Route path="payslip/:id" element={<PayslipPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="*" element={<NotFound />} />
