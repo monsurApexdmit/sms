@@ -118,6 +118,10 @@ Admins plan a meeting day (**Campus → Parent-teacher meetings**): date, time w
 
 For each month, payroll uses the latest salary structure in effect. Working days exclude weekly days off and calendar holidays. Working days with no attendance recorded are paid. When **Deduct unpaid absences** is on (setting `payroll_deduct_absence`), pay drops by basic ÷ working days for each absent day, and by half that for a half day. Approved leave is paid. Marking a run as paid records one "Salary" expense per payslip in Income & expenses, and running it again records nothing new. The rules are in `backend/app/services/payroll.py`, together with `record_staff_leave` / `clear_staff_leave`, which mark approved staff leave on the attendance sheet.
 
+## Transport
+
+**Campus → Transport** manages routes, stops, vehicles, drivers and which student rides where. A route is still a row of the legacy `transport` table, and a student's route is still `student.transport_id`, so the old app and the Transport & dormitory screen keep showing it; the new `student_transport` table adds the stop and pick-up/drop-off choice (it is ignored when the route was since changed on the student form). Route capacity is the seats of the route's active vehicles; assigning more students than that is allowed with a warning. Vehicle insurance/fitness and driving licences expiring within 30 days are listed on the admin dashboard (`GET /api/transport/expiring`). Students and parents see their route, stop, times, vehicle and driver phone. Deleting a route on the old screen leaves its stops in `route_stop`; they are not shown anywhere.
+
 ## Docker
 
 ```bash

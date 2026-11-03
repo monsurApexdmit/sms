@@ -20,6 +20,7 @@ NEW_TABLES |= {"meeting_booking", "meeting_session", "meeting_slot"}
     "audit_log", "academic_year", "term", "calendar_event",
     "staff_attendance", "salary_structure", "payroll_run", "payslip",
 }  # fmt: skip
+NEW_TABLES |= {"driver", "route_stop", "student_transport", "vehicle"}
 
 
 def _table_of(diff) -> str | None:

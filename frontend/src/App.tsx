@@ -65,6 +65,7 @@ const StaffAttendancePage = page(() => import("./pages/Hr"), "StaffAttendancePag
 const IdCardsPage = page(() => import("./pages/Students"), "IdCardsPage");
 const PromotionPage = page(() => import("./pages/Students"), "PromotionPage");
 const StudentsPage = page(() => import("./pages/Students"), "StudentsPage");
+const TransportPage = page(() => import("./pages/Transport"), "TransportPage");
 const HomePage = page(() => import("./pages/public/Public"), "HomePage");
 const PublicAdmissionPage = page(() => import("./pages/public/Public"), "PublicAdmissionPage");
 const PublicContactPage = page(() => import("./pages/public/Public"), "PublicContactPage");
@@ -127,6 +128,7 @@ const APP_PAGES: [string, ReactNode][] = [
   ["salary-structures", <SalaryStructuresPage />],
   ["my-payslips", <MyPayslipsPage />],
   ["library", <LibraryPage />],
+  ["transport", <TransportPage />],
   ["facilities", <FacilitiesPage />],
   ["notices", <NoticesPage />],
   ["messages", <MessagesPage />],
