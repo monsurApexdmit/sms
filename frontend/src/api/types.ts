@@ -436,8 +436,9 @@ export interface ReportCard {
   /** GPA, or CGPA on annual cards */
   gpa: number | null;
   result: "Pass" | "Fail" | "Incomplete";
-  position_class: number;
-  position_section: number;
+  /** null on an annual card while an exam is missing or incomplete */
+  position_class: number | null;
+  position_section: number | null;
   class_size: number;
   section_size: number;
   warnings: string[];

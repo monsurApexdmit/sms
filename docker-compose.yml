@@ -22,24 +22,42 @@ x-backend: &backend
     COOKIE_SECURE: ${COOKIE_SECURE:-true}
     STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
     SCHOOL_TIMEZONE: ${SCHOOL_TIMEZONE:-UTC}
+    # Optional error reporting; nothing is sent while SENTRY_DSN is empty.
+    SENTRY_DSN: ${SENTRY_DSN:-}
+    SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0}
+    LOG_FORMAT: ${LOG_FORMAT:-text}
   extra_hosts:
     - "host.docker.internal:host-gateway"
   volumes:
     # Shared with the legacy app so existing photos/documents keep working.
     - ../uploads:/data/uploads
   depends_on:
-    - redis
+    redis:
+      condition: service_healthy
   restart: unless-stopped
 
 services:
   # Runs `alembic upgrade head` before starting (see backend/Dockerfile).
+  # Healthy when /api/health/ready reaches the database and Redis.
   api:
     <<: *backend
+    healthcheck:
+      test: ["CMD", "python", "-m", "scripts.healthcheck", "api"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
 
   # Sends queued emails/SMS and retries failures after 1, 5 and 30 minutes.
   worker:
     <<: *backend
-    command: ["rq", "worker", "--with-scheduler", "--url", "redis://redis:6379/0", "notifications"]
+    command: ["rq", "worker", "--with-scheduler", "-c", "app.rq_settings", "--url", "redis://redis:6379/0", "notifications"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "scripts.healthcheck", "worker"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # Daily fee jobs: late fines, then due reminders (backend/scripts/daily_jobs.py).
   # The first run waits a minute so the api service can apply migrations.
@@ -53,6 +71,37 @@ services:
     volumes:
       - redisdata:/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Database dump (and uploads archive) every BACKUP_INTERVAL_HOURS into BACKUP_DIR,
+  # keeping BACKUP_KEEP_DAILY daily and BACKUP_KEEP_WEEKLY weekly copies. See scripts/backup.sh
+  # and "Backups" in README.md (including how to restore).
+  backup:
+    image: ${BACKUP_IMAGE:-mysql:8.4}
+    entrypoint: ["bash", "/usr/local/bin/backup.sh"]
+    command: ["loop"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://sms:CHANGE_ME@host.docker.internal:3306/sms?charset=utf8mb4}
+      BACKUP_INTERVAL_HOURS: ${BACKUP_INTERVAL_HOURS:-24}
+      BACKUP_KEEP_DAILY: ${BACKUP_KEEP_DAILY:-14}
+      BACKUP_KEEP_WEEKLY: ${BACKUP_KEEP_WEEKLY:-8}
+      BACKUP_UPLOADS: ${BACKUP_UPLOADS:-weekly}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./scripts/backup.sh:/usr/local/bin/backup.sh:ro
+      - ../uploads:/data/uploads:ro
+      - ${BACKUP_DIR:-./backups}:/backups
+    restart: unless-stopped
+    healthcheck:
+      # unhealthy when no backup has succeeded for two intervals
+      test: ["CMD", "bash", "/usr/local/bin/backup.sh", "check"]
+      interval: 1h
+      timeout: 10s
 
   web:
     build: ./frontend

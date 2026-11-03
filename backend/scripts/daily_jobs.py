@@ -12,6 +12,7 @@ import logging
 
 from fastapi import BackgroundTasks
 
+from app.core.monitoring import init_sentry, setup_logging
 from app.db import SessionLocal
 from app.services import audit as audit_trail
 from app.services.fees import run_daily_jobs
@@ -20,7 +21,8 @@ log = logging.getLogger("daily_jobs")
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    setup_logging()
+    init_sentry("scheduler")
     audit_trail.install(SessionLocal)
     tasks = BackgroundTasks()
     with SessionLocal() as db:

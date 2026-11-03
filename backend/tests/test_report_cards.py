@@ -119,6 +119,23 @@ def test_annual_result_is_weighted(client, as_role):
     assert _card(client, admin, 2).json()["gpa"] == 4.0
 
 
+
+def test_incomplete_annual_result_has_no_percentage_or_position(client, as_role):
+    admin = as_role("admin")
+    with SessionLocal() as db:
+        db.add(Exam(name="Final", year=YEAR))
+        db.commit()
+    _marks(1, {1: (90, 85), 2: (60, 60)})
+    _marks(2, {1: (95, 95), 2: (50, None)})  # student 2 has no Physics mark in the final
+    client.put("/api/exam-weights", headers=admin, json={"year": YEAR, "weights": [{"exam_id": 1, "weight": 40}, {"exam_id": 2, "weight": 60}]})
+
+    complete, incomplete = _card(client, admin, 1).json(), _card(client, admin, 2).json()
+    assert complete["percentage"] == 92.0 and complete["position_class"] == 1
+    assert incomplete["result"] == "Incomplete" and incomplete["gpa"] is None
+    # not 0.4 * 60 + 0.6 * 25 with the missing mark counted as 0
+    assert incomplete["percentage"] is None
+    assert incomplete["position_class"] is None and incomplete["position_section"] is None
+
 def test_timetable_clashes_and_access(client, as_role):
     admin = as_role("admin")
     paper = {"exam_id": 1, "class_id": 1, "exam_date": "2026-04-01"}

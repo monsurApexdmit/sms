@@ -45,6 +45,12 @@ class Settings(BaseSettings):
 
     stripe_webhook_secret: str = ""
 
+    # Optional error reporting (https://sentry.io or self-hosted); off when empty.
+    sentry_dsn: str = ""
+    sentry_traces_sample_rate: float = 0.0
+    # "json" writes one JSON object per log line.
+    log_format: Literal["text", "json"] = "text"
+
     @model_validator(mode="after")
     def check_production(self) -> "Settings":
         if self.environment != "production":

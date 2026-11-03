@@ -17,6 +17,7 @@ PUBLIC = {
     ("POST", "/api/auth/mfa/verify"),
     ("GET", "/api/settings/public"),
     ("GET", "/api/health"),
+    ("GET", "/api/health/ready"),
 }
 
 

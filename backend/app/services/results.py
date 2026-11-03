@@ -9,6 +9,9 @@ Rules:
 - Full marks per subject come from `mark.mark_total`, or 100 when it is empty.
 - Positions rank by total (annual: by weighted percentage), highest first; ties share a
   position and the next one is skipped (1, 1, 3).
+- The annual percentage needs every weighted exam complete: with a missing or
+  "Incomplete" exam it is None (missing marks are not counted as 0) and the student gets
+  no annual position.
 """
 
 from collections import defaultdict
@@ -164,8 +167,9 @@ class AnnualResult:
     percentage: float | None
     cgpa: float | None
     result: str
-    position_class: int = 0
-    position_section: int = 0
+    # None while any weighted exam is missing or incomplete (no percentage to rank by)
+    position_class: int | None = None
+    position_section: int | None = None
     weights_total: float = 0
     warnings: list[str] = field(default_factory=list)
 
@@ -244,10 +248,11 @@ def annual_results(db: Session, class_id: int, year: str) -> dict[int, AnnualRes
             result, cgpa = "Pass", round(gp_sum / weight_sum, 2)
         out[sid] = AnnualResult(
             student_id=sid, section_id=section_id, exams=exams, subjects=subject_rows,
-            percentage=round(pct_sum / weight_sum, 2) if used else None, cgpa=cgpa, result=result,
+            # missing marks would count as 0, so an incomplete year has no percentage
+            percentage=round(pct_sum / weight_sum, 2) if used and not incomplete else None, cgpa=cgpa, result=result,
             weights_total=sum(w or 0 for _, w in weighted), warnings=warnings,
         )  # fmt: skip
-    _set_positions(out, {sid: r.percentage or 0 for sid, r in out.items()})
+    _set_positions(out, {sid: r.percentage for sid, r in out.items() if r.percentage is not None})
     return out
 
 
