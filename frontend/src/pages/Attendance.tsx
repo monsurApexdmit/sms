@@ -31,6 +31,8 @@ interface SheetRow {
   name: string;
   roll: number | null;
   status: number | null;
+  /** approved leave covers this day */
+  on_leave: boolean;
 }
 
 // legacy statuses: 0 = not marked, 1 = present, 2 = absent
@@ -139,7 +141,10 @@ export function AttendancePage() {
               {rows.map((r, i) => (
                 <TableRow key={r.attendance_id}>
                   <TableCell className="text-muted-foreground">{r.roll ?? <Dash />}</TableCell>
-                  <TableCell className="font-medium">{r.name}</TableCell>
+                  <TableCell className="font-medium">
+                    {r.name}
+                    {r.on_leave && <Badge className="bg-chart-2/15 text-chart-2 ml-2 border-transparent">On leave</Badge>}
+                  </TableCell>
                   <TableCell>
                     <ToggleGroup
                       type="single"

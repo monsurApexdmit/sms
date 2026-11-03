@@ -22,6 +22,7 @@ import {
   MessageSquareTextIcon,
   MessagesSquareIcon,
   NotebookPenIcon,
+  PlaneIcon,
   PresentationIcon,
   SettingsIcon,
   UserCogIcon,
@@ -74,6 +75,7 @@ export const NAV: NavItem[] = [
 
   { label: "Daily attendance", path: "attendance", icon: ClipboardCheckIcon, roles: ["admin", "teacher"], group: "Attendance" },
   { label: "Attendance report", path: "attendance-report", icon: CalendarDaysIcon, roles: ["admin", "teacher", "student", "parent"], group: "Attendance" },
+  { label: "Leave", path: "leave", icon: PlaneIcon, roles: ALL, group: "Attendance" },
 
   { label: "Invoices", path: "invoices", icon: WalletIcon, roles: ["admin", "accountant"], group: "Finance" },
   { label: "Payments", path: "my-invoices", icon: WalletIcon, roles: ["student", "parent"], group: "Finance" },

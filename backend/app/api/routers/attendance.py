@@ -14,6 +14,7 @@ from app.core.deps import DB, Me, require_roles
 from app.models import Attendance, Enroll, Parent, Student
 from app.services.access import ensure_can_view_student
 from app.services.jobs import enqueue
+from app.services.leave import students_on_leave
 from app.services.notify import send_sms
 from app.services.school_calendar import holidays_between, weekly_off_days, working_days
 from app.services.settings import get_setting, running_year
@@ -54,6 +55,7 @@ class SheetRow(BaseModel):
     name: str | None
     roll: int | None
     status: int | None
+    on_leave: bool = False
 
 
 class SheetItem(BaseModel):
@@ -91,8 +93,12 @@ def _sheet(db: Session, class_id: int, section_id: int, d: date) -> list[SheetRo
             db.add(row)
             rows[sid] = row
     db.commit()
+    on_leave = students_on_leave(db, rows, d)
     return [
-        SheetRow(attendance_id=rows[sid].attendance_id, student_id=sid, name=name, roll=roll, status=rows[sid].status)
+        SheetRow(
+            attendance_id=rows[sid].attendance_id, student_id=sid, name=name, roll=roll, status=rows[sid].status,
+            on_leave=sid in on_leave,
+        )  # fmt: skip
         for sid, roll, name in enrolled
     ]
 
@@ -126,6 +132,8 @@ def save_sheet(body: SheetSave, tasks: BackgroundTasks, db: DB):
         row.status = item.status
     db.commit()
 
+    # parents already know about approved leave
+    newly_absent = [sid for sid in newly_absent if sid not in students_on_leave(db, newly_absent, body.date)]
     if newly_absent and get_setting(db, "active_sms_service", "disabled") not in ("", "disabled"):
         for student, phone in db.execute(
             select(Student, Parent.phone)

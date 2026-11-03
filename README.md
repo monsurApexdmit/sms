@@ -80,6 +80,10 @@ Every insert, update and delete made through this API on marks, attendance, onli
 
 Teachers set homework for a class (or one section) in a subject they teach, with an optional attachment, due date and maximum marks; admins can set it for any subject. Students hand in text and/or one file until the due date (later only when "accept late submissions" is on, and then flagged late), and may replace their answer until it is graded. Teachers see every student the homework was set for, with or without a submission, and grade with marks and feedback; the parent gets an email the first time a submission is graded. Parents see their children's homework and grades. Files go to `uploads/homework/` and `uploads/homework_submission/` and are served through signed links. Tables: `homework`, `homework_submission` (migration `0005`).
 
+## Leave
+
+Students apply for their own leave, parents for their children, and teachers, librarians and accountants for themselves (**Attendance → Leave**). Student leave is decided by an admin or any teacher with a subject in the student's current class; staff leave by an admin. Leave an admin records is approved at once. A request counts school days only (holidays and weekly days off are skipped), may span at most 60 days and may not overlap another pending or approved request for the same person; the applicant can cancel it while it is pending. Approved leave shows as "On leave" on the daily attendance sheet, and no absence SMS is sent for those students. The parent (or the member of staff) is emailed the decision, and texted when SMS is set up.
+
 ## Docker
 
 ```bash
