@@ -15,7 +15,6 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.core.config import base_settings
 from app.core.tenancy import Tenant, current_tenant
 
-
 engine = create_engine(base_settings().database_url, pool_pre_ping=True, pool_recycle=3600)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
