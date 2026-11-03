@@ -13,6 +13,7 @@ from app.core.security import (
     password_fingerprint,
     verify_password,
 )
+from app.services import mfa
 from app.services.accounts import email_taken, find_by_email, get_account
 from app.services.files import save_image, user_image_url
 from app.services.jobs import enqueue
@@ -42,6 +43,15 @@ class TokenOut(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserOut
+
+
+class MfaChallengeOut(BaseModel):
+    """Password accepted, second step needed (see app/api/routers/mfa.py)."""
+
+    # True: send a code to /auth/mfa/verify. False with enroll_required: set up 2FA first.
+    mfa_required: bool
+    enroll_required: bool = False
+    mfa_token: str
 
 
 class ForgotIn(BaseModel):
@@ -100,10 +110,26 @@ def _issue(response: Response, role: str, row) -> TokenOut:
     return TokenOut(access_token=access, user=_user_out(role, row))
 
 
+MFA_TOKEN_MINUTES, ENROLL_TOKEN_MINUTES = 5, 15
+
+
+def _mfa_challenge(db: DB, role: str, row) -> MfaChallengeOut | None:
+    """None when the password alone is enough; otherwise the second step to send the client to."""
+    uid = getattr(row, f"{role}_id")
+    fp = password_fingerprint(row.password)
+    if mfa.is_enabled(db, role, uid):
+        token = create_token(role=role, user_id=uid, fp=fp, kind="mfa", lifetime=timedelta(minutes=MFA_TOKEN_MINUTES))
+        return MfaChallengeOut(mfa_required=True, mfa_token=token)
+    if role in mfa.required_roles(db):
+        token = create_token(role=role, user_id=uid, fp=fp, kind="mfa_enroll", lifetime=timedelta(minutes=ENROLL_TOKEN_MINUTES))
+        return MfaChallengeOut(mfa_required=False, enroll_required=True, mfa_token=token)
+    return None
+
+
 # --- routes -------------------------------------------------------------------
 
 
-@router.post("/login", response_model=TokenOut)
+@router.post("/login", response_model=TokenOut | MfaChallengeOut)
 def login(body: LoginIn, request: Request, response: Response, db: DB):
     _throttle(f"{request.client.host if request.client else '?'}:{body.email.lower()}")
     found = find_by_email(db, body.email)
@@ -113,7 +139,7 @@ def login(body: LoginIn, request: Request, response: Response, db: DB):
     if needs_rehash(row.password):
         row.password = hash_password(body.password)
         db.commit()
-    return _issue(response, role, row)
+    return _mfa_challenge(db, role, row) or _issue(response, role, row)
 
 
 @router.post("/refresh", response_model=TokenOut)

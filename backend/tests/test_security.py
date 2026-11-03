@@ -13,6 +13,8 @@ PUBLIC = {
     ("POST", "/api/auth/logout"),
     ("POST", "/api/auth/forgot-password"),
     ("POST", "/api/auth/reset-password"),
+    # second sign-in step: authorised by the short-lived mfa_token in the body
+    ("POST", "/api/auth/mfa/verify"),
     ("GET", "/api/settings/public"),
     ("GET", "/api/health"),
 }

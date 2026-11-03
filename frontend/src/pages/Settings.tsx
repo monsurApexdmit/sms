@@ -15,6 +15,7 @@ import { Field } from "../components/field";
 import { FileButton } from "../components/file-button";
 import { PageHeader } from "../components/PageHeader";
 import { Pager } from "../components/Pager";
+import { TwoFactorUsers } from "../components/TwoFactor";
 import { Dash, TableState } from "../components/states";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
@@ -101,6 +102,7 @@ function SecretInput({ id, value, onChange }: { id: string; value: string | null
 
 // API weekday numbers: Monday = 0
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((label, i) => ({ value: String(i), label }));
+const MFA_ROLES = ["admin", "accountant", "librarian", "teacher", "parent", "student"].map((r) => ({ value: r, label: r[0].toUpperCase() + r.slice(1) }));
 
 const secretHint = (value: string | null | undefined) => (value === MASK ? "Saved; type to replace" : undefined);
 
@@ -175,11 +177,32 @@ export function SystemSettingsPage() {
             <TabsTrigger value="payments">Payments</TabsTrigger>
             <TabsTrigger value="logo">Logo</TabsTrigger>
             <TabsTrigger value="ai">AI assistant</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="ai">
           <AiSettingsCard />
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-4">
+          <SettingsCard
+            title="Two-factor authentication"
+            description="Roles that must use an authenticator app at sign-in. Their users set it up the next time they sign in."
+            footer={saveBtn(["mfa_required_roles"])}
+          >
+            <Field label="Required for" className="max-w-md">
+              <MultiCombobox
+                data={MFA_ROLES}
+                value={(values.mfa_required_roles ?? "").split(",").filter(Boolean)}
+                onChange={(v) => set("mfa_required_roles", [...v].sort().join(","))}
+                placeholder="Nobody (optional for everyone)"
+              />
+            </Field>
+          </SettingsCard>
+          <SettingsCard title="Accounts using two-factor authentication" description="Reset someone who lost their phone so they can sign in again.">
+            <TwoFactorUsers />
+          </SettingsCard>
         </TabsContent>
 
         <TabsContent value="general">
