@@ -945,3 +945,41 @@ export interface NotificationPreferences {
   items: { category: string; label: string; in_app: boolean; email: boolean; sms: boolean; push: boolean; whatsapp: boolean }[];
   available: Record<"in_app" | "email" | "sms" | "push" | "whatsapp", boolean>;
 }
+
+/** /auth/login when a second step is needed: a code (mfa_required) or setting up 2FA first (enroll_required). */
+export interface MfaChallenge {
+  mfa_required: boolean;
+  enroll_required: boolean;
+  mfa_token: string;
+}
+
+export type LoginResponse = TokenResponse | MfaChallenge;
+
+export interface MfaStatus {
+  enabled: boolean;
+  pending: boolean;
+  confirmed_at: string | null;
+  recovery_codes_left: number;
+  required: boolean;
+}
+
+export interface MfaSetup {
+  secret: string;
+  otpauth_uri: string;
+  /** QR code as an SVG data URI */
+  qr: string;
+}
+
+export interface MfaConfirm {
+  recovery_codes: string[];
+  /** set when setup was forced at sign-in */
+  session: TokenResponse | null;
+}
+
+export interface MfaEnrolledUser {
+  role: Role;
+  user_id: number;
+  name: string | null;
+  email: string | null;
+  confirmed_at: string | null;
+}

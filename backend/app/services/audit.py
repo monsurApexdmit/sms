@@ -33,8 +33,9 @@ AUDITED += (models.Vehicle, models.Driver, models.RouteStop, models.StudentTrans
 AUDITED += (models.PeriodAttendance, models.IdCard, models.AttendanceDevice)  # not attendance_punch: it is itself a log
 # push_subscription is left out: its keys are secrets and it changes on every browser sign-up
 AUDITED += (models.NotificationPreference,)
+AUDITED += (models.UserTotp,)  # the secret and recovery codes are hidden (SENSITIVE_COLUMNS)
 
-SENSITIVE_COLUMNS = {"password", "authentication_key", "api_key_hash"}
+SENSITIVE_COLUMNS = {"password", "authentication_key", "api_key_hash", "secret_encrypted", "recovery_codes"}
 # Settings rows whose value is a credential (or a JSON blob holding one).
 SECRET_SETTINGS = settings_service.SECRET_KEYS | {"paypal", "stripe_keys", "payumoney_merchant_key", "recaptcha_secret_key"}
 HIDDEN = "[hidden]"

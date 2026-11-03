@@ -165,6 +165,15 @@ Absence alerts, leave decisions, graded homework, fee reminders, meeting booking
 - **WhatsApp**: Meta WhatsApp Cloud API. In Meta's WhatsApp Manager create a phone number and a permanent system-user token, then enter the phone number ID and token under **Delivery channels**. Meta only allows free-form text to people who messaged the school in the last 24 hours, so for alerts create and get approved a *Utility* template whose body has one variable (`{{1}}`) and enter its name (and language, default `en`); the notification text fills the variable. Numbers are taken from each account's phone field and must include the country code.
 - **Installable app (PWA)**: `frontend/public/manifest.webmanifest`, icons in `frontend/public/icons`, service worker `frontend/public/sw.js`. The worker caches only the app shell and the hashed `/assets/` files; `/api/` responses are never cached. Bump `VERSION` in `sw.js` to drop old caches. nginx serves `sw.js` and the manifest uncached.
 
+## Two-factor authentication
+
+Anyone can turn on a second sign-in step with an authenticator app (Google Authenticator, Microsoft Authenticator, Authy…) under **My profile → Two-factor authentication**, and gets 10 single-use recovery codes. After the password, sign-in then asks for the 6-digit code (or a recovery code). Admins choose roles that must use it under **System settings → Security** (`mfa_required_roles`); users in those roles set it up at their next sign-in before they can do anything else, and cannot turn it off. The same tab lists who has it and resets it for someone who lost their phone (recorded in the audit log).
+
+- Secrets are encrypted at rest with a key derived from `SECRET_KEY`. **Changing `SECRET_KEY` breaks everyone's 2FA**; an admin must reset them.
+- Codes are accepted for the current 30-second step and one either side; a code that was used once is refused. Five wrong codes per account per 5 minutes, then 429.
+- Recovery codes are stored as salted hashes and removed when used.
+- Sessions that were already signed in when 2FA was turned on stay signed in until they expire.
+
 ## Docker
 
 ```bash

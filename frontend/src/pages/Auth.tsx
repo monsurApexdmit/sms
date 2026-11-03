@@ -5,8 +5,10 @@ import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react
 
 import { api, errorMessage } from "../api/client";
 import { usePublicSettings } from "../api/hooks";
+import type { MfaChallenge, MfaConfirm, TokenResponse } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { Field } from "../components/field";
+import { CodeInput, RecoveryCodes, TotpSetup } from "../components/TwoFactor";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -99,30 +101,127 @@ function ErrorAlert({ message }: { message: string | null }) {
   );
 }
 
+/** Second sign-in step: a code from the authenticator app, or a recovery code. */
+function MfaStep({ token, onDone, onCancel }: { token: string; onDone: (data: TokenResponse) => void; onCancel: () => void }) {
+  const [recovery, setRecovery] = useState(false);
+  const [value, setValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const body = recovery ? { mfa_token: token, recovery_code: value } : { mfa_token: token, code: value };
+      onDone((await api.post<TokenResponse>("/auth/mfa/verify", body)).data);
+    } catch (err) {
+      setError(errorMessage(err));
+      setValue("");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <AuthShell
+      title="Two-factor authentication"
+      description={recovery ? "Enter one of your recovery codes." : "Enter the 6-digit code from your authenticator app."}
+    >
+      <form onSubmit={submit} className="grid gap-4" noValidate>
+        <ErrorAlert message={error} />
+        {recovery ? (
+          <Field label="Recovery code" htmlFor="mfa-recovery">
+            <Input id="mfa-recovery" autoFocus autoComplete="off" placeholder="abcd-efgh" className="font-mono" value={value} onChange={(e) => setValue(e.target.value)} />
+          </Field>
+        ) : (
+          <Field label="Code" htmlFor="mfa-code">
+            <CodeInput id="mfa-code" value={value} onChange={setValue} autoFocus />
+          </Field>
+        )}
+        <Button type="submit" loading={busy} className="w-full" disabled={recovery ? value.trim().length < 8 : value.length !== 6}>
+          Verify
+        </Button>
+        <div className="flex justify-between text-sm">
+          <button type="button" className="text-primary hover:underline" onClick={() => { setRecovery(!recovery); setValue(""); setError(null); }}>
+            {recovery ? "Use the authenticator app" : "Use a recovery code"}
+          </button>
+          <button type="button" className="text-muted-foreground hover:underline" onClick={onCancel}>
+            Start over
+          </button>
+        </div>
+      </form>
+    </AuthShell>
+  );  // prettier-ignore
+}
+
+/** Forced setup at sign-in, for roles the school requires two-factor authentication for. */
+function EnrollStep({ token, onDone, onCancel }: { token: string; onDone: (data: TokenResponse) => void; onCancel: () => void }) {
+  const [confirmed, setConfirmed] = useState<MfaConfirm | null>(null);
+  if (confirmed?.session) {
+    const session = confirmed.session;
+    return (
+      <AuthShell title="Save your recovery codes">
+        <div className="grid gap-4">
+          <RecoveryCodes codes={confirmed.recovery_codes} />
+          <Button className="w-full" onClick={() => onDone(session)}>
+            Continue
+          </Button>
+        </div>
+      </AuthShell>
+    );
+  }
+  return (
+    <AuthShell title="Set up two-factor authentication" description="Your school requires a second step at sign-in for your account.">
+      <div className="grid gap-4">
+        <TotpSetup token={token} onConfirmed={setConfirmed} />
+        <button type="button" className="text-muted-foreground text-sm hover:underline" onClick={onCancel}>
+          Start over
+        </button>
+      </div>
+    </AuthShell>
+  );
+}
+
 export function LoginPage() {
-  const { user, login } = useAuth();
+  const { user, login, finishLogin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [challenge, setChallenge] = useState<MfaChallenge | null>(null);
   const form = useForm({ defaultValues: { email: "", password: "" } });
   const errors = form.formState.errors;
 
   if (user) return <Navigate to="/app/dashboard" replace />;
 
+  const goIn = () => {
+    const from = (location.state as { from?: string } | null)?.from;
+    navigate(from && from.startsWith("/app") ? from : "/app/dashboard", { replace: true });
+  };
+  const finish = (data: TokenResponse) => {
+    finishLogin(data);
+    goIn();
+  };
+  const startOver = () => {
+    setChallenge(null);
+    form.setValue("password", "");
+  };
+
   const submit = form.handleSubmit(async (values) => {
     setBusy(true);
     setError(null);
     try {
-      await login(values.email.trim(), values.password);
-      const from = (location.state as { from?: string } | null)?.from;
-      navigate(from && from.startsWith("/app") ? from : "/app/dashboard", { replace: true });
+      const result = await login(values.email.trim(), values.password);
+      if (result.challenge) setChallenge(result.challenge);
+      else goIn();
     } catch (e) {
       setError(errorMessage(e));
     } finally {
       setBusy(false);
     }
   });
+
+  if (challenge?.mfa_required) return <MfaStep token={challenge.mfa_token} onDone={finish} onCancel={startOver} />;
+  if (challenge?.enroll_required) return <EnrollStep token={challenge.mfa_token} onDone={finish} onCancel={startOver} />;
 
   return (
     <AuthShell title="Sign in" description="Use the email and password your school gave you.">

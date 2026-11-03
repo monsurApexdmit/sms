@@ -30,6 +30,7 @@ from app.models import (
     Teacher,
 )
 from app.services.access import children_ids, current_enroll
+from app.services.accounts import ROLES
 from app.services.files import media_url, safe_path, save_site_image
 from app.services.settings import (
     MASK,
@@ -56,7 +57,7 @@ EDITABLE = {
     "twilio_account_sid", "twilio_auth_token", "twilio_sender_phone_number",
     "msg91_authentication_key", "msg91_sender_ID", "msg91_route", "msg91_country_code",
     "payumoney_merchant_key", "payumoney_salt_id", "paypal", "stripe_keys",
-    "protocol", "smtp_host", "smtp_port", "smtp_user", "smtp_pass", "weekly_off_days",
+    "protocol", "smtp_host", "smtp_port", "smtp_user", "smtp_pass", "weekly_off_days", "mfa_required_roles",
 }  # fmt: skip
 SMS_SERVICES = {"", "disabled", "clickatell", "twilio", "msg91"}
 
@@ -100,6 +101,11 @@ def update_settings(body: dict[str, Any], db: DB):
             continue
         if key == "weekly_off_days" and value and not re.fullmatch(r"[0-6](,[0-6])*", value.replace(" ", "")):
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "weekly_off_days must be weekday numbers 0-6 (Monday = 0)")
+        if key == "mfa_required_roles" and value:
+            roles = [r.strip() for r in value.split(",") if r.strip()]
+            if not set(roles) <= set(ROLES):
+                raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"mfa_required_roles may only list: {', '.join(ROLES)}")
+            value = ",".join(sorted(set(roles)))
         set_setting(db, key, value)
     db.commit()
     return all_settings(db)

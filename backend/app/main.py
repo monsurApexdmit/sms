@@ -24,6 +24,7 @@ from app.api.routers import (
     library,
     meetings,
     messages,
+    mfa,
     notifications,
     notices,
     online_exams,
@@ -66,6 +67,7 @@ api = APIRouter(prefix="/api")
 # One module per line: each feature adds its own line here.
 ROUTERS = (
     auth.router,
+    mfa.router,
     students.router,
     academic.router,
     exams.router,

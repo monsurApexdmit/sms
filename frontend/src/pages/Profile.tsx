@@ -8,6 +8,7 @@ import { useAuth, useUser } from "../auth/AuthContext";
 import { Field } from "../components/field";
 import { FileButton } from "../components/file-button";
 import { PageHeader } from "../components/PageHeader";
+import { TwoFactorCard } from "../components/TwoFactor";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -158,6 +159,7 @@ export function ProfilePage() {
             </CardFooter>
           </form>
         </Card>
+        <TwoFactorCard />
         <div className="lg:col-span-2">
           <NotificationSettingsCard />
         </div>
