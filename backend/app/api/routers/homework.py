@@ -13,11 +13,10 @@ from sqlalchemy.orm import Session
 from app.api.crud import Page, get_or_404
 from app.core.config import get_settings
 from app.core.deps import DB, CurrentUser, Me, forbid, require_roles
-from app.models import Enroll, Homework, HomeworkSubmission, Parent, SchoolClass, Section, Student, Subject, Teacher
+from app.models import Enroll, Homework, HomeworkSubmission, SchoolClass, Section, Student, Subject, Teacher
 from app.services.access import children_ids, current_enroll, ensure_teaches_subject
 from app.services.files import delete_file, media_url, save_document
-from app.services.jobs import enqueue
-from app.services.notify import send_email
+from app.services.notifications import notify, user as account
 from app.services.settings import running_year
 
 router = APIRouter(prefix="/homework", tags=["homework"])
@@ -389,15 +388,15 @@ def grade(submission_id: int, body: GradeIn, tasks: BackgroundTasks, db: DB, use
     row.graded_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.commit()
 
-    if first_grade:
-        found = db.execute(
-            select(Student.name, Parent.email).join(Parent, Parent.parent_id == Student.parent_id).where(Student.student_id == row.student_id)
-        ).first()
-        if found and found[1]:
-            score = f"{row.marks:g}" + (f" / {hw.max_marks:g}" if hw.max_marks else "") if row.marks is not None else "no marks"
-            enqueue(
-                tasks, send_email, found[1], f"Homework graded: {hw.title}",
-                f"{found[0]}'s homework \"{hw.title}\" has been graded: {score}."
-                + (f"\n\nFeedback:\n{row.feedback}" if row.feedback else ""),
-            )  # fmt: skip
+    student = db.get(Student, row.student_id) if first_grade else None
+    if student is not None:
+        score = f"{row.marks:g}" + (f" / {hw.max_marks:g}" if hw.max_marks else "") if row.marks is not None else "no marks"
+        text = f"{student.name}'s homework \"{hw.title}\" has been graded: {score}." + (
+            f"\n\nFeedback:\n{row.feedback}" if row.feedback else ""
+        )
+        title = f"Homework graded: {hw.title}"
+        if student.parent_id:
+            notify(db, tasks, [account("parent", student.parent_id)], "homework", title, text, "/app/homework")
+        # the student sees it in the app (and by push); emails went to parents only
+        notify(db, tasks, [account("student", student.student_id)], "homework", title, text, "/app/homework", defaults={"push"})
     return _submission_out(row)

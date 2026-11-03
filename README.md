@@ -157,6 +157,14 @@ Admins issue transfer, bonafide and character certificates from editable templat
 - **Fees:** billed vs collected for each of the last 12 months, the year's collection rate, outstanding by class, overdue amounts by days late (1–30, 31–60, 61–90, 90+), collection per fee-plan instalment, and a paged list of defaulters.
 - The at-risk and defaulters lists export to Excel.
 
+## Notifications and the installable app
+
+Absence alerts, leave decisions, graded homework, fee reminders, meeting bookings, admission decisions and notices sent with "send SMS" all go through `app/services/notifications.py`. Each one appears in the app (bell in the header, **Settings → Notifications**) and is also sent on the channels the person chose for that category under **My profile → Notifications**: email, SMS, web push, WhatsApp. Until someone changes them, the defaults match what was sent before (absence alerts and notices by SMS, homework grades and meeting bookings by email, leave and fee reminders by both). Each address or phone number gets one message per event, so a parent and child sharing a phone get one SMS.
+
+- **Web push**: an admin creates the VAPID keys under **Notifications → Delivery channels → Create keys** (stored in the `settings` table; replacing them signs every device out of push). To make a pair by hand: `.venv/bin/python -c "from app.services.notifications import generate_vapid_keys as g; print(*g(), sep='\n')"` and store them as the `vapid_public_key` / `vapid_private_key` settings. Users then press **Enable push on this device** on My profile. Push needs HTTPS and the production build (the service worker isn't registered by `npm run dev`); on iPhone it works only after **Add to Home Screen** (iOS 16.4+).
+- **WhatsApp**: Meta WhatsApp Cloud API. In Meta's WhatsApp Manager create a phone number and a permanent system-user token, then enter the phone number ID and token under **Delivery channels**. Meta only allows free-form text to people who messaged the school in the last 24 hours, so for alerts create and get approved a *Utility* template whose body has one variable (`{{1}}`) and enter its name (and language, default `en`); the notification text fills the variable. Numbers are taken from each account's phone field and must include the country code.
+- **Installable app (PWA)**: `frontend/public/manifest.webmanifest`, icons in `frontend/public/icons`, service worker `frontend/public/sw.js`. The worker caches only the app shell and the hashed `/assets/` files; `/api/` responses are never cached. Bump `VERSION` in `sw.js` to drop old caches. nginx serves `sw.js` and the manifest uncached.
+
 ## Docker
 
 ```bash

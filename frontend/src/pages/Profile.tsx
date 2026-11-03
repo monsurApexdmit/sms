@@ -16,6 +16,7 @@ import { Input } from "../components/ui/input";
 import { Separator } from "../components/ui/separator";
 import { initials, titleCase } from "../utils";
 import { bind, PasswordInput } from "./Auth";
+import { NotificationSettingsCard } from "./Notifications";
 
 export function ProfilePage() {
   const user = useUser();
@@ -46,7 +47,7 @@ export function ProfilePage() {
 
   return (
     <>
-      <PageHeader title="My profile" subtitle="Your account details and password" />
+      <PageHeader title="My profile" subtitle="Your account details, password and notifications" />
       <div className="grid items-start gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
@@ -157,6 +158,9 @@ export function ProfilePage() {
             </CardFooter>
           </form>
         </Card>
+        <div className="lg:col-span-2">
+          <NotificationSettingsCard />
+        </div>
       </div>
     </>
   );

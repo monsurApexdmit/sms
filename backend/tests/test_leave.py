@@ -1,10 +1,10 @@
 import pytest
 from sqlalchemy import select
 
-from app.api.routers import attendance
 from app.core.security import hash_password
 from app.db import SessionLocal
 from app.models import Librarian, Parent, SchoolClass, Section, StaffAttendance, Student, Subject, Teacher
+from app.services import notify
 from tests.conftest import PASSWORD, YEAR, login
 
 WEEK = {"from_date": "2026-03-02", "to_date": "2026-03-06"}  # Monday to Friday
@@ -118,7 +118,7 @@ def test_attendance_sheet_marks_leave_and_skips_absence_sms(client, as_role, mon
     assert {r["student_id"]: r["on_leave"] for r in rows} == {1: True, 2: False}
 
     sent = []
-    monkeypatch.setattr(attendance, "send_sms", lambda phone, text: sent.append((phone, text)))
+    monkeypatch.setattr(notify, "send_sms", lambda phone, text: sent.append((phone, text)))
     items = [{"attendance_id": r["attendance_id"], "status": 2} for r in rows]
     r = client.put("/api/attendance/sheet", headers=admin, json={"class_id": 1, "section_id": 1, "date": "2026-03-03", "items": items})
     assert r.status_code == 200

@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from app.api.routers import meetings
 from app.db import SessionLocal
 from app.models import CalendarEvent, MeetingBooking, MeetingSlot, Teacher
+from app.services import notifications
 
 NOW = datetime(2030, 1, 10, 8, 0)
 DAY = "2030-01-10"
@@ -20,7 +21,7 @@ def fixed_clock(monkeypatch):
 @pytest.fixture
 def emails(monkeypatch):
     sent = []
-    monkeypatch.setattr(meetings, "enqueue", lambda tasks, fn, *args: sent.append((fn.__name__, args[0], args[1])))
+    monkeypatch.setattr(notifications, "enqueue", lambda tasks, fn, *args: sent.append((fn.__name__, args[0], args[1])))
     return sent
 
 

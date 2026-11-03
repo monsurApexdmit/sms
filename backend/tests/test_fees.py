@@ -173,7 +173,6 @@ def test_due_reminders_once_per_day(client, as_role):
 def test_daily_jobs_endpoint(client, as_role, monkeypatch):
     sent = []
     monkeypatch.setattr(notify, "send_email", lambda *a: sent.append(a))
-    monkeypatch.setattr(fees, "send_email", lambda *a: sent.append(a))
     monkeypatch.setattr(fees, "school_today", lambda: date(2026, 1, 9))
     _billed_plan(client, as_role)
     assert client.post("/api/fees/daily-jobs", headers=as_role("teacher")).status_code == 403

@@ -31,6 +31,8 @@ AUDITED: tuple[type, ...] = (
 AUDITED += (models.ExamSchedule, models.ExamWeight, models.ReportRemark)  # report cards
 AUDITED += (models.Vehicle, models.Driver, models.RouteStop, models.StudentTransport)
 AUDITED += (models.PeriodAttendance, models.IdCard, models.AttendanceDevice)  # not attendance_punch: it is itself a log
+# push_subscription is left out: its keys are secrets and it changes on every browser sign-up
+AUDITED += (models.NotificationPreference,)
 
 SENSITIVE_COLUMNS = {"password", "authentication_key", "api_key_hash"}
 # Settings rows whose value is a credential (or a JSON blob holding one).

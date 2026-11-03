@@ -24,7 +24,9 @@ FORM = {
 @pytest.fixture
 def outbox(monkeypatch):
     mails: list[tuple[str, str, str]] = []
-    monkeypatch.setattr("app.api.routers.admissions.send_email", lambda to, subject, body: mails.append((to, subject, body)))
+    fake = lambda to, subject, body: mails.append((to, subject, body))  # noqa: E731
+    monkeypatch.setattr("app.api.routers.admissions.send_email", fake)
+    monkeypatch.setattr("app.services.notify.send_email", fake)  # status emails go through notifications
     return mails
 
 

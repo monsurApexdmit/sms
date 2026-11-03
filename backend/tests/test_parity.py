@@ -130,7 +130,7 @@ def test_exam_marks_sms(client, as_role, monkeypatch):
 
 def test_notice_send_sms(client, as_role, monkeypatch):
     sent: list[tuple[str, str]] = []
-    monkeypatch.setattr("app.api.routers.notices.deliver_sms", lambda phone, text: sent.append((phone, text)))
+    monkeypatch.setattr("app.services.notify.send_sms", lambda phone, text: sent.append((phone, text)))
     _phones()
     _set(active_sms_service="msg91")
     admin = as_role("admin")

@@ -11,13 +11,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.deps import DB, Me, require_roles
-from app.models import Attendance, Enroll, Parent, Student
+from app.models import Attendance, Enroll, Student
 from app.services.access import ensure_can_view_student
-from app.services.jobs import enqueue
 from app.services.leave import students_on_leave
-from app.services.notify import send_sms
+from app.services.notifications import notify, user
 from app.services.school_calendar import holidays_between, weekly_off_days, working_days
-from app.services.settings import get_setting, running_year
+from app.services.settings import running_year
 
 router = APIRouter(prefix="/attendance", tags=["attendance"])
 staff = [Depends(require_roles("admin", "teacher"))]
@@ -134,14 +133,14 @@ def save_sheet(body: SheetSave, tasks: BackgroundTasks, db: DB):
 
     # parents already know about approved leave
     newly_absent = [sid for sid in newly_absent if sid not in students_on_leave(db, newly_absent, body.date)]
-    if newly_absent and get_setting(db, "active_sms_service", "disabled") not in ("", "disabled"):
-        for student, phone in db.execute(
-            select(Student, Parent.phone)
-            .join(Parent, Parent.parent_id == Student.parent_id)
-            .where(Student.student_id.in_(newly_absent))
-        ):
-            if phone:
-                enqueue(tasks, send_sms, phone, f"Your child {student.name} is absent today ({body.date.isoformat()}).")
+    if newly_absent:
+        for student in db.scalars(select(Student).where(Student.student_id.in_(newly_absent), Student.parent_id.is_not(None))):
+            text = f"Your child {student.name} is absent today ({body.date.isoformat()})."
+            notify(
+                db, tasks, [user("parent", student.parent_id)], "attendance", f"{student.name} is absent", text,
+                "/app/attendance-report", sms_text=text, commit=False,
+            )  # fmt: skip
+        db.commit()
     return _sheet(db, body.class_id, body.section_id, body.date)
 
 

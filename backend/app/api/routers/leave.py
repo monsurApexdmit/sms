@@ -13,11 +13,10 @@ from sqlalchemy.orm import Session
 
 from app.api.crud import Page, get_or_404
 from app.core.deps import DB, CurrentUser, Me, forbid, require_roles
-from app.models import Enroll, LeaveRequest, Parent, SchoolClass, Section, Student, Subject
+from app.models import Enroll, LeaveRequest, SchoolClass, Section, Student, Subject
 from app.services.access import children_ids, current_enroll
 from app.services.accounts import get_account, ref_name
-from app.services.jobs import enqueue
-from app.services.notify import send_email, send_sms, sms_enabled
+from app.services.notifications import notify, parent_or_student, user
 from app.services.payroll import record_staff_leave
 from app.services.school_calendar import working_days
 from app.services.settings import running_year
@@ -183,22 +182,18 @@ def _page(db: Session, user: CurrentUser, stmt, order, limit: int, offset: int) 
 def _notify_decision(db: Session, tasks: BackgroundTasks, row: LeaveRequest) -> None:
     span = row.from_date.isoformat() if row.from_date == row.to_date else f"{row.from_date.isoformat()} to {row.to_date.isoformat()}"
     note = f" Note: {row.decision_note}" if row.decision_note else ""
-    email = phone = None
     if row.student_id is not None:
         student = db.get(Student, row.student_id)
         name = student.name if student else "your child"
-        parent = db.get(Parent, student.parent_id) if student and student.parent_id else None
-        email = (parent.email if parent else student.email if student else None) or None
-        phone = (parent.phone or "").strip() if parent else None
+        recipient = parent_or_student(db, row.student_id)
+        # a student without a linked parent was only ever emailed
+        defaults = None if student and student.parent_id else {"email", "push"}
     else:
-        account = get_account(db, row.staff_role or "", row.staff_id or 0)
         name = "you"
-        email = account.email if account is not None else None
+        recipient = user(row.staff_role or "", row.staff_id or 0)
+        defaults = {"email", "push"}  # staff decisions were emailed, not texted
     text = f"Leave for {name} ({span}) was {row.status}.{note}"
-    if email:
-        enqueue(tasks, send_email, email, f"Leave request {row.status}", text)
-    if phone and sms_enabled(db):
-        enqueue(tasks, send_sms, phone, text)
+    notify(db, tasks, [recipient], "leave", f"Leave request {row.status}", text, "/app/leave", defaults=defaults)
 
 
 # --- routes -------------------------------------------------------------------------
