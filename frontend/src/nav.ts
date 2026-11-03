@@ -11,6 +11,7 @@ import {
   CalendarDaysIcon,
   CalendarRangeIcon,
   ChartColumnIcon,
+  ChartLineIcon,
   ClipboardCheckIcon,
   ClipboardListIcon,
   FileBadgeIcon,
@@ -58,6 +59,7 @@ const ALL: Role[] = ["admin", "teacher", "student", "parent", "librarian", "acco
 
 export const NAV: NavItem[] = [
   { label: "Dashboard", path: "dashboard", icon: LayoutDashboardIcon, roles: ALL },
+  { label: "Analytics", path: "analytics", icon: ChartLineIcon, roles: ["admin", "teacher", "accountant"] },
 
   { label: "Students", path: "students", icon: GraduationCapIcon, roles: ["admin", "teacher"], group: "People" },
   { label: "Teachers", path: "teachers", icon: PresentationIcon, roles: ["admin", "student", "parent", "teacher"], group: "People" },

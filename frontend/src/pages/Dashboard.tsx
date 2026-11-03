@@ -21,6 +21,7 @@ import {
 
 import { useGet } from "../api/hooks";
 import { useUser } from "../auth/AuthContext";
+import { AnalyticsTiles } from "../components/AnalyticsTiles";
 import { PageHeader } from "../components/PageHeader";
 import { EmptyState } from "../components/states";
 import { TransportExpiryAlert } from "../components/TransportExpiryAlert";
@@ -171,6 +172,7 @@ export function DashboardPage() {
       <div className="space-y-6">
         {isLoading && <StatSkeletons />}
         {user.role === "admin" && <TransportExpiryAlert />}
+        {user.role === "admin" && <AnalyticsTiles />}
         {data?.counts && (
           <div className={cn("grid gap-4 sm:grid-cols-2", GRID_COLS[Math.min(countKeys.length, 5)])}>
             {Object.entries(data.counts).map(([k, v]) => {

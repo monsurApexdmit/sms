@@ -28,6 +28,7 @@ const FacilitiesPage = page(() => import("./pages/Campus"), "FacilitiesPage");
 const HomeworkPage = page(() => import("./pages/Homework"), "HomeworkPage");
 const LibraryPage = page(() => import("./pages/Campus"), "LibraryPage");
 const NoticesPage = page(() => import("./pages/Campus"), "NoticesPage");
+const AnalyticsPage = page(() => import("./pages/Analytics"), "AnalyticsPage");
 const DashboardPage = page(() => import("./pages/Dashboard"), "DashboardPage");
 const ExamSmsPage = page(() => import("./pages/Exams"), "ExamSmsPage");
 const ExamsPage = page(() => import("./pages/Exams"), "ExamsPage");
@@ -95,6 +96,7 @@ function Guard({ page, children }: { page: string; children: ReactNode }) {
 
 const APP_PAGES: [string, ReactNode][] = [
   ["dashboard", <DashboardPage />],
+  ["analytics", <AnalyticsPage />],
   ["students", <StudentsPage />],
   ["teachers", <TeachersPage />],
   ["parents", <ParentsPage />],
