@@ -1,7 +1,7 @@
 """In-app notifications, notification preferences, web push subscriptions, and the admin
 settings for the push and WhatsApp channels."""
 
-from datetime import datetime, timezone
+from datetime import timezone
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, status
 from sqlalchemy import case, delete, func, select, update
@@ -12,6 +12,7 @@ from app.schemas.common import Page
 from app.schemas.notifications import ChannelSettingsIn, NotificationOut, PreferencesIn, SubscribeIn, UnsubscribeIn
 from app.services.notifications import CATEGORIES, available_channels, channels_for, generate_vapid_keys, notify, user, vapid_keys
 from app.services.settings import MASK, SECRET_KEYS, get_setting, set_setting
+from app.utils.dates import utc_now as _now
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 admin_only = [Depends(require_roles("admin"))]
@@ -25,10 +26,6 @@ CHANNEL_SETTINGS = (
     "whatsapp_token", "whatsapp_phone_number_id", "whatsapp_template", "whatsapp_template_language",
     "vapid_public_key", "vapid_private_key", "vapid_subject",
 )  # fmt: skip
-
-
-def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _out(row: Notification) -> NotificationOut:

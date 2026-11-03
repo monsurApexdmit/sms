@@ -56,8 +56,8 @@ from app.models import (
     Teacher,
 )
 from app.services.fees import school_today
-from app.services.invoices import num
 from app.services.results import exam_results, grade_point
+from app.utils.money import num
 
 DAY = 86400
 AGEING = (("1-30", 1, 30), ("31-60", 31, 60), ("61-90", 61, 90), ("90+", 91, None))

@@ -24,8 +24,8 @@ from app.models import (
 from app.schemas.fees import DiscountIn, DiscountOut, FeeHeadIn, GenerateIn, InstalmentOut, PlanIn, PlanOut
 from app.services.access import children_ids, current_enroll
 from app.services.fees import generate_invoices, instalment_amount, plan_total, run_daily_jobs
-from app.services.invoices import num
 from app.services.settings import get_setting
+from app.utils.money import num
 
 router = APIRouter(tags=["fees"])
 FIN = ("admin", "accountant")

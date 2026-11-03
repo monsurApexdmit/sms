@@ -27,9 +27,10 @@ from app.models import (
     Parent,
     Student,
 )
-from app.services.invoices import fmt, num, refresh_status
+from app.services.invoices import refresh_status
 from app.services.notifications import notify, user
 from app.services.settings import get_setting
+from app.utils.money import fmt, num
 
 
 def plan_total(db: Session, plan_id: int) -> int:

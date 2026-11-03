@@ -46,6 +46,7 @@ from app.services.settings import (
     set_setting,
 )
 from app.services.years import set_current_year, valid_year_name
+from app.utils.money import num as _num
 
 router = APIRouter(tags=["system"])
 admin_only = [Depends(require_roles("admin"))]
@@ -176,13 +177,6 @@ def media(path: str, exp: int = Query(...), sig: str = Query(...)):
 
 
 # --- dashboard ----------------------------------------------------------------
-
-
-def _num(v) -> float:
-    try:
-        return float(v or 0)
-    except (TypeError, ValueError):
-        return 0.0
 
 
 def _today_ts() -> str:

@@ -3,7 +3,7 @@ The pay rules are documented in app/services/payroll.py."""
 
 import calendar
 import time
-from datetime import date, datetime, timezone
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import delete, func, select
@@ -28,16 +28,13 @@ from app.services.payroll import (
 )
 from app.services.school_calendar import day_info, holidays_between, weekly_off_days, working_days
 from app.services.settings import get_setting, running_year, set_setting
+from app.utils.dates import utc_now as _now
 
 router = APIRouter(prefix="/hr", tags=["hr"])
 admin_only = [Depends(require_roles("admin"))]
 PAYROLL = ("admin", "accountant")
 payroll_roles = [Depends(require_roles(*PAYROLL))]
 staff_only = [Depends(require_roles(*STAFF_ROLES))]
-
-
-def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _require_staff(db: Session, role: str, staff_id: int) -> str:

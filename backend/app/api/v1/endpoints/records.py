@@ -11,7 +11,7 @@ Who sees what:
   Anyone can check a serial at /api/public/certificates/verify (validity, kind, date, initials).
 """
 
-from datetime import date, datetime, timezone
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy import func, or_, select
@@ -56,6 +56,7 @@ from app.services.certificates import (
 )
 from app.services.files import user_image_url
 from app.services.ratelimit import throttle
+from app.utils.dates import utc_now as _now
 
 router = APIRouter(tags=["student records"])
 public = APIRouter(prefix="/public/certificates", tags=["public website"])
@@ -64,10 +65,6 @@ readers = [Depends(require_roles("admin", "teacher", "student", "parent"))]
 
 PARENT_KINDS = ("discipline", "achievement")
 STUDENT_KINDS = ("achievement",)
-
-
-def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _student(db: DB, student_id: int) -> Student:

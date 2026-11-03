@@ -15,7 +15,7 @@ Settings (System settings -> AI assistant): `ai_enabled` ("1"), `anthropic_api_k
 import logging
 import os
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, TypeVar
 
 import anthropic
@@ -27,6 +27,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import CurrentUser
 from app.models import AiRequest
 from app.services.settings import get_setting
+from app.utils.dates import utc_now as _now
 
 log = logging.getLogger("ai")
 
@@ -92,10 +93,6 @@ def config(db: Session) -> AiConfig:
 def make_client(api_key: str | None) -> anthropic.Anthropic:
     """Replaced in tests. Without a key the SDK reads ANTHROPIC_API_KEY."""
     return anthropic.Anthropic(api_key=api_key or None, timeout=TIMEOUT_SECONDS, max_retries=1)
-
-
-def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def month_count(db: Session) -> int:

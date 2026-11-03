@@ -14,7 +14,6 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timezone
 
 import httpx
 from cryptography.hazmat.primitives import serialization
@@ -30,6 +29,7 @@ from app.services import notify as delivery
 from app.services.accounts import ROLE_MODELS, id_column
 from app.services.jobs import enqueue
 from app.services.settings import get_setting, running_year
+from app.utils.dates import utc_now as _now
 
 log = logging.getLogger("notifications")
 
@@ -93,10 +93,6 @@ def class_members(db: Session, class_id: int, section_id: int | None = None, *, 
     ids = sorted(set(db.scalars(stmt)))
     out = [user("student", s) for s in ids]
     return out + parents_of(db, ids) if with_parents else out
-
-
-def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def channels_for(db: Session, role: str, user_id: int, category: str, defaults: Iterable[str] | None = None) -> set[str]:

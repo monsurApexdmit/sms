@@ -8,7 +8,7 @@ status only.
 
 import re
 import secrets
-from datetime import date, datetime, timezone
+from datetime import date
 from typing import Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, Request, UploadFile, status
@@ -44,6 +44,7 @@ from app.services.notify import send_email
 from app.services.ratelimit import throttle
 from app.services.settings import get_setting, running_year, set_setting
 from app.services.years import valid_year_name
+from app.utils.dates import utc_now as _now
 
 public = APIRouter(prefix="/public/admissions", tags=["admissions"])
 router = APIRouter(prefix="/admissions", tags=["admissions"])
@@ -63,10 +64,6 @@ DOCUMENT_TYPES = {"pdf", "jpg", "jpeg", "png", "webp", "doc", "docx"}
 MAX_DOCUMENTS = 5
 SUBMIT_LIMIT, SUBMIT_WINDOW = 5, 3600
 LOOKUP_LIMIT, LOOKUP_WINDOW = 20, 600
-
-
-def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _ip(request: Request) -> str:

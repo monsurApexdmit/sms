@@ -3,7 +3,7 @@
 Student leave is decided by an admin or a teacher of the student's current class;
 staff leave by an admin. Leave an admin records is approved straight away."""
 
-from datetime import date, datetime, timezone
+from datetime import date, timezone
 from typing import Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
@@ -21,6 +21,7 @@ from app.services.notifications import notify, parent_or_student, user
 from app.services.payroll import record_staff_leave
 from app.services.school_calendar import working_days
 from app.services.settings import running_year
+from app.utils.dates import utc_now as _now
 
 ALL = ("admin", "teacher", "accountant", "librarian", "student", "parent")
 STAFF_ROLES = ("teacher", "accountant", "librarian")
@@ -81,10 +82,6 @@ def _resolve_person(db: Session, user: CurrentUser, body: LeaveIn) -> tuple[int 
     if get_account(db, body.staff_role, body.staff_id) is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Staff member not found")
     return None, body.staff_role, body.staff_id
-
-
-def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 # --- output -------------------------------------------------------------------------

@@ -16,6 +16,7 @@ from app.schemas.common import out_schema
 from app.schemas.online_exams import ExamBase, ExamIn, ExamOut, QuestionIn, StatusIn, SubmitIn
 from app.services.access import children_ids, current_enroll, ensure_teaches_subject
 from app.services.settings import running_year
+from app.utils.money import num as _num
 
 router = APIRouter(prefix="/online-exams", tags=["online exams"])
 STAFF = ("admin", "teacher")
@@ -51,13 +52,6 @@ def exam_window(exam: OnlineExam) -> tuple[int, int]:
 def _exam_date_ts(d: date) -> int:
     tz = ZoneInfo(get_settings().school_timezone)
     return int(datetime(d.year, d.month, d.day, tzinfo=tz).timestamp())
-
-
-def _num(v) -> float:
-    try:
-        return float(v or 0)
-    except (TypeError, ValueError):
-        return 0.0
 
 
 def correct_list(q: QuestionBank) -> list[str]:

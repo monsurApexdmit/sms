@@ -1,17 +1,9 @@
 """Money helpers for the legacy invoice/payment tables, which store amounts as text."""
 
 from app.models import Invoice
+from app.utils.money import fmt, num
 
-
-def num(value) -> float:
-    try:
-        return float(value or 0)
-    except (TypeError, ValueError):
-        return 0.0
-
-
-def fmt(value: float) -> str:
-    return f"{value:.2f}".rstrip("0").rstrip(".")
+__all__ = ["fmt", "num", "refresh_status"]
 
 
 def refresh_status(inv: Invoice) -> None:

@@ -12,7 +12,6 @@ import logging
 import re
 import secrets
 import time
-from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Literal
 from urllib.parse import urlencode
@@ -32,14 +31,11 @@ from app.services import local_gateways as gw
 from app.services.accounts import get_account
 from app.services.ratelimit import throttle
 from app.services.settings import set_setting
+from app.utils.dates import utc_now as _now
 
 log = logging.getLogger("payments")
 router = APIRouter(tags=["payment gateways"])
 admin_only = [Depends(require_roles("admin"))]
-
-
-def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _front() -> str:
