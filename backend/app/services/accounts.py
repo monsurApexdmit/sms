@@ -1,12 +1,15 @@
 """Helpers for the six legacy account tables (admin, teacher, student, parent,
 librarian, accountant). Each role keeps its own table and `<role>_id` column."""
 
+import secrets
+import time
 from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models import Accountant, Admin, Librarian, Parent, Student, Teacher
+from app.core.security import hash_password
+from app.models import Accountant, Admin, Enroll, Librarian, Parent, Student, Teacher
 
 ROLE_MODELS: dict[str, Any] = {
     "admin": Admin,
@@ -68,3 +71,36 @@ def ref_name(db: Session, ref: str | None, sep: str = "-") -> str:
         return "Unknown"
     row = get_account(db, *parsed)
     return row.name if row is not None and row.name else "Deleted user"
+
+
+def new_code() -> str:
+    """Short random code used for student IDs and enrolment codes (legacy format)."""
+    return secrets.token_hex(4)[:7]
+
+
+def insert_account(db: Session, model: Any, data: dict[str, Any]) -> Any:
+    """Insert an account row with the password hashed. The caller checks the email and commits."""
+    row = model(**{**data, "password": hash_password(data["password"])})
+    db.add(row)
+    db.flush()
+    return row
+
+
+def insert_student(
+    db: Session, data: dict[str, Any], *, class_id: int, section_id: int | None, roll: int | None, year: str
+) -> Student:
+    """Student account plus its enrolment for `year`. The caller checks email/student code and commits."""
+    student = insert_account(db, Student, {**data, "student_code": data.get("student_code") or new_code()})
+    db.add(
+        Enroll(
+            student_id=student.student_id,
+            enroll_code=new_code(),
+            class_id=class_id,
+            section_id=section_id,
+            roll=roll,
+            date_added=str(int(time.time())),
+            year=year,
+        )
+    )
+    db.flush()
+    return student

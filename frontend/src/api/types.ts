@@ -240,3 +240,49 @@ export interface SchoolYear {
   is_current: boolean;
   terms: { term_id: number; name: string; start_date: string | null; end_date: string | null }[];
 }
+
+export type AdmissionStatus = "new" | "reviewing" | "accepted" | "rejected" | "enrolled" | "withdrawn";
+
+export interface AdmissionApplication {
+  application_id: number;
+  reference: string;
+  year: string;
+  class_id: number;
+  class_name: string | null;
+  student_name: string;
+  date_of_birth: string | null;
+  gender: string | null;
+  previous_school: string | null;
+  guardian_name: string;
+  guardian_relation: string | null;
+  guardian_phone: string;
+  guardian_email: string | null;
+  address: string | null;
+  notes: string | null;
+  source: "online" | "office" | "enquiry";
+  status: AdmissionStatus;
+  status_note: string | null;
+  reviewed_by: string | null;
+  created_at: string;
+  updated_at: string;
+  student_id: number | null;
+  parent_id: number | null;
+  document_count: number;
+  documents: { document_id: number; label: string; file_name: string; url: string | null; uploaded_at: string }[] | null;
+}
+
+export interface Enquiry {
+  enquiry_id: number;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  class_id: number | null;
+  class_name: string | null;
+  source: "walk-in" | "phone" | "website" | "other";
+  follow_up_on: string | null;
+  status: "open" | "converted" | "closed";
+  notes: string | null;
+  assigned_to: string | null;
+  application_id: number | null;
+  created_at: string;
+}

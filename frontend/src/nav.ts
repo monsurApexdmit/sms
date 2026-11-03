@@ -25,6 +25,7 @@ import {
   SettingsIcon,
   UserCogIcon,
   UserIcon,
+  UserPlusIcon,
   UsersIcon,
   WalletIcon,
   type LucideIcon,
@@ -51,6 +52,7 @@ export const NAV: NavItem[] = [
   { label: "Staff accounts", path: "staff", icon: UserCogIcon, roles: ["admin"], group: "People" },
   { label: "Promotion", path: "promotion", icon: AwardIcon, roles: ["admin"], group: "People" },
   { label: "ID cards", path: "id-cards", icon: IdCardIcon, roles: ["admin"], group: "People" },
+  { label: "Admissions", path: "admissions", icon: UserPlusIcon, roles: ["admin", "accountant"], group: "People" },
 
   { label: "School years", path: "school-years", icon: CalendarCogIcon, roles: ["admin"], group: "Academic" },
   { label: "Classes & sections", path: "classes", icon: BuildingIcon, roles: ["admin"], group: "Academic" },

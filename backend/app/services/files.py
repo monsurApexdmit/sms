@@ -35,6 +35,7 @@ DIRS = {
     "notice": "frontend/noticeboard",
     "slider": "frontend/slider",
     "site": "frontend",
+    "admission": "admission_document",
 }
 
 

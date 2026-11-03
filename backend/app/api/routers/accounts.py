@@ -11,7 +11,7 @@ from app.api.crud import Page, get_or_404, out_schema
 from app.core.deps import DB, CurrentUser, Me, require_roles
 from app.core.security import hash_password
 from app.models import Accountant, Admin, Librarian, Parent, Student, Teacher
-from app.services.accounts import email_taken
+from app.services.accounts import email_taken, insert_account
 from app.services.files import safe_path, save_image, user_image_url
 
 SECRET = ("password", "authentication_key")
@@ -91,10 +91,7 @@ def account_router(
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Password is required")
         if email_taken(db, body.email):
             raise HTTPException(status.HTTP_409_CONFLICT, "Email is already used by another account")
-        data = body.model_dump()
-        data["password"] = hash_password(data["password"])
-        row = model(**data)
-        db.add(row)
+        row = insert_account(db, model, body.model_dump())
         db.commit()
         db.refresh(row)
         return to_out(row)

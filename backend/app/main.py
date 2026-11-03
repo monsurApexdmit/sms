@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import (
     academic,
     accounts,
+    admissions,
     attendance,
     audit,
     auth,
@@ -56,6 +57,9 @@ for router in accounts.routers:
     api.include_router(router)
 api.include_router(cms.public)
 api.include_router(cms.admin)
+api.include_router(admissions.public)
+api.include_router(admissions.router)
+api.include_router(admissions.enquiries)
 
 
 @api.get("/health", tags=["system"])
