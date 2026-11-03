@@ -47,13 +47,13 @@ const PRESENT_BADGE = "bg-success/15 text-success border-transparent";
 const OFF_CELL = "bg-muted text-muted-foreground";
 
 /** Holiday titles and weekly days off of a month, as returned with the attendance reports. */
-interface MonthCalendar {
+export interface MonthCalendar {
   holidays: Record<string, string>;
   off_days: number[];
   working_days: number;
 }
 
-const offTitle = (cal: MonthCalendar, day: number) => cal.holidays[String(day)] ?? (cal.off_days.includes(day) ? "Weekly day off" : undefined);
+export const offTitle = (cal: MonthCalendar, day: number) => cal.holidays[String(day)] ?? (cal.off_days.includes(day) ? "Weekly day off" : undefined);
 const ABSENT_BADGE = "bg-destructive/10 text-destructive border-transparent";
 
 export function AttendancePage() {
