@@ -2,85 +2,85 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const attendanceCapture: Record<string, string> = {
-  "· Section {section_name}": "", // untranslated
-  "{created} card(s) created": "", // untranslated
-  "{holder_role} ·": "", // untranslated
-  "{section_name}": "", // untranslated
-  "{value} · Class {class_name}{value2}": "", // untranslated
-  "A person has one active card; issuing a new one revokes the old one.": "", // untranslated
-  "Add device": "", // untranslated
-  "Already marked": "", // untranslated
-  "Back to periods": "", // untranslated
-  "Camera not available": "", // untranslated
-  "Card code": "", // untranslated
-  "Card for": "", // untranslated
-  "Card issued": "", // untranslated
-  "Card revoked": "", // untranslated
-  "Cards": "", // untranslated
-  "Cards for whole class": "", // untranslated
-  "Cards people scan at the kiosk or at RFID/biometric terminals, the terminals themselves, and the scan log.": "", // untranslated
-  "Checked out": "", // untranslated
-  "Class {class_name}{value}": "", // untranslated
-  "Connecting a terminal": "", // untranslated
-  "Copied": "", // untranslated
-  "Copy it into the device now. It is shown only once; if it is lost, create a new key.": "", // untranslated
-  "Create cards for this class?": "", // untranslated
-  "Daily attendance already taken for this day will be replaced.": "", // untranslated
-  "Daily attendance is the official record. Filling it from periods marks a student present if they were present or late in at least one period, and absent if absent in every marked period.": "", // untranslated
-  "Daily attendance: {updated} updated, {kept} already marked, {skipped} without periods": "", // untranslated
-  "Device key for {name}": "", // untranslated
-  "Devices": "", // untranslated
-  "E": "", // untranslated
-  "Edit device": "", // untranslated
-  "Excused": "", // untranslated
-  "Fill daily attendance": "", // untranslated
-  "Fill daily attendance from periods?": "", // untranslated
-  "Full screen": "", // untranslated
-  "Future time": "", // untranslated
-  "Holder": "", // untranslated
-  "Ignore repeat scans for (minutes)": "", // untranslated
-  "Include revoked": "", // untranslated
-  "Issue a card": "", // untranslated
-  "Issue card": "", // untranslated
-  "It stops working at once.": "", // untranslated
-  "Last seen": "", // untranslated
-  "Late after": "", // untranslated
-  "Location": "", // untranslated
-  "Main gate": "", // untranslated
-  "New key": "", // untranslated
-  "No cards": "", // untranslated
-  "No devices": "", // untranslated
-  "No periods on this day": "", // untranslated
-  "No scans": "", // untranslated
-  "None of your subjects is on the class routine for this weekday.": "", // untranslated
-  "None yet": "", // untranslated
-  "Not taken": "", // untranslated
-  "Nothing on the class routine for this weekday.": "", // untranslated
-  "Period attendance for {name}": "", // untranslated
-  "Period attendance saved": "", // untranslated
-  "Periods": "", // untranslated
-  "Person": "", // untranslated
-  "Recent scans": "", // untranslated
-  "Repeat scan": "", // untranslated
-  "Replace days already marked": "", // untranslated
-  "Replace the key of {name}?": "", // untranslated
-  "Revoke": "", // untranslated
-  "Revoke card {card_uid}?": "", // untranslated
-  "Revoked": "", // untranslated
-  "RFID or biometric terminals (or the middleware that reads them) send {request} with the header {header} and a JSON body {body} or {batch} for a backlog.": "", // untranslated
-  "Scan a card…": "", // untranslated
-  "Scan an ID card with a barcode/QR or RFID reader, or the camera. Students are marked present for the day; staff check in and out.": "", // untranslated
-  "Scan log": "", // untranslated
-  "Scan the RFID card or type its UID. Leave empty to generate a barcode code.": "", // untranslated
-  "Scans after this time count as late. Empty = never late.": "", // untranslated
-  "Section day": "", // untranslated
-  "Stop camera": "", // untranslated
-  "Students already marked in the daily sheet are kept. No absence SMS is sent.": "", // untranslated
-  "Students without an active card get one (their student code is used when set).": "", // untranslated
-  "Take attendance for each period of the class routine. Everyone starts as present; tap the exceptions.": "", // untranslated
-  "Taken (": "", // untranslated
-  "The old key stops working at once.": "", // untranslated
-  "Unknown card": "", // untranslated
-  "Use camera": "", // untranslated
-  "Waiting for the first scan": "", // untranslated
+  "· Section {section_name}": "· শাখা {section_name}",
+  "{created} card(s) created": "{created}টি কার্ড তৈরি হয়েছে",
+  "{holder_role} ·": "{holder_role} ·",
+  "{section_name}": "{section_name}",
+  "{value} · Class {class_name}{value2}": "{value} · শ্রেণি {class_name}{value2}",
+  "A person has one active card; issuing a new one revokes the old one.": "একজনের একটিই সক্রিয় কার্ড থাকে; নতুন কার্ড ইস্যু করলে পুরোনোটি বাতিল হয়।",
+  "Add device": "ডিভাইস যোগ করুন",
+  "Already marked": "আগেই চিহ্নিত",
+  "Back to periods": "পিরিয়ডে ফিরে যান",
+  "Camera not available": "ক্যামেরা পাওয়া যাচ্ছে না",
+  "Card code": "কার্ড কোড",
+  "Card for": "যার কার্ড",
+  "Card issued": "কার্ড ইস্যু হয়েছে",
+  "Card revoked": "কার্ড বাতিল হয়েছে",
+  "Cards": "কার্ড",
+  "Cards for whole class": "পুরো শ্রেণির কার্ড",
+  "Cards people scan at the kiosk or at RFID/biometric terminals, the terminals themselves, and the scan log.": "কিয়স্ক বা RFID/বায়োমেট্রিক টার্মিনালে স্ক্যান করা কার্ড, টার্মিনালগুলো এবং স্ক্যানের লগ।",
+  "Checked out": "প্রস্থান করেছেন",
+  "Class {class_name}{value}": "শ্রেণি {class_name}{value}",
+  "Connecting a terminal": "টার্মিনাল সংযোগ",
+  "Copied": "কপি হয়েছে",
+  "Copy it into the device now. It is shown only once; if it is lost, create a new key.": "এখনই ডিভাইসে কপি করে নিন। এটি একবারই দেখানো হয়; হারালে নতুন কী তৈরি করুন।",
+  "Create cards for this class?": "এই শ্রেণির জন্য কার্ড তৈরি করবেন?",
+  "Daily attendance already taken for this day will be replaced.": "এই দিনের আগে নেওয়া দৈনিক উপস্থিতি প্রতিস্থাপিত হবে।",
+  "Daily attendance is the official record. Filling it from periods marks a student present if they were present or late in at least one period, and absent if absent in every marked period.": "দৈনিক উপস্থিতিই দাপ্তরিক রেকর্ড। পিরিয়ড থেকে পূরণ করলে কোনো শিক্ষার্থী অন্তত একটি পিরিয়ডে উপস্থিত বা দেরিতে থাকলে উপস্থিত, আর চিহ্নিত সব পিরিয়ডে অনুপস্থিত থাকলে অনুপস্থিত ধরা হয়।",
+  "Daily attendance: {updated} updated, {kept} already marked, {skipped} without periods": "দৈনিক উপস্থিতি: {updated}টি হালনাগাদ, {kept}টি আগেই চিহ্নিত, {skipped}টি পিরিয়ড ছাড়া",
+  "Device key for {name}": "{name}-এর ডিভাইস কী",
+  "Devices": "ডিভাইস",
+  "E": "অনু",
+  "Edit device": "ডিভাইস সম্পাদনা",
+  "Excused": "অনুমোদিত অনুপস্থিতি",
+  "Fill daily attendance": "দৈনিক উপস্থিতি পূরণ করুন",
+  "Fill daily attendance from periods?": "পিরিয়ড থেকে দৈনিক উপস্থিতি পূরণ করবেন?",
+  "Full screen": "পূর্ণ পর্দা",
+  "Future time": "ভবিষ্যতের সময়",
+  "Holder": "কার্ডধারী",
+  "Ignore repeat scans for (minutes)": "পুনরায় স্ক্যান উপেক্ষা করুন (মিনিট)",
+  "Include revoked": "বাতিলগুলোসহ",
+  "Issue a card": "একটি কার্ড ইস্যু করুন",
+  "Issue card": "কার্ড ইস্যু করুন",
+  "It stops working at once.": "এটি সঙ্গে সঙ্গে কাজ করা বন্ধ করবে।",
+  "Last seen": "সর্বশেষ দেখা গেছে",
+  "Late after": "এর পরে দেরি",
+  "Location": "অবস্থান",
+  "Main gate": "প্রধান ফটক",
+  "New key": "নতুন কী",
+  "No cards": "কোনো কার্ড নেই",
+  "No devices": "কোনো ডিভাইস নেই",
+  "No periods on this day": "এই দিনে কোনো পিরিয়ড নেই",
+  "No scans": "কোনো স্ক্যান নেই",
+  "None of your subjects is on the class routine for this weekday.": "সপ্তাহের এই দিনের ক্লাস রুটিনে আপনার কোনো বিষয় নেই।",
+  "None yet": "এখনও নেই",
+  "Not taken": "নেওয়া হয়নি",
+  "Nothing on the class routine for this weekday.": "সপ্তাহের এই দিনের ক্লাস রুটিনে কিছু নেই।",
+  "Period attendance for {name}": "{name}-এর পিরিয়ডভিত্তিক উপস্থিতি",
+  "Period attendance saved": "পিরিয়ডভিত্তিক উপস্থিতি সংরক্ষিত হয়েছে",
+  "Periods": "পিরিয়ড",
+  "Person": "ব্যক্তি",
+  "Recent scans": "সাম্প্রতিক স্ক্যান",
+  "Repeat scan": "পুনরায় স্ক্যান",
+  "Replace days already marked": "আগে চিহ্নিত দিনগুলো প্রতিস্থাপন করুন",
+  "Replace the key of {name}?": "{name}-এর কী বদলাবেন?",
+  "Revoke": "বাতিল করুন",
+  "Revoke card {card_uid}?": "{card_uid} কার্ডটি বাতিল করবেন?",
+  "Revoked": "বাতিল",
+  "RFID or biometric terminals (or the middleware that reads them) send {request} with the header {header} and a JSON body {body} or {batch} for a backlog.": "RFID বা বায়োমেট্রিক টার্মিনাল (অথবা যে মিডলওয়্যার এগুলো পড়ে) {header} হেডার এবং {body} JSON বডিসহ {request} পাঠায়; জমে থাকা স্ক্যানের জন্য {batch} পাঠায়।",
+  "Scan a card…": "একটি কার্ড স্ক্যান করুন…",
+  "Scan an ID card with a barcode/QR or RFID reader, or the camera. Students are marked present for the day; staff check in and out.": "বারকোড/QR বা RFID রিডার, অথবা ক্যামেরা দিয়ে আইডি কার্ড স্ক্যান করুন। শিক্ষার্থীরা দিনের জন্য উপস্থিত চিহ্নিত হয়; কর্মীদের আগমন ও প্রস্থান লিপিবদ্ধ হয়।",
+  "Scan log": "স্ক্যানের লগ",
+  "Scan the RFID card or type its UID. Leave empty to generate a barcode code.": "RFID কার্ড স্ক্যান করুন বা এর UID লিখুন। বারকোড তৈরি করতে খালি রাখুন।",
+  "Scans after this time count as late. Empty = never late.": "এই সময়ের পরের স্ক্যান দেরি হিসেবে গণ্য হবে। খালি = কখনো দেরি নয়।",
+  "Section day": "শাখার দিন",
+  "Stop camera": "ক্যামেরা বন্ধ করুন",
+  "Students already marked in the daily sheet are kept. No absence SMS is sent.": "দৈনিক খাতায় আগে চিহ্নিত শিক্ষার্থীরা অপরিবর্তিত থাকবে। অনুপস্থিতির কোনো এসএমএস পাঠানো হয় না।",
+  "Students without an active card get one (their student code is used when set).": "সক্রিয় কার্ড নেই এমন শিক্ষার্থীরা একটি কার্ড পাবে (শিক্ষার্থী কোড থাকলে সেটি ব্যবহার করা হয়)।",
+  "Take attendance for each period of the class routine. Everyone starts as present; tap the exceptions.": "ক্লাস রুটিনের প্রতিটি পিরিয়ডের উপস্থিতি নিন। শুরুতে সবাই উপস্থিত; ব্যতিক্রমগুলোতে ট্যাপ করুন।",
+  "Taken (": "নেওয়া হয়েছে (",
+  "The old key stops working at once.": "পুরোনো কী সঙ্গে সঙ্গে কাজ করা বন্ধ করবে।",
+  "Unknown card": "অজানা কার্ড",
+  "Use camera": "ক্যামেরা ব্যবহার করুন",
+  "Waiting for the first scan": "প্রথম স্ক্যানের অপেক্ষায়",
 };

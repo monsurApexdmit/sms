@@ -1015,7 +1015,7 @@ export function IdCardsPage() {
 
   return (
     <>
-      <style>{tr("@media print { @page { size: A4 portrait; margin: 8mm; } }")}</style>
+      <style>{"@media print { @page { size: A4 portrait; margin: 8mm; } }"}</style>
       <PageHeader
         title={tr("ID cards")}
         subtitle={single ? tr("Single student card") : tr("Print student identity cards for a class or section")}

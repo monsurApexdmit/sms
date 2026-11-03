@@ -2,148 +2,148 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const settings: Record<string, string> = {
-  "{label} updated": "", // untranslated
-  "{length} items": "", // untranslated
-  "About us image": "", // untranslated
-  "Account SID": "", // untranslated
-  "Accounts using two-factor authentication": "", // untranslated
-  "Action": "", // untranslated
-  "Active SMS service": "", // untranslated
-  "Add photos": "", // untranslated
-  "Add slide": "", // untranslated
-  "album": "", // untranslated
-  "All actions": "", // untranslated
-  "All tables": "", // untranslated
-  "API ID": "", // untranslated
-  "App key": "", // untranslated
-  "App secret": "", // untranslated
-  "Auth key": "", // untranslated
-  "Auth token": "", // untranslated
-  "Basic information shown across the system": "", // untranslated
-  "BDT only": "", // untranslated
-  "bKash tokenized checkout. The server executes each payment and checks the amount with bKash before recording it.": "", // untranslated
-  "bKash, Nagad and SSLCommerz are offered to parents only when the currency in General settings is bdt.": "", // untranslated
-  "By": "", // untranslated
-  "Card payments through Stripe Checkout": "", // untranslated
-  "Changed": "", // untranslated
-  "Changes": "", // untranslated
-  "Changing this switches every screen to the new year": "", // untranslated
-  "Clickatell": "", // untranslated
-  "Contact details and the homepage note": "", // untranslated
-  "Content of the public school website": "", // untranslated
-  "Copyright text": "", // untranslated
-  "Country code": "", // untranslated
-  "Cover": "", // untranslated
-  "Cover image": "", // untranslated
-  "Currency code (e.g. usd, bdt)": "", // untranslated
-  "Default": "", // untranslated
-  "Delete?": "", // untranslated
-  "Email (SMTP)": "", // untranslated
-  "Enable {value}": "", // untranslated
-  "Enable PayPal": "", // untranslated
-  "Enable Stripe": "", // untranslated
-  "Enabled": "", // untranslated
-  "event": "", // untranslated
-  "Footer logo": "", // untranslated
-  "From date": "", // untranslated
-  "Full-width photo hero with a dark overlay": "", // untranslated
-  "Gateway used for notices, attendance and exam result messages": "", // untranslated
-  "General": "", // untranslated
-  "Header logo": "", // untranslated
-  "Homepage note": "", // untranslated
-  "Homepage note title": "", // untranslated
-  "Homepage slider": "", // untranslated
-  "https://{value}/…": "", // untranslated
-  "Images & slider": "", // untranslated
-  "Images added": "", // untranslated
-  "Invoices are marked paid only by Stripe's signed webhook; set STRIPE_WEBHOOK_SECRET on the server and point the webhook at": "", // untranslated
-  "Large images at the top of the homepage. Wide photos (16:9) work best.": "", // untranslated
-  "Leave empty to keep the current cover": "", // untranslated
-  "Live": "", // untranslated
-  "Live publishable key": "", // untranslated
-  "Live secret key": "", // untranslated
-  "Logo": "", // untranslated
-  "Logo updated": "", // untranslated
-  "Look of the public website's homepage": "", // untranslated
-  "Map location (lat,lng)": "", // untranslated
-  "Merchant ID": "", // untranslated
-  "Merchant mobile number": "", // untranslated
-  "Merchant private key": "", // untranslated
-  "Mode": "", // untranslated
-  "MSG91": "", // untranslated
-  "Nagad merchant checkout. Requests are signed with your merchant private key; each payment is verified with Nagad before recording.": "", // untranslated
-  "Nagad public key": "", // untranslated
-  "news": "", // untranslated
-  "No changes recorded": "", // untranslated
-  "No photos in this album yet.": "", // untranslated
-  "No slides yet.": "", // untranslated
-  "Nobody (optional for everyone)": "", // untranslated
-  "Not counted as school days in attendance": "", // untranslated
-  "Outgoing mail server for password resets and notifications": "", // untranslated
-  "Pages": "", // untranslated
-  "Parents and students pay invoices through PayPal; the server captures and verifies each order": "", // untranslated
-  "Payment gateway saved": "", // untranslated
-  "PayPal settings saved": "", // untranslated
-  "Photos": "", // untranslated
-  "Plain text; line breaks are kept": "", // untranslated
-  "Production (live)": "", // untranslated
-  "Production client ID": "", // untranslated
-  "Production secret key": "", // untranslated
-  "Protects the contact form. Create v2 checkbox keys in the": "", // untranslated
-  "reCAPTCHA admin console": "", // untranslated
-  "Record": "", // untranslated
-  "Remove photo": "", // untranslated
-  "Remove slide": "", // untranslated
-  "Required for": "", // untranslated
-  "Reset someone who lost their phone so they can sign in again.": "", // untranslated
-  "Roles that must use an authenticator app at sign-in. Their users set it up the next time they sign in.": "", // untranslated
-  "Running academic year": "", // untranslated
-  "Sandbox (testing)": "", // untranslated
-  "Sandbox client ID": "", // untranslated
-  "Sandbox secret key": "", // untranslated
-  "Save slider": "", // untranslated
-  "School details, messaging, email and online payments": "", // untranslated
-  "School information": "", // untranslated
-  "School logo": "", // untranslated
-  "School name": "", // untranslated
-  "School title": "", // untranslated
-  "Secret key": "", // untranslated
-  "Security": "", // untranslated
-  "Sender ID": "", // untranslated
-  "Sender number": "", // untranslated
-  "Show on website": "", // untranslated
-  "Shown in the website footer. Use full addresses starting with https://": "", // untranslated
-  "Shown on the login page, sidebar and printed documents. PNG or JPG, ideally square.": "", // untranslated
-  "Site key": "", // untranslated
-  "Slide description": "", // untranslated
-  "Slide title": "", // untranslated
-  "Slider saved": "", // untranslated
-  "SMTP password": "", // untranslated
-  "SMTP port": "", // untranslated
-  "SMTP user": "", // untranslated
-  "Social links": "", // untranslated
-  "Social links saved": "", // untranslated
-  "Spam protection (reCAPTCHA)": "", // untranslated
-  "Split hero with a coloured panel beside the photo": "", // untranslated
-  "SSLCommerz hosted checkout (cards, mobile banking, net banking). Payments are confirmed with the SSLCommerz validation API.": "", // untranslated
-  "Store ID": "", // untranslated
-  "Store password": "", // untranslated
-  "Stripe settings saved": "", // untranslated
-  "System": "", // untranslated
-  "System email": "", // untranslated
-  "System title": "", // untranslated
-  "Test mode": "", // untranslated
-  "Test publishable key": "", // untranslated
-  "Test secret key": "", // untranslated
-  "Theme": "", // untranslated
-  "To date": "", // untranslated
-  "Twilio": "", // untranslated
-  "Twitter / X": "", // untranslated
-  "Ultimate": "", // untranslated
-  "Upload logo": "", // untranslated
-  "Username": "", // untranslated
-  "Visible": "", // untranslated
-  "Webhook required": "", // untranslated
-  "Weekly days off": "", // untranslated
-  "Who changed marks, attendance, invoices, payments, enrolments, accounts and settings in this system, and what changed.": "", // untranslated
+  "{label} updated": "{label} হালনাগাদ হয়েছে",
+  "{length} items": "{length}টি আইটেম",
+  "About us image": "‘আমাদের সম্পর্কে’ ছবি",
+  "Account SID": "Account SID",
+  "Accounts using two-factor authentication": "দুই-ধাপের যাচাই ব্যবহারকারী অ্যাকাউন্ট",
+  "Action": "কাজ",
+  "Active SMS service": "সক্রিয় এসএমএস সেবা",
+  "Add photos": "ছবি যোগ করুন",
+  "Add slide": "স্লাইড যোগ করুন",
+  "album": "অ্যালবাম",
+  "All actions": "সব কাজ",
+  "All tables": "সব টেবিল",
+  "API ID": "API ID",
+  "App key": "App key",
+  "App secret": "App secret",
+  "Auth key": "Auth key",
+  "Auth token": "Auth token",
+  "Basic information shown across the system": "সিস্টেমজুড়ে দেখানো মৌলিক তথ্য",
+  "BDT only": "শুধু BDT",
+  "bKash tokenized checkout. The server executes each payment and checks the amount with bKash before recording it.": "bKash টোকেনাইজড চেকআউট। লিপিবদ্ধ করার আগে সার্ভার প্রতিটি পেমেন্ট সম্পন্ন করে bKash-এর সাথে পরিমাণ যাচাই করে।",
+  "bKash, Nagad and SSLCommerz are offered to parents only when the currency in General settings is bdt.": "সাধারণ সেটিংসে মুদ্রা bdt হলে তবেই অভিভাবকদের bKash, Nagad ও SSLCommerz দেখানো হয়।",
+  "By": "যিনি করেছেন",
+  "Card payments through Stripe Checkout": "Stripe Checkout-এর মাধ্যমে কার্ডে পেমেন্ট",
+  "Changed": "পরিবর্তিত",
+  "Changes": "পরিবর্তন",
+  "Changing this switches every screen to the new year": "এটি বদলালে প্রতিটি পর্দা নতুন বছরে চলে যাবে",
+  "Clickatell": "Clickatell",
+  "Contact details and the homepage note": "যোগাযোগের তথ্য ও হোমপেজের বার্তা",
+  "Content of the public school website": "বিদ্যালয়ের পাবলিক ওয়েবসাইটের বিষয়বস্তু",
+  "Copyright text": "কপিরাইট লেখা",
+  "Country code": "দেশের কোড",
+  "Cover": "প্রচ্ছদ",
+  "Cover image": "প্রচ্ছদের ছবি",
+  "Currency code (e.g. usd, bdt)": "মুদ্রার কোড (যেমন usd, bdt)",
+  "Default": "ডিফল্ট",
+  "Delete?": "মুছে ফেলবেন?",
+  "Email (SMTP)": "ইমেইল (SMTP)",
+  "Enable {value}": "{value} চালু করুন",
+  "Enable PayPal": "PayPal চালু করুন",
+  "Enable Stripe": "Stripe চালু করুন",
+  "Enabled": "চালু",
+  "event": "অনুষ্ঠান",
+  "Footer logo": "ফুটারের লোগো",
+  "From date": "শুরুর তারিখ",
+  "Full-width photo hero with a dark overlay": "গাঢ় আবরণসহ পূর্ণ প্রস্থের প্রধান ছবি",
+  "Gateway used for notices, attendance and exam result messages": "নোটিশ, উপস্থিতি ও পরীক্ষার ফলাফলের বার্তার জন্য ব্যবহৃত গেটওয়ে",
+  "General": "সাধারণ",
+  "Header logo": "হেডারের লোগো",
+  "Homepage note": "হোমপেজের বার্তা",
+  "Homepage note title": "হোমপেজের বার্তার শিরোনাম",
+  "Homepage slider": "হোমপেজের স্লাইডার",
+  "https://{value}/…": "https://{value}/…",
+  "Images & slider": "ছবি ও স্লাইডার",
+  "Images added": "ছবি যোগ করা হয়েছে",
+  "Invoices are marked paid only by Stripe's signed webhook; set STRIPE_WEBHOOK_SECRET on the server and point the webhook at": "শুধু Stripe-এর স্বাক্ষরিত webhook-এর মাধ্যমে ইনভয়েস পরিশোধিত চিহ্নিত হয়; সার্ভারে STRIPE_WEBHOOK_SECRET নির্ধারণ করুন এবং webhook এখানে নির্দেশ করুন:",
+  "Large images at the top of the homepage. Wide photos (16:9) work best.": "হোমপেজের ওপরের বড় ছবি। চওড়া ছবি (16:9) সবচেয়ে ভালো দেখায়।",
+  "Leave empty to keep the current cover": "বর্তমান প্রচ্ছদ রাখতে খালি রাখুন",
+  "Live": "লাইভ",
+  "Live publishable key": "লাইভ publishable key",
+  "Live secret key": "লাইভ secret key",
+  "Logo": "লোগো",
+  "Logo updated": "লোগো হালনাগাদ হয়েছে",
+  "Look of the public website's homepage": "পাবলিক ওয়েবসাইটের হোমপেজের চেহারা",
+  "Map location (lat,lng)": "মানচিত্রে অবস্থান (lat,lng)",
+  "Merchant ID": "মার্চেন্ট আইডি",
+  "Merchant mobile number": "মার্চেন্ট মোবাইল নম্বর",
+  "Merchant private key": "মার্চেন্ট প্রাইভেট কী",
+  "Mode": "মোড",
+  "MSG91": "MSG91",
+  "Nagad merchant checkout. Requests are signed with your merchant private key; each payment is verified with Nagad before recording.": "Nagad মার্চেন্ট চেকআউট। অনুরোধগুলো আপনার মার্চেন্ট প্রাইভেট কী দিয়ে স্বাক্ষরিত হয়; লিপিবদ্ধ করার আগে প্রতিটি পেমেন্ট Nagad-এর সাথে যাচাই করা হয়।",
+  "Nagad public key": "Nagad পাবলিক কী",
+  "news": "সংবাদ",
+  "No changes recorded": "কোনো পরিবর্তন লিপিবদ্ধ নেই",
+  "No photos in this album yet.": "এই অ্যালবামে এখনও কোনো ছবি নেই।",
+  "No slides yet.": "এখনও কোনো স্লাইড নেই।",
+  "Nobody (optional for everyone)": "কেউ না (সবার জন্য ঐচ্ছিক)",
+  "Not counted as school days in attendance": "উপস্থিতিতে কার্যদিবস হিসেবে গণনা করা হয় না",
+  "Outgoing mail server for password resets and notifications": "পাসওয়ার্ড রিসেট ও বিজ্ঞপ্তির জন্য বহির্গামী মেইল সার্ভার",
+  "Pages": "পাতা",
+  "Parents and students pay invoices through PayPal; the server captures and verifies each order": "অভিভাবক ও শিক্ষার্থীরা PayPal দিয়ে ইনভয়েস পরিশোধ করেন; সার্ভার প্রতিটি অর্ডার গ্রহণ ও যাচাই করে",
+  "Payment gateway saved": "পেমেন্ট গেটওয়ে সংরক্ষিত হয়েছে",
+  "PayPal settings saved": "PayPal সেটিংস সংরক্ষিত হয়েছে",
+  "Photos": "ছবি",
+  "Plain text; line breaks are kept": "সাধারণ লেখা; লাইন বিরতি বজায় থাকে",
+  "Production (live)": "প্রোডাকশন (লাইভ)",
+  "Production client ID": "প্রোডাকশন client ID",
+  "Production secret key": "প্রোডাকশন secret key",
+  "Protects the contact form. Create v2 checkbox keys in the": "যোগাযোগ ফর্ম সুরক্ষিত রাখে। v2 checkbox কী তৈরি করুন এখানে:",
+  "reCAPTCHA admin console": "reCAPTCHA অ্যাডমিন কনসোল",
+  "Record": "রেকর্ড",
+  "Remove photo": "ছবি সরান",
+  "Remove slide": "স্লাইড সরান",
+  "Required for": "যাদের জন্য আবশ্যক",
+  "Reset someone who lost their phone so they can sign in again.": "কেউ ফোন হারালে আবার সাইন ইন করতে পারার জন্য রিসেট করুন।",
+  "Roles that must use an authenticator app at sign-in. Their users set it up the next time they sign in.": "যেসব ভূমিকার জন্য সাইন ইনে অথেনটিকেটর অ্যাপ আবশ্যক। তাদের ব্যবহারকারীরা পরের বার সাইন ইনের সময় এটি চালু করবেন।",
+  "Running academic year": "চলতি শিক্ষাবর্ষ",
+  "Sandbox (testing)": "স্যান্ডবক্স (পরীক্ষামূলক)",
+  "Sandbox client ID": "স্যান্ডবক্স client ID",
+  "Sandbox secret key": "স্যান্ডবক্স secret key",
+  "Save slider": "স্লাইডার সংরক্ষণ করুন",
+  "School details, messaging, email and online payments": "বিদ্যালয়ের তথ্য, বার্তা, ইমেইল ও অনলাইন পেমেন্ট",
+  "School information": "বিদ্যালয়ের তথ্য",
+  "School logo": "বিদ্যালয়ের লোগো",
+  "School name": "বিদ্যালয়ের নাম",
+  "School title": "বিদ্যালয়ের শিরোনাম",
+  "Secret key": "Secret key",
+  "Security": "নিরাপত্তা",
+  "Sender ID": "প্রেরক আইডি",
+  "Sender number": "প্রেরকের নম্বর",
+  "Show on website": "ওয়েবসাইটে দেখান",
+  "Shown in the website footer. Use full addresses starting with https://": "ওয়েবসাইটের ফুটারে দেখানো হয়। https:// দিয়ে শুরু পূর্ণ ঠিকানা ব্যবহার করুন",
+  "Shown on the login page, sidebar and printed documents. PNG or JPG, ideally square.": "লগইন পাতা, সাইডবার ও প্রিন্ট করা কাগজে দেখানো হয়। PNG বা JPG, বর্গাকার হলে ভালো।",
+  "Site key": "Site key",
+  "Slide description": "স্লাইডের বিবরণ",
+  "Slide title": "স্লাইডের শিরোনাম",
+  "Slider saved": "স্লাইডার সংরক্ষিত হয়েছে",
+  "SMTP password": "SMTP পাসওয়ার্ড",
+  "SMTP port": "SMTP পোর্ট",
+  "SMTP user": "SMTP ব্যবহারকারী",
+  "Social links": "সামাজিক মাধ্যমের লিংক",
+  "Social links saved": "সামাজিক মাধ্যমের লিংক সংরক্ষিত হয়েছে",
+  "Spam protection (reCAPTCHA)": "স্প্যাম সুরক্ষা (reCAPTCHA)",
+  "Split hero with a coloured panel beside the photo": "ছবির পাশে রঙিন প্যানেলসহ বিভক্ত প্রধান অংশ",
+  "SSLCommerz hosted checkout (cards, mobile banking, net banking). Payments are confirmed with the SSLCommerz validation API.": "SSLCommerz হোস্টেড চেকআউট (কার্ড, মোবাইল ব্যাংকিং, নেট ব্যাংকিং)। SSLCommerz validation API দিয়ে পেমেন্ট নিশ্চিত করা হয়।",
+  "Store ID": "স্টোর আইডি",
+  "Store password": "স্টোর পাসওয়ার্ড",
+  "Stripe settings saved": "Stripe সেটিংস সংরক্ষিত হয়েছে",
+  "System": "সিস্টেম",
+  "System email": "সিস্টেম ইমেইল",
+  "System title": "সিস্টেমের শিরোনাম",
+  "Test mode": "পরীক্ষামূলক মোড",
+  "Test publishable key": "পরীক্ষামূলক publishable key",
+  "Test secret key": "পরীক্ষামূলক secret key",
+  "Theme": "থিম",
+  "To date": "শেষ তারিখ",
+  "Twilio": "Twilio",
+  "Twitter / X": "Twitter / X",
+  "Ultimate": "Ultimate",
+  "Upload logo": "লোগো আপলোড করুন",
+  "Username": "ব্যবহারকারীর নাম",
+  "Visible": "দৃশ্যমান",
+  "Webhook required": "Webhook প্রয়োজন",
+  "Weekly days off": "সাপ্তাহিক ছুটির দিন",
+  "Who changed marks, attendance, invoices, payments, enrolments, accounts and settings in this system, and what changed.": "এই সিস্টেমে কে নম্বর, উপস্থিতি, ইনভয়েস, পেমেন্ট, ভর্তি, অ্যাকাউন্ট ও সেটিংস পরিবর্তন করেছেন এবং কী পরিবর্তন হয়েছে।",
 };

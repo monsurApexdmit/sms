@@ -2,50 +2,50 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const notifications: Record<string, string> = {
-  "{label}: {label2}": "", // untranslated
-  "{value} device(s) subscribed.": "", // untranslated
-  "A permanent system-user token": "", // untranslated
-  "Access token": "", // untranslated
-  "All categories": "", // untranslated
-  "Choose how you hear about each kind of update. Channels the school hasn't set up are greyed out.": "", // untranslated
-  "Create keys": "", // untranslated
-  "Create push keys?": "", // untranslated
-  "Default \"en\"": "", // untranslated
-  "Delivery channels": "", // untranslated
-  "Enable push on this device": "", // untranslated
-  "Every device has to turn push on again.": "", // untranslated
-  "In app": "", // untranslated
-  "Inbox": "", // untranslated
-  "Leave the token empty to turn WhatsApp off.": "", // untranslated
-  "Message template": "", // untranslated
-  "Meta WhatsApp Cloud API. Messages go to the phone number on each account.": "", // untranslated
-  "My settings": "", // untranslated
-  "New push keys created": "", // untranslated
-  "no channels": "", // untranslated
-  "No notifications": "", // untranslated
-  "Not created yet": "", // untranslated
-  "Notification settings saved": "", // untranslated
-  "Notifications are blocked for this site. Allow them in the browser's site settings.": "", // untranslated
-  "Notifications on phones and computers that installed or opened the portal and turned push on.": "", // untranslated
-  "Phone number ID": "", // untranslated
-  "Public key": "", // untranslated
-  "Push": "", // untranslated
-  "Push notifications are not set up by the school yet.": "", // untranslated
-  "Push notifications turned off on this device": "", // untranslated
-  "Push notifications turned on for this device": "", // untranslated
-  "Push notifications work in the installed (production) app only.": "", // untranslated
-  "Replace keys": "", // untranslated
-  "Replace the push keys?": "", // untranslated
-  "Send me a test": "", // untranslated
-  "Sent to push services, e.g. \"mailto:office@school.edu\". Defaults to the system email.": "", // untranslated
-  "Template language": "", // untranslated
-  "Test sent ({value})": "", // untranslated
-  "This browser does not support push notifications. On iPhone, add the portal to your Home Screen first.": "", // untranslated
-  "Turn off push on this device": "", // untranslated
-  "Unread": "", // untranslated
-  "Updates about attendance, homework, leave, fees, meetings and notices.": "", // untranslated
-  "Users can then turn on push notifications.": "", // untranslated
-  "Web push": "", // untranslated
-  "WhatsApp": "", // untranslated
-  "WhatsApp Manager → API setup": "", // untranslated
+  "{label}: {label2}": "{label}: {label2}",
+  "{value} device(s) subscribed.": "{value}টি ডিভাইস যুক্ত আছে।",
+  "A permanent system-user token": "একটি স্থায়ী সিস্টেম-ইউজার টোকেন",
+  "Access token": "অ্যাক্সেস টোকেন",
+  "All categories": "সব বিভাগ",
+  "Choose how you hear about each kind of update. Channels the school hasn't set up are greyed out.": "প্রতিটি ধরনের হালনাগাদ কীভাবে জানবেন তা বেছে নিন। বিদ্যালয় যেসব মাধ্যম চালু করেনি সেগুলো ধূসর দেখাবে।",
+  "Create keys": "কী তৈরি করুন",
+  "Create push keys?": "পুশ কী তৈরি করবেন?",
+  "Default \"en\"": "ডিফল্ট \"en\"",
+  "Delivery channels": "পাঠানোর মাধ্যম",
+  "Enable push on this device": "এই ডিভাইসে পুশ চালু করুন",
+  "Every device has to turn push on again.": "প্রতিটি ডিভাইসে আবার পুশ চালু করতে হবে।",
+  "In app": "অ্যাপে",
+  "Inbox": "ইনবক্স",
+  "Leave the token empty to turn WhatsApp off.": "WhatsApp বন্ধ করতে টোকেন খালি রাখুন।",
+  "Message template": "বার্তার টেমপ্লেট",
+  "Meta WhatsApp Cloud API. Messages go to the phone number on each account.": "Meta WhatsApp Cloud API। বার্তা প্রতিটি অ্যাকাউন্টের ফোন নম্বরে যায়।",
+  "My settings": "আমার সেটিংস",
+  "New push keys created": "নতুন পুশ কী তৈরি হয়েছে",
+  "no channels": "কোনো মাধ্যম নেই",
+  "No notifications": "কোনো বিজ্ঞপ্তি নেই",
+  "Not created yet": "এখনও তৈরি হয়নি",
+  "Notification settings saved": "বিজ্ঞপ্তির সেটিংস সংরক্ষিত হয়েছে",
+  "Notifications are blocked for this site. Allow them in the browser's site settings.": "এই সাইটের বিজ্ঞপ্তি বন্ধ করা আছে। ব্রাউজারের সাইট সেটিংসে অনুমতি দিন।",
+  "Notifications on phones and computers that installed or opened the portal and turned push on.": "যেসব ফোন ও কম্পিউটারে পোর্টাল ইনস্টল বা খুলে পুশ চালু করা হয়েছে সেগুলোতে বিজ্ঞপ্তি।",
+  "Phone number ID": "ফোন নম্বর আইডি",
+  "Public key": "পাবলিক কী",
+  "Push": "পুশ",
+  "Push notifications are not set up by the school yet.": "বিদ্যালয় এখনও পুশ বিজ্ঞপ্তি চালু করেনি।",
+  "Push notifications turned off on this device": "এই ডিভাইসে পুশ বিজ্ঞপ্তি বন্ধ হয়েছে",
+  "Push notifications turned on for this device": "এই ডিভাইসে পুশ বিজ্ঞপ্তি চালু হয়েছে",
+  "Push notifications work in the installed (production) app only.": "পুশ বিজ্ঞপ্তি শুধু ইনস্টল করা (প্রোডাকশন) অ্যাপে কাজ করে।",
+  "Replace keys": "কী বদলান",
+  "Replace the push keys?": "পুশ কী বদলাবেন?",
+  "Send me a test": "আমাকে একটি পরীক্ষামূলক বিজ্ঞপ্তি পাঠান",
+  "Sent to push services, e.g. \"mailto:office@school.edu\". Defaults to the system email.": "পুশ সেবায় পাঠানো হয়, যেমন \"mailto:office@school.edu\"। ডিফল্ট হলো সিস্টেম ইমেইল।",
+  "Template language": "টেমপ্লেটের ভাষা",
+  "Test sent ({value})": "পরীক্ষামূলক বিজ্ঞপ্তি পাঠানো হয়েছে ({value})",
+  "This browser does not support push notifications. On iPhone, add the portal to your Home Screen first.": "এই ব্রাউজার পুশ বিজ্ঞপ্তি সমর্থন করে না। iPhone-এ আগে পোর্টালটি হোম স্ক্রিনে যোগ করুন।",
+  "Turn off push on this device": "এই ডিভাইসে পুশ বন্ধ করুন",
+  "Unread": "অপঠিত",
+  "Updates about attendance, homework, leave, fees, meetings and notices.": "উপস্থিতি, বাড়ির কাজ, ছুটি, ফি, সভা ও নোটিশের হালনাগাদ।",
+  "Users can then turn on push notifications.": "এরপর ব্যবহারকারীরা পুশ বিজ্ঞপ্তি চালু করতে পারবেন।",
+  "Web push": "ওয়েব পুশ",
+  "WhatsApp": "WhatsApp",
+  "WhatsApp Manager → API setup": "WhatsApp Manager → API setup",
 };

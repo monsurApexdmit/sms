@@ -2,158 +2,158 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const publicSite: Record<string, string> = {
-  ". Keep it: with your phone number it lets you check the status below.": "", // untranslated
-  "{length} photos": "", // untranslated
-  "{value} / {length}": "", // untranslated
-  "© {getFullYear} {name}. All rights reserved.": "", // untranslated
-  "A26-1F2E3D": "", // untranslated
-  "About": "", // untranslated
-  "Academic year: {year}–{value}  ·  Form no.: ____________": "", // untranslated
-  "Admission": "", // untranslated
-  "Admission form": "", // untranslated
-  "Admission no.": "", // untranslated
-  "Admissions are open": "", // untranslated
-  "Affix passport-size photo": "", // untranslated
-  "All albums": "", // untranslated
-  "All news": "", // untranslated
-  "All notices": "", // untranslated
-  "All teachers": "", // untranslated
-  "Announcements from the school office": "", // untranslated
-  "Anything we should know?": "", // untranslated
-  "Application received": "", // untranslated
-  "Applications for {year} are open. Apply online below, or print the form and hand it in at the school office.": "", // untranslated
-  "Apply online": "", // untranslated
-  "Attach a document": "", // untranslated
-  "Birth certificate (copy)": "", // untranslated
-  "Call us": "", // untranslated
-  "Check an application": "", // untranslated
-  "Check status": "", // untranslated
-  "Class / section": "", // untranslated
-  "Class applying for": "", // untranslated
-  "Class applying for ({year})": "", // untranslated
-  "Contact details have not been published yet.": "", // untranslated
-  "Contact us": "", // untranslated
-  "Dates for your calendar": "", // untranslated
-  "Declaration": "", // untranslated
-  "Documents attached": "", // untranslated
-  "Download the admission form, fill it in and bring it to the school office, or get in touch with any questions.": "", // untranslated
-  "e.g. Birth certificate": "", // untranslated
-  "Educational background": "", // untranslated
-  "Email us": "", // untranslated
-  "Emergency contact (name & phone)": "", // untranslated
-  "Enter a valid email address": "", // untranslated
-  "Enter the reference you received and the phone number given on the application.": "", // untranslated
-  "Facebook": "", // untranslated
-  "Father's name": "", // untranslated
-  "For office use only": "", // untranslated
-  "Full name (in block letters)": "", // untranslated
-  "Get in touch": "", // untranslated
-  "Google": "", // untranslated
-  "Guardian (if other than parents)": "", // untranslated
-  "Home": "", // untranslated
-  "Home address": "", // untranslated
-  "I declare that the information given above is true and complete. I agree to abide by the rules and regulations of {name}.": "", // untranslated
-  "Immunisation / medical record": "", // untranslated
-  "Important dates in the school calendar": "", // untranslated
-  "Instagram": "", // untranslated
-  "Label for {name}": "", // untranslated
-  "Last class attended": "", // untranslated
-  "Latest news": "", // untranslated
-  "Learn more": "", // untranslated
-  "LinkedIn": "", // untranslated
-  "Medical conditions / special needs (if any)": "", // untranslated
-  "Meet our teachers": "", // untranslated
-  "Message is too short": "", // untranslated
-  "Message sent": "", // untranslated
-  "Mobile": "", // untranslated
-  "Moments from school life": "", // untranslated
-  "Mother, father, uncle…": "", // untranslated
-  "Mother's name": "", // untranslated
-  "Nationality": "", // untranslated
-  "Next photo": "", // untranslated
-  "Next slide": "", // untranslated
-  "No albums yet": "", // untranslated
-  "No events": "", // untranslated
-  "No events scheduled.": "", // untranslated
-  "No news yet": "", // untranslated
-  "No notices at the moment.": "", // untranslated
-  "No photos in this album yet": "", // untranslated
-  "No teachers listed yet": "", // untranslated
-  "Nothing here yet.": "", // untranslated
-  "Notices": "", // untranslated
-  "Occupation": "", // untranslated
-  "Official announcements from the school": "", // untranslated
-  "Open in Google Maps": "", // untranslated
-  "Open menu": "", // untranslated
-  "Open original": "", // untranslated
-  "Optional. Up to {MAX_DOCUMENTS} files: PDF, image or Word, each at most 10 MB.": "", // untranslated
-  "Our people": "", // untranslated
-  "Our teachers": "", // untranslated
-  "Paper form": "", // untranslated
-  "Parent / guardian information": "", // untranslated
-  "Parent / guardian name": "", // untranslated
-  "Parent or guardian ID (copy)": "", // untranslated
-  "Past": "", // untranslated
-  "Phone number is too short": "", // untranslated
-  "Phone used on the application": "", // untranslated
-  "Photos from school life": "", // untranslated
-  "Place of birth": "", // untranslated
-  "Please choose a class": "", // untranslated
-  "Please confirm you are not a robot.": "", // untranslated
-  "Please enter a name": "", // untranslated
-  "Please enter a phone number": "", // untranslated
-  "Please enter the student's name": "", // untranslated
-  "Please enter your email": "", // untranslated
-  "Please enter your name": "", // untranslated
-  "Please write a message": "", // untranslated
-  "Portal login": "", // untranslated
-  "Preferred section / shift": "", // untranslated
-  "Previous photo": "", // untranslated
-  "Previous school report card / transcript": "", // untranslated
-  "Previous slide": "", // untranslated
-  "Print form": "", // untranslated
-  "Print the admission form, fill it in by hand and hand it in at the school office together with the listed documents.": "", // untranslated
-  "Questions about admission, fees or anything else? We are happy to help.": "", // untranslated
-  "Questions? Contact us": "", // untranslated
-  "Reach the school office": "", // untranslated
-  "Reason for leaving": "", // untranslated
-  "reCAPTCHA failed to load": "", // untranslated
-  "Received by": "", // untranslated
-  "Relation to student": "", // untranslated
-  "Relationship": "", // untranslated
-  "Result / GPA": "", // untranslated
-  "Save as PDF": "", // untranslated
-  "School life": "", // untranslated
-  "School location": "", // untranslated
-  "Send another message": "", // untranslated
-  "Send message": "", // untranslated
-  "Send us a message": "", // untranslated
-  "Signature of parent / guardian": "", // untranslated
-  "Signature of student": "", // untranslated
-  "Slide {value}": "", // untranslated
-  "Stay informed": "", // untranslated
-  "Stories and updates from campus": "", // untranslated
-  "Stories and updates from our school community": "", // untranslated
-  "Student information": "", // untranslated
-  "Student's full name": "", // untranslated
-  "Submit application": "", // untranslated
-  "Thank you for getting in touch. The school office will reply to you by email as soon as possible.": "", // untranslated
-  "The dedicated people who make learning happen": "", // untranslated
-  "The spam check could not be loaded. Check your connection and reload the page.": "", // untranslated
-  "Transfer / leaving certificate": "", // untranslated
-  "Two recent passport-size photographs": "", // untranslated
-  "Upcoming": "", // untranslated
-  "updated {dayjs}": "", // untranslated
-  "View all": "", // untranslated
-  "Visit us": "", // untranslated
-  "We send the reference and decisions here": "", // untranslated
-  "We usually reply within one working day.": "", // untranslated
-  "Welcome to {name}": "", // untranslated
-  "Welcome to {schoolName}": "", // untranslated
-  "What is happening and when": "", // untranslated
-  "X / Twitter": "", // untranslated
-  "You get a reference number right away. The school office will contact you.": "", // untranslated
-  "Your name": "", // untranslated
-  "Your reference is": "", // untranslated
-  "YouTube": "", // untranslated
+  ". Keep it: with your phone number it lets you check the status below.": "। এটি সংরক্ষণ করুন: আপনার ফোন নম্বরসহ এটি দিয়ে নিচে আবেদনের অবস্থা দেখতে পারবেন।",
+  "{length} photos": "{length}টি ছবি",
+  "{value} / {length}": "{value} / {length}",
+  "© {getFullYear} {name}. All rights reserved.": "© {getFullYear} {name}। সর্বস্বত্ব সংরক্ষিত।",
+  "A26-1F2E3D": "A26-1F2E3D",
+  "About": "পরিচিতি",
+  "Academic year: {year}–{value}  ·  Form no.: ____________": "শিক্ষাবর্ষ: {year}–{value}  ·  ফর্ম নং: ____________",
+  "Admission": "ভর্তি",
+  "Admission form": "ভর্তি ফর্ম",
+  "Admission no.": "ভর্তি নং",
+  "Admissions are open": "ভর্তি চলছে",
+  "Affix passport-size photo": "পাসপোর্ট সাইজের ছবি লাগান",
+  "All albums": "সব অ্যালবাম",
+  "All news": "সব সংবাদ",
+  "All notices": "সব নোটিশ",
+  "All teachers": "সব শিক্ষক",
+  "Announcements from the school office": "বিদ্যালয়ের অফিসের ঘোষণা",
+  "Anything we should know?": "আমাদের আর কিছু জানানোর আছে?",
+  "Application received": "আবেদন গৃহীত হয়েছে",
+  "Applications for {year} are open. Apply online below, or print the form and hand it in at the school office.": "{year}-এর আবেদন চলছে। নিচে অনলাইনে আবেদন করুন, অথবা ফর্ম প্রিন্ট করে বিদ্যালয়ের অফিসে জমা দিন।",
+  "Apply online": "অনলাইনে আবেদন করুন",
+  "Attach a document": "একটি কাগজ সংযুক্ত করুন",
+  "Birth certificate (copy)": "জন্ম নিবন্ধন সনদ (কপি)",
+  "Call us": "আমাদের ফোন করুন",
+  "Check an application": "আবেদন যাচাই করুন",
+  "Check status": "অবস্থা দেখুন",
+  "Class / section": "শ্রেণি / শাখা",
+  "Class applying for": "যে শ্রেণিতে ভর্তির আবেদন",
+  "Class applying for ({year})": "যে শ্রেণিতে ভর্তির আবেদন ({year})",
+  "Contact details have not been published yet.": "যোগাযোগের তথ্য এখনও প্রকাশ করা হয়নি।",
+  "Contact us": "যোগাযোগ করুন",
+  "Dates for your calendar": "আপনার ক্যালেন্ডারের জন্য তারিখ",
+  "Declaration": "ঘোষণা",
+  "Documents attached": "সংযুক্ত কাগজপত্র",
+  "Download the admission form, fill it in and bring it to the school office, or get in touch with any questions.": "ভর্তি ফর্ম ডাউনলোড করে পূরণ করুন এবং বিদ্যালয়ের অফিসে নিয়ে আসুন, অথবা কোনো প্রশ্ন থাকলে যোগাযোগ করুন।",
+  "e.g. Birth certificate": "যেমন: জন্ম নিবন্ধন সনদ",
+  "Educational background": "শিক্ষাগত তথ্য",
+  "Email us": "আমাদের ইমেইল করুন",
+  "Emergency contact (name & phone)": "জরুরি যোগাযোগ (নাম ও ফোন)",
+  "Enter a valid email address": "সঠিক ইমেইল ঠিকানা দিন",
+  "Enter the reference you received and the phone number given on the application.": "আপনার পাওয়া রেফারেন্স এবং আবেদনে দেওয়া ফোন নম্বরটি লিখুন।",
+  "Facebook": "Facebook",
+  "Father's name": "পিতার নাম",
+  "For office use only": "শুধু অফিসের ব্যবহারের জন্য",
+  "Full name (in block letters)": "পূর্ণ নাম (বড় হাতের অক্ষরে)",
+  "Get in touch": "যোগাযোগ করুন",
+  "Google": "Google",
+  "Guardian (if other than parents)": "অভিভাবক (পিতা-মাতা ছাড়া অন্য কেউ হলে)",
+  "Home": "প্রথম পাতা",
+  "Home address": "বাড়ির ঠিকানা",
+  "I declare that the information given above is true and complete. I agree to abide by the rules and regulations of {name}.": "আমি ঘোষণা করছি যে উপরে দেওয়া তথ্য সত্য ও সম্পূর্ণ। আমি {name}-এর নিয়মকানুন মেনে চলতে সম্মত।",
+  "Immunisation / medical record": "টিকা / চিকিৎসার রেকর্ড",
+  "Important dates in the school calendar": "বিদ্যালয়ের ক্যালেন্ডারের গুরুত্বপূর্ণ তারিখ",
+  "Instagram": "Instagram",
+  "Label for {name}": "{name}-এর নাম",
+  "Last class attended": "সর্বশেষ যে শ্রেণিতে পড়েছে",
+  "Latest news": "সাম্প্রতিক সংবাদ",
+  "Learn more": "আরও জানুন",
+  "LinkedIn": "LinkedIn",
+  "Medical conditions / special needs (if any)": "শারীরিক সমস্যা / বিশেষ চাহিদা (যদি থাকে)",
+  "Meet our teachers": "আমাদের শিক্ষকদের সাথে পরিচিত হোন",
+  "Message is too short": "বার্তাটি খুব ছোট",
+  "Message sent": "বার্তা পাঠানো হয়েছে",
+  "Mobile": "মোবাইল",
+  "Moments from school life": "বিদ্যালয় জীবনের মুহূর্ত",
+  "Mother, father, uncle…": "মা, বাবা, চাচা…",
+  "Mother's name": "মাতার নাম",
+  "Nationality": "জাতীয়তা",
+  "Next photo": "পরের ছবি",
+  "Next slide": "পরের স্লাইড",
+  "No albums yet": "এখনও কোনো অ্যালবাম নেই",
+  "No events": "কোনো অনুষ্ঠান নেই",
+  "No events scheduled.": "কোনো অনুষ্ঠান নির্ধারিত নেই।",
+  "No news yet": "এখনও কোনো সংবাদ নেই",
+  "No notices at the moment.": "এই মুহূর্তে কোনো নোটিশ নেই।",
+  "No photos in this album yet": "এই অ্যালবামে এখনও কোনো ছবি নেই",
+  "No teachers listed yet": "এখনও কোনো শিক্ষকের তালিকা নেই",
+  "Nothing here yet.": "এখানে এখনও কিছু নেই।",
+  "Notices": "নোটিশ",
+  "Occupation": "পেশা",
+  "Official announcements from the school": "বিদ্যালয়ের দাপ্তরিক ঘোষণা",
+  "Open in Google Maps": "Google Maps-এ খুলুন",
+  "Open menu": "মেনু খুলুন",
+  "Open original": "মূল ছবি খুলুন",
+  "Optional. Up to {MAX_DOCUMENTS} files: PDF, image or Word, each at most 10 MB.": "ঐচ্ছিক। সর্বোচ্চ {MAX_DOCUMENTS}টি ফাইল: PDF, ছবি বা Word, প্রতিটি সর্বোচ্চ ১০ MB।",
+  "Our people": "আমাদের মানুষ",
+  "Our teachers": "আমাদের শিক্ষক",
+  "Paper form": "কাগজের ফর্ম",
+  "Parent / guardian information": "পিতা-মাতা / অভিভাবকের তথ্য",
+  "Parent / guardian name": "পিতা-মাতা / অভিভাবকের নাম",
+  "Parent or guardian ID (copy)": "পিতা-মাতা বা অভিভাবকের পরিচয়পত্র (কপি)",
+  "Past": "অতীত",
+  "Phone number is too short": "ফোন নম্বর খুব ছোট",
+  "Phone used on the application": "আবেদনে দেওয়া ফোন নম্বর",
+  "Photos from school life": "বিদ্যালয় জীবনের ছবি",
+  "Place of birth": "জন্মস্থান",
+  "Please choose a class": "একটি শ্রেণি বেছে নিন",
+  "Please confirm you are not a robot.": "অনুগ্রহ করে নিশ্চিত করুন যে আপনি রোবট নন।",
+  "Please enter a name": "অনুগ্রহ করে একটি নাম লিখুন",
+  "Please enter a phone number": "অনুগ্রহ করে একটি ফোন নম্বর লিখুন",
+  "Please enter the student's name": "অনুগ্রহ করে শিক্ষার্থীর নাম লিখুন",
+  "Please enter your email": "অনুগ্রহ করে আপনার ইমেইল লিখুন",
+  "Please enter your name": "অনুগ্রহ করে আপনার নাম লিখুন",
+  "Please write a message": "অনুগ্রহ করে একটি বার্তা লিখুন",
+  "Portal login": "পোর্টালে লগইন",
+  "Preferred section / shift": "পছন্দের শাখা / শিফট",
+  "Previous photo": "আগের ছবি",
+  "Previous school report card / transcript": "পূর্ববর্তী বিদ্যালয়ের রিপোর্ট কার্ড / নম্বরপত্র",
+  "Previous slide": "আগের স্লাইড",
+  "Print form": "ফর্ম প্রিন্ট করুন",
+  "Print the admission form, fill it in by hand and hand it in at the school office together with the listed documents.": "ভর্তি ফর্ম প্রিন্ট করে হাতে পূরণ করুন এবং তালিকাভুক্ত কাগজপত্রসহ বিদ্যালয়ের অফিসে জমা দিন।",
+  "Questions about admission, fees or anything else? We are happy to help.": "ভর্তি, ফি বা অন্য কোনো বিষয়ে প্রশ্ন আছে? আমরা সাহায্য করতে প্রস্তুত।",
+  "Questions? Contact us": "প্রশ্ন আছে? যোগাযোগ করুন",
+  "Reach the school office": "বিদ্যালয়ের অফিসে যোগাযোগ করুন",
+  "Reason for leaving": "বিদ্যালয় ছাড়ার কারণ",
+  "reCAPTCHA failed to load": "reCAPTCHA লোড হয়নি",
+  "Received by": "গ্রহণকারী",
+  "Relation to student": "শিক্ষার্থীর সাথে সম্পর্ক",
+  "Relationship": "সম্পর্ক",
+  "Result / GPA": "ফলাফল / জিপিএ",
+  "Save as PDF": "PDF হিসেবে সংরক্ষণ করুন",
+  "School life": "বিদ্যালয় জীবন",
+  "School location": "বিদ্যালয়ের অবস্থান",
+  "Send another message": "আরেকটি বার্তা পাঠান",
+  "Send message": "বার্তা পাঠান",
+  "Send us a message": "আমাদের বার্তা পাঠান",
+  "Signature of parent / guardian": "পিতা-মাতা / অভিভাবকের স্বাক্ষর",
+  "Signature of student": "শিক্ষার্থীর স্বাক্ষর",
+  "Slide {value}": "স্লাইড {value}",
+  "Stay informed": "হালনাগাদ থাকুন",
+  "Stories and updates from campus": "ক্যাম্পাসের গল্প ও খবর",
+  "Stories and updates from our school community": "আমাদের বিদ্যালয় পরিবারের গল্প ও খবর",
+  "Student information": "শিক্ষার্থীর তথ্য",
+  "Student's full name": "শিক্ষার্থীর পূর্ণ নাম",
+  "Submit application": "আবেদন জমা দিন",
+  "Thank you for getting in touch. The school office will reply to you by email as soon as possible.": "যোগাযোগের জন্য ধন্যবাদ। বিদ্যালয়ের অফিস যত দ্রুত সম্ভব ইমেইলে উত্তর দেবে।",
+  "The dedicated people who make learning happen": "যাদের নিষ্ঠায় শেখা সম্ভব হয়",
+  "The spam check could not be loaded. Check your connection and reload the page.": "স্প্যাম যাচাই লোড করা যায়নি। আপনার সংযোগ পরীক্ষা করে পাতাটি আবার লোড করুন।",
+  "Transfer / leaving certificate": "ছাড়পত্র",
+  "Two recent passport-size photographs": "সাম্প্রতিক দুই কপি পাসপোর্ট সাইজের ছবি",
+  "Upcoming": "আসন্ন",
+  "updated {dayjs}": "হালনাগাদ {dayjs}",
+  "View all": "সব দেখুন",
+  "Visit us": "আমাদের এখানে আসুন",
+  "We send the reference and decisions here": "রেফারেন্স ও সিদ্ধান্ত এখানে পাঠানো হয়",
+  "We usually reply within one working day.": "আমরা সাধারণত এক কার্যদিবসের মধ্যে উত্তর দিই।",
+  "Welcome to {name}": "{name}-এ স্বাগতম",
+  "Welcome to {schoolName}": "{schoolName}-এ স্বাগতম",
+  "What is happening and when": "কী হচ্ছে এবং কবে",
+  "X / Twitter": "X / Twitter",
+  "You get a reference number right away. The school office will contact you.": "আপনি সঙ্গে সঙ্গে একটি রেফারেন্স নম্বর পাবেন। বিদ্যালয়ের অফিস আপনার সাথে যোগাযোগ করবে।",
+  "Your name": "আপনার নাম",
+  "Your reference is": "আপনার রেফারেন্স হলো",
+  "YouTube": "YouTube",
 };

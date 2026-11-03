@@ -520,7 +520,7 @@ export function ReportCardsPage() {
 
   return (
     <div className="space-y-6">
-      <style>{t("@media print { @page { size: A4 portrait; } }")}</style>
+      <style>{"@media print { @page { size: A4 portrait; } }"}</style>
       <PageHeader
         title={t("Report cards")}
         subtitle={staff ? t("Results per exam or for the whole year, with positions, attendance and remarks. Print one or the whole section.") : undefined}

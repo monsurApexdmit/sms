@@ -2,34 +2,34 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const academic: Record<string, string> = {
-  "Add period": "", // untranslated
-  "Choose a class and section": "", // untranslated
-  "Choose a file": "", // untranslated
-  "Class {className} · Section {sectionName}": "", // untranslated
-  "Class {value} : Section {value2}": "", // untranslated
-  "Delete file?": "", // untranslated
-  "e.g. 10": "", // untranslated
-  "e.g. Ten (max 11 characters)": "", // untranslated
-  "Edit period": "", // untranslated
-  "End time must be after the start time": "", // untranslated
-  "File": "", // untranslated
-  "Files are renamed and served through signed links.": "", // untranslated
-  "Filter by class": "", // untranslated
-  "Nick name": "", // untranslated
-  "No classes": "", // untranslated
-  "Nothing uploaded yet": "", // untranslated
-  "Numeric name": "", // untranslated
-  "Period updated": "", // untranslated
-  "Periods of the subjects you teach": "", // untranslated
-  "Remove period": "", // untranslated
-  "Remove this period?": "", // untranslated
-  "Section teacher": "", // untranslated
-  "Sections": "", // untranslated
-  "Start and end times are required": "", // untranslated
-  "Subject #{subject_id}": "", // untranslated
-  "The weekly timetable appears here.": "", // untranslated
-  "Upload {toLowerCase}": "", // untranslated
-  "Uploaded": "", // untranslated
-  "Weekly timetable": "", // untranslated
-  "Weekly timetable (read only)": "", // untranslated
+  "Add period": "পিরিয়ড যোগ করুন",
+  "Choose a class and section": "শ্রেণি ও শাখা বেছে নিন",
+  "Choose a file": "একটি ফাইল বেছে নিন",
+  "Class {className} · Section {sectionName}": "শ্রেণি {className} · শাখা {sectionName}",
+  "Class {value} : Section {value2}": "শ্রেণি {value} : শাখা {value2}",
+  "Delete file?": "ফাইলটি মুছে ফেলবেন?",
+  "e.g. 10": "যেমন: 10",
+  "e.g. Ten (max 11 characters)": "যেমন: দশম (সর্বোচ্চ ১১ অক্ষর)",
+  "Edit period": "পিরিয়ড সম্পাদনা",
+  "End time must be after the start time": "শেষের সময় শুরুর সময়ের পরে হতে হবে",
+  "File": "ফাইল",
+  "Files are renamed and served through signed links.": "ফাইলগুলোর নাম বদলে নিরাপদ লিংকের মাধ্যমে দেওয়া হয়।",
+  "Filter by class": "শ্রেণি অনুযায়ী বাছাই",
+  "Nick name": "ডাকনাম",
+  "No classes": "কোনো শ্রেণি নেই",
+  "Nothing uploaded yet": "এখনও কিছু আপলোড করা হয়নি",
+  "Numeric name": "সংখ্যায় নাম",
+  "Period updated": "পিরিয়ড হালনাগাদ হয়েছে",
+  "Periods of the subjects you teach": "আপনার পড়ানো বিষয়গুলোর পিরিয়ড",
+  "Remove period": "পিরিয়ড সরান",
+  "Remove this period?": "এই পিরিয়ডটি সরাবেন?",
+  "Section teacher": "শাখা শিক্ষক",
+  "Sections": "শাখাসমূহ",
+  "Start and end times are required": "শুরু ও শেষের সময় আবশ্যক",
+  "Subject #{subject_id}": "বিষয় #{subject_id}",
+  "The weekly timetable appears here.": "সাপ্তাহিক রুটিন এখানে দেখা যাবে।",
+  "Upload {toLowerCase}": "{toLowerCase} আপলোড করুন",
+  "Uploaded": "আপলোড হয়েছে",
+  "Weekly timetable": "সাপ্তাহিক রুটিন",
+  "Weekly timetable (read only)": "সাপ্তাহিক রুটিন (শুধু দেখার জন্য)",
 };

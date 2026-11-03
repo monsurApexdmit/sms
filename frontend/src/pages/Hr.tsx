@@ -220,7 +220,7 @@ function MonthGrid({ path }: { path: string }) {
 export function StaffAttendancePage() {
   return (
     <div className="space-y-6">
-      <style>{t("@media print { @page { size: landscape; } }")}</style>
+      <style>{"@media print { @page { size: landscape; } }"}</style>
       <PageHeader title={t("Staff attendance")} subtitle={t("Teachers, librarians and accountants. Absences can reduce pay when payroll deducts them.")} />
       <Tabs defaultValue="daily" className="gap-6">
         <TabsList className="no-print">

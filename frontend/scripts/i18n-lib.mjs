@@ -18,8 +18,8 @@ export const I18N = path.join(SRC, "i18n");
 export const LANGS = ["bn"];
 const FUNCS = ["t", "tn", "tp"];
 
-/** Text in these elements is code or data, not language. */
-const CODE_TAGS = new Set(["code", "kbd", "pre", "samp"]);
+/** Text in these elements is code, CSS or data, not language. */
+const CODE_TAGS = new Set(["code", "kbd", "pre", "samp", "style", "script"]);
 /** Attributes whose string values are read by people (checked for hard-coded text). */
 export const TEXT_ATTRS = new Set(["label", "title", "placeholder", "emptyText", "subtitle", "description", "aria-label", "hint", "alt", "nameLabel", "namePlaceholder", "eyebrow", "confirmLabel", "cancelLabel"]);
 /** Hard-coded JSX text that is allowed (data formats, product names shown verbatim). */

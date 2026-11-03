@@ -2,82 +2,81 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const studentRecords: Record<string, string> = {
-  ": {cancel_reason}": "", // untranslated
-  "· Parent: {parent_name}": "", // untranslated
-  "@media print { @page { size: A4; margin: 16mm; } }": "", // untranslated
-  "A cancelled certificate can't be printed by the student or parent and no longer verifies.": "", // untranslated
-  "Achievement": "", // untranslated
-  "Action taken": "", // untranslated
-  "Action: {action_taken}": "", // untranslated
-  "Add default templates": "", // untranslated
-  "Add record": "", // untranslated
-  "All kinds": "", // untranslated
-  "Allergies": "", // untranslated
-  "Available when issuing": "", // untranslated
-  "Bonafide certificate": "", // untranslated
-  "Cancel {serial_no}?": "", // untranslated
-  "Cancel certificate": "", // untranslated
-  "Cancelled{value}. Shown for the record only.": "", // untranslated
-  "Certificate": "", // untranslated
-  "Certificate cancelled": "", // untranslated
-  "Certificate issued": "", // untranslated
-  "Certificates ({length})": "", // untranslated
-  "Character certificate": "", // untranslated
-  "Choose a student and a template to see the preview.": "", // untranslated
-  "Choose template": "", // untranslated
-  "Class {class_name}{value}{value2}": "", // untranslated
-  "Click a placeholder to add it; it is replaced with the student's details when issuing.": "", // untranslated
-  "Conduct": "", // untranslated
-  "Confidential": "", // untranslated
-  "Counselling": "", // untranslated
-  "Counselling notes are always confidential.": "", // untranslated
-  "Date: {fmtDate}": "", // untranslated
-  "Default templates added": "", // untranslated
-  "Delete \"{name}\"?": "", // untranslated
-  "Discipline": "", // untranslated
-  "Doctor": "", // untranslated
-  "Edit record": "", // untranslated
-  "Edit template": "", // untranslated
-  "Emergency contact": "", // untranslated
-  "Emergency phone": "", // untranslated
-  "Head of institution": "", // untranslated
-  "Health": "", // untranslated
-  "Health profile": "", // untranslated
-  "Health profile saved": "", // untranslated
-  "Health profile, school records and certificates": "", // untranslated
-  "Health, records and certificates": "", // untranslated
-  "Height (cm)": "", // untranslated
-  "Issue certificate": "", // untranslated
-  "Issue date": "", // untranslated
-  "Keep": "", // untranslated
-  "Kind": "", // untranslated
-  "Medical conditions": "", // untranslated
-  "Medications": "", // untranslated
-  "New template": "", // untranslated
-  "No active templates": "", // untranslated
-  "No certificates issued": "", // untranslated
-  "No records.": "", // untranslated
-  "No templates": "", // untranslated
-  "Not enrolled this year": "", // untranslated
-  "Nothing recorded yet.": "", // untranslated
-  "Only admins and the author can see it. Never shown to the student or parents.": "", // untranslated
-  "Open / print": "", // untranslated
-  "Reason / purpose": "", // untranslated
-  "Records": "", // untranslated
-  "Records ({length})": "", // untranslated
-  "Serial": "", // untranslated
-  "Serial:": "", // untranslated
-  "Sets the serial prefix (TC, BC, CC, CERT)": "", // untranslated
-  "Template": "", // untranslated
-  "Template saved": "", // untranslated
-  "Templates": "", // untranslated
-  "The text is saved as shown in the preview; later template changes don't alter issued certificates.": "", // untranslated
-  "This certificate is not available": "", // untranslated
-  "This student's records are not available to you": "", // untranslated
-  "Transfer certificate": "", // untranslated
-  "Transfer, bonafide and character certificates. Anyone can check a serial number at /api/public/certificates/verify.": "", // untranslated
-  "Unknown placeholders stay as typed:": "", // untranslated
-  "unknown: {unknown_placeholders}": "", // untranslated
-  "Updated {dayjs}": "", // untranslated
-  "Weight (kg)": "", // untranslated
+  ": {cancel_reason}": ": {cancel_reason}",
+  "· Parent: {parent_name}": "· অভিভাবক: {parent_name}",
+  "A cancelled certificate can't be printed by the student or parent and no longer verifies.": "বাতিল সনদ শিক্ষার্থী বা অভিভাবক প্রিন্ট করতে পারবেন না এবং এটি আর যাচাইয়ে বৈধ দেখাবে না।",
+  "Achievement": "কৃতিত্ব",
+  "Action taken": "গৃহীত ব্যবস্থা",
+  "Action: {action_taken}": "ব্যবস্থা: {action_taken}",
+  "Add default templates": "ডিফল্ট টেমপ্লেট যোগ করুন",
+  "Add record": "রেকর্ড যোগ করুন",
+  "All kinds": "সব ধরন",
+  "Allergies": "অ্যালার্জি",
+  "Available when issuing": "ইস্যু করার সময় পাওয়া যাবে",
+  "Bonafide certificate": "প্রত্যয়নপত্র",
+  "Cancel {serial_no}?": "{serial_no} বাতিল করবেন?",
+  "Cancel certificate": "সনদ বাতিল করুন",
+  "Cancelled{value}. Shown for the record only.": "বাতিল{value}। শুধু রেকর্ডের জন্য দেখানো হচ্ছে।",
+  "Certificate": "সনদ",
+  "Certificate cancelled": "সনদ বাতিল হয়েছে",
+  "Certificate issued": "সনদ ইস্যু হয়েছে",
+  "Certificates ({length})": "সনদপত্র ({length})",
+  "Character certificate": "চারিত্রিক সনদ",
+  "Choose a student and a template to see the preview.": "প্রিভিউ দেখতে শিক্ষার্থী ও টেমপ্লেট বেছে নিন।",
+  "Choose template": "টেমপ্লেট বেছে নিন",
+  "Class {class_name}{value}{value2}": "শ্রেণি {class_name}{value}{value2}",
+  "Click a placeholder to add it; it is replaced with the student's details when issuing.": "যোগ করতে একটি স্থানধারকে ক্লিক করুন; ইস্যুর সময় এটি শিক্ষার্থীর তথ্য দিয়ে বদলে যাবে।",
+  "Conduct": "আচরণ",
+  "Confidential": "গোপনীয়",
+  "Counselling": "কাউন্সেলিং",
+  "Counselling notes are always confidential.": "কাউন্সেলিং নোট সবসময় গোপনীয়।",
+  "Date: {fmtDate}": "তারিখ: {fmtDate}",
+  "Default templates added": "ডিফল্ট টেমপ্লেট যোগ করা হয়েছে",
+  "Delete \"{name}\"?": "\"{name}\" মুছে ফেলবেন?",
+  "Discipline": "শৃঙ্খলা",
+  "Doctor": "চিকিৎসক",
+  "Edit record": "রেকর্ড সম্পাদনা",
+  "Edit template": "টেমপ্লেট সম্পাদনা",
+  "Emergency contact": "জরুরি যোগাযোগ",
+  "Emergency phone": "জরুরি ফোন",
+  "Head of institution": "প্রতিষ্ঠান প্রধান",
+  "Health": "স্বাস্থ্য",
+  "Health profile": "স্বাস্থ্য প্রোফাইল",
+  "Health profile saved": "স্বাস্থ্য প্রোফাইল সংরক্ষিত হয়েছে",
+  "Health profile, school records and certificates": "স্বাস্থ্য প্রোফাইল, বিদ্যালয়ের রেকর্ড ও সনদপত্র",
+  "Health, records and certificates": "স্বাস্থ্য, রেকর্ড ও সনদপত্র",
+  "Height (cm)": "উচ্চতা (সেমি)",
+  "Issue certificate": "সনদ ইস্যু করুন",
+  "Issue date": "ইস্যুর তারিখ",
+  "Keep": "রাখুন",
+  "Kind": "ধরন",
+  "Medical conditions": "শারীরিক সমস্যা",
+  "Medications": "ওষুধ",
+  "New template": "নতুন টেমপ্লেট",
+  "No active templates": "কোনো সক্রিয় টেমপ্লেট নেই",
+  "No certificates issued": "কোনো সনদ ইস্যু করা হয়নি",
+  "No records.": "কোনো রেকর্ড নেই।",
+  "No templates": "কোনো টেমপ্লেট নেই",
+  "Not enrolled this year": "এ বছর ভর্তি নয়",
+  "Nothing recorded yet.": "এখনও কিছু লিপিবদ্ধ নেই।",
+  "Only admins and the author can see it. Never shown to the student or parents.": "শুধু অ্যাডমিন ও লেখক এটি দেখতে পারবেন। শিক্ষার্থী বা অভিভাবককে কখনো দেখানো হয় না।",
+  "Open / print": "খুলুন / প্রিন্ট করুন",
+  "Reason / purpose": "কারণ / উদ্দেশ্য",
+  "Records": "রেকর্ড",
+  "Records ({length})": "রেকর্ড ({length})",
+  "Serial": "ক্রমিক নং",
+  "Serial:": "ক্রমিক নং:",
+  "Sets the serial prefix (TC, BC, CC, CERT)": "ক্রমিক নম্বরের শুরুর অংশ নির্ধারণ করে (TC, BC, CC, CERT)",
+  "Template": "টেমপ্লেট",
+  "Template saved": "টেমপ্লেট সংরক্ষিত হয়েছে",
+  "Templates": "টেমপ্লেট",
+  "The text is saved as shown in the preview; later template changes don't alter issued certificates.": "প্রিভিউতে যেমন দেখাচ্ছে লেখাটি তেমনই সংরক্ষিত হয়; পরে টেমপ্লেট বদলালেও ইস্যু করা সনদ বদলায় না।",
+  "This certificate is not available": "এই সনদটি পাওয়া যাচ্ছে না",
+  "This student's records are not available to you": "এই শিক্ষার্থীর রেকর্ড আপনার জন্য উন্মুক্ত নয়",
+  "Transfer certificate": "ছাড়পত্র",
+  "Transfer, bonafide and character certificates. Anyone can check a serial number at /api/public/certificates/verify.": "ছাড়পত্র, প্রত্যয়নপত্র ও চারিত্রিক সনদ। যে কেউ /api/public/certificates/verify-এ ক্রমিক নম্বর যাচাই করতে পারবেন।",
+  "Unknown placeholders stay as typed:": "অজানা স্থানধারক যেমন লেখা আছে তেমনই থাকবে:",
+  "unknown: {unknown_placeholders}": "অজানা: {unknown_placeholders}",
+  "Updated {dayjs}": "হালনাগাদ {dayjs}",
+  "Weight (kg)": "ওজন (কেজি)",
 };

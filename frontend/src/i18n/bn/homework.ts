@@ -2,57 +2,57 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const homework: Record<string, string> = {
-  "· {teacher_name}": "", // untranslated
-  "· all sections": "", // untranslated
-  "· out of {max_marks}": "", // untranslated
-  "{subject_name}{value} · set {day} · due {day2}": "", // untranslated
-  "{value} · due {day} · {handedIn} of {length} handed in": "", // untranslated
-  "Accept late submissions (marked as late)": "", // untranslated
-  "All sections": "", // untranslated
-  "All subjects": "", // untranslated
-  "Answer": "", // untranslated
-  "Attached file": "", // untranslated
-  "Due {day}": "", // untranslated
-  "Due {value}.": "", // untranslated
-  "Due soon": "", // untranslated
-  "Due today": "", // untranslated
-  "Edit homework": "", // untranslated
-  "Feedback": "", // untranslated
-  "Graded": "", // untranslated
-  "Graded {score}": "", // untranslated
-  "Hand in": "", // untranslated
-  "Handed in": "", // untranslated
-  "Handed in {dayjs}": "", // untranslated
-  "Homework deleted": "", // untranslated
-  "Homework handed in": "", // untranslated
-  "Homework saved": "", // untranslated
-  "Homework set for your class.": "", // untranslated
-  "Homework sheet": "", // untranslated
-  "Leave empty for ungraded homework": "", // untranslated
-  "Marks (of {max_marks})": "", // untranslated
-  "Marks: {score}": "", // untranslated
-  "Must be more than 0": "", // untranslated
-  "New homework": "", // untranslated
-  "New homework appears here when a teacher sets it.": "", // untranslated
-  "No homework": "", // untranslated
-  "No homework yet": "", // untranslated
-  "No open homework": "", // untranslated
-  "No students are enrolled for this homework.": "", // untranslated
-  "Not submitted": "", // untranslated
-  "Out of (marks)": "", // untranslated
-  "Past due": "", // untranslated
-  "Remove the current attachment": "", // untranslated
-  "Replace answer": "", // untranslated
-  "Replace attachment": "", // untranslated
-  "Replace your answer": "", // untranslated
-  "Saved grade for {name}": "", // untranslated
-  "Set homework for a class or section, collect answers and grade them.": "", // untranslated
-  "Students' submissions and grades are deleted too.": "", // untranslated
-  "Submissions": "", // untranslated
-  "Submitted late": "", // untranslated
-  "This will be marked as late.": "", // untranslated
-  "You teach no subject in this class": "", // untranslated
-  "Your child's homework, what was handed in and the grades.": "", // untranslated
-  "Your file": "", // untranslated
-  "Your new answer replaces the one you handed in, attachment included.": "", // untranslated
+  "· {teacher_name}": "· {teacher_name}",
+  "· all sections": "· সব শাখা",
+  "· out of {max_marks}": "· {max_marks}-এর মধ্যে",
+  "{subject_name}{value} · set {day} · due {day2}": "{subject_name}{value} · দেওয়া হয়েছে {day} · জমার শেষ {day2}",
+  "{value} · due {day} · {handedIn} of {length} handed in": "{value} · জমার শেষ {day} · {length} জনের মধ্যে {handedIn} জন জমা দিয়েছে",
+  "Accept late submissions (marked as late)": "দেরিতে জমা গ্রহণ করুন (দেরি হিসেবে চিহ্নিত হবে)",
+  "All sections": "সব শাখা",
+  "All subjects": "সব বিষয়",
+  "Answer": "উত্তর",
+  "Attached file": "সংযুক্ত ফাইল",
+  "Due {day}": "জমার শেষ {day}",
+  "Due {value}.": "জমার শেষ {value}।",
+  "Due soon": "শিগগির জমা দিতে হবে",
+  "Due today": "আজ জমার শেষ দিন",
+  "Edit homework": "বাড়ির কাজ সম্পাদনা",
+  "Feedback": "মতামত",
+  "Graded": "মূল্যায়িত",
+  "Graded {score}": "মূল্যায়ন {score}",
+  "Hand in": "জমা দিন",
+  "Handed in": "জমা দেওয়া হয়েছে",
+  "Handed in {dayjs}": "জমা দেওয়া হয়েছে {dayjs}",
+  "Homework deleted": "বাড়ির কাজ মুছে ফেলা হয়েছে",
+  "Homework handed in": "বাড়ির কাজ জমা দেওয়া হয়েছে",
+  "Homework saved": "বাড়ির কাজ সংরক্ষিত হয়েছে",
+  "Homework set for your class.": "আপনার শ্রেণির জন্য দেওয়া বাড়ির কাজ।",
+  "Homework sheet": "বাড়ির কাজের তালিকা",
+  "Leave empty for ungraded homework": "নম্বরবিহীন বাড়ির কাজের জন্য খালি রাখুন",
+  "Marks (of {max_marks})": "নম্বর ({max_marks}-এর মধ্যে)",
+  "Marks: {score}": "নম্বর: {score}",
+  "Must be more than 0": "০-এর বেশি হতে হবে",
+  "New homework": "নতুন বাড়ির কাজ",
+  "New homework appears here when a teacher sets it.": "শিক্ষক নতুন বাড়ির কাজ দিলে এখানে দেখা যাবে।",
+  "No homework": "কোনো বাড়ির কাজ নেই",
+  "No homework yet": "এখনও কোনো বাড়ির কাজ নেই",
+  "No open homework": "চলমান কোনো বাড়ির কাজ নেই",
+  "No students are enrolled for this homework.": "এই বাড়ির কাজের জন্য কোনো শিক্ষার্থী ভর্তি নেই।",
+  "Not submitted": "জমা দেওয়া হয়নি",
+  "Out of (marks)": "মোট নম্বর",
+  "Past due": "সময় পেরিয়ে গেছে",
+  "Remove the current attachment": "বর্তমান সংযুক্তি সরান",
+  "Replace answer": "উত্তর বদলান",
+  "Replace attachment": "সংযুক্তি বদলান",
+  "Replace your answer": "আপনার উত্তর বদলান",
+  "Saved grade for {name}": "{name}-এর মূল্যায়ন সংরক্ষিত হয়েছে",
+  "Set homework for a class or section, collect answers and grade them.": "শ্রেণি বা শাখার জন্য বাড়ির কাজ দিন, উত্তর সংগ্রহ করে মূল্যায়ন করুন।",
+  "Students' submissions and grades are deleted too.": "শিক্ষার্থীদের জমা দেওয়া উত্তর ও মূল্যায়নও মুছে যাবে।",
+  "Submissions": "জমা দেওয়া উত্তর",
+  "Submitted late": "দেরিতে জমা দেওয়া হয়েছে",
+  "This will be marked as late.": "এটি দেরি হিসেবে চিহ্নিত হবে।",
+  "You teach no subject in this class": "এই শ্রেণিতে আপনি কোনো বিষয় পড়ান না",
+  "Your child's homework, what was handed in and the grades.": "আপনার সন্তানের বাড়ির কাজ, কী জমা দেওয়া হয়েছে এবং মূল্যায়ন।",
+  "Your file": "আপনার ফাইল",
+  "Your new answer replaces the one you handed in, attachment included.": "আপনার নতুন উত্তর আগের জমা দেওয়া উত্তরটি (সংযুক্তিসহ) প্রতিস্থাপন করবে।",
 };

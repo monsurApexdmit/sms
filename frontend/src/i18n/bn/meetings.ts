@@ -2,60 +2,60 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const meetings: Record<string, string> = {
-  "({parent_phone})": "", // untranslated
-  "{sessionWhen}{value}": "", // untranslated
-  "Agenda: {note}": "", // untranslated
-  "Block slot": "", // untranslated
-  "Blocked": "", // untranslated
-  "Book a time with your child's teachers": "", // untranslated
-  "Booked": "", // untranslated
-  "Booking cancelled": "", // untranslated
-  "Cancel booking": "", // untranslated
-  "Cancel this booking?": "", // untranslated
-  "Cancel this meeting?": "", // untranslated
-  "Choose a meeting day": "", // untranslated
-  "Choose teachers": "", // untranslated
-  "Choose who takes part": "", // untranslated
-  "Class teachers": "", // untranslated
-  "Edit meeting day": "", // untranslated
-  "Empty: every teacher of the class": "", // untranslated
-  "Free": "", // untranslated
-  "Location or meeting link": "", // untranslated
-  "Make available": "", // untranslated
-  "Meet {teacher_name}": "", // untranslated
-  "Meeting booked. A confirmation email is on its way.": "", // untranslated
-  "Meeting days with time slots per teacher. Parents book a slot for their child; each day also appears on the academic calendar.": "", // untranslated
-  "Meeting held": "", // untranslated
-  "Minutes per meeting": "", // untranslated
-  "My bookings": "", // untranslated
-  "New meeting day": "", // untranslated
-  "No free slots": "", // untranslated
-  "No meeting days": "", // untranslated
-  "No meeting days open for booking": "", // untranslated
-  "No meeting days planned": "", // untranslated
-  "No upcoming meetings booked": "", // untranslated
-  "None of your child's teachers take part in this meeting.": "", // untranslated
-  "Not held yet": "", // untranslated
-  "Note: {teacher_note}": "", // untranslated
-  "of": "", // untranslated
-  "Only parents of this class can book. Leave empty for every class.": "", // untranslated
-  "Only staff can see this": "", // untranslated
-  "Outcome": "", // untranslated
-  "Parent did not come": "", // untranslated
-  "Parent-teacher meetings you take part in": "", // untranslated
-  "Parents have booked slots, so only the title and location can change.": "", // untranslated
-  "Parents with bookings are emailed that the meeting is cancelled.": "", // untranslated
-  "Private note": "", // untranslated
-  "Record outcome": "", // untranslated
-  "Show past days": "", // untranslated
-  "Slots and bookings": "", // untranslated
-  "slots booked": "", // untranslated
-  "Teacher #{teacher_id}": "", // untranslated
-  "Teachers of the class": "", // untranslated
-  "Term 1 parent-teacher meeting": "", // untranslated
-  "The parent and teacher are emailed.": "", // untranslated
-  "The school announces parent-teacher meetings on the academic calendar.": "", // untranslated
-  "This meeting day is not for your child's class.": "", // untranslated
-  "What would you like to discuss? (optional)": "", // untranslated
-  "When the school plans a parent-teacher meeting with you, your slots appear here.": "", // untranslated
+  "({parent_phone})": "({parent_phone})",
+  "{sessionWhen}{value}": "{sessionWhen}{value}",
+  "Agenda: {note}": "আলোচ্য বিষয়: {note}",
+  "Block slot": "সময়টি বন্ধ করুন",
+  "Blocked": "বন্ধ",
+  "Book a time with your child's teachers": "আপনার সন্তানের শিক্ষকদের সাথে সময় নির্ধারণ করুন",
+  "Booked": "নির্ধারিত",
+  "Booking cancelled": "নির্ধারিত সময় বাতিল হয়েছে",
+  "Cancel booking": "নির্ধারিত সময় বাতিল করুন",
+  "Cancel this booking?": "এই নির্ধারিত সময়টি বাতিল করবেন?",
+  "Cancel this meeting?": "এই সভাটি বাতিল করবেন?",
+  "Choose a meeting day": "সভার দিন বেছে নিন",
+  "Choose teachers": "শিক্ষক বেছে নিন",
+  "Choose who takes part": "কারা অংশ নেবেন বেছে নিন",
+  "Class teachers": "শ্রেণির শিক্ষক",
+  "Edit meeting day": "সভার দিন সম্পাদনা",
+  "Empty: every teacher of the class": "খালি রাখলে: শ্রেণির সব শিক্ষক",
+  "Free": "খালি",
+  "Location or meeting link": "স্থান বা সভার লিংক",
+  "Make available": "উন্মুক্ত করুন",
+  "Meet {teacher_name}": "{teacher_name}-এর সাথে সভা",
+  "Meeting booked. A confirmation email is on its way.": "সভার সময় নির্ধারিত হয়েছে। নিশ্চিতকরণ ইমেইল পাঠানো হচ্ছে।",
+  "Meeting days with time slots per teacher. Parents book a slot for their child; each day also appears on the academic calendar.": "শিক্ষকভিত্তিক সময়সহ সভার দিন। অভিভাবকেরা সন্তানের জন্য একটি সময় নির্ধারণ করেন; প্রতিটি দিন শিক্ষাবর্ষের ক্যালেন্ডারেও দেখা যায়।",
+  "Meeting held": "সভা অনুষ্ঠিত হয়েছে",
+  "Minutes per meeting": "প্রতি সভায় মিনিট",
+  "My bookings": "আমার নির্ধারিত সময়",
+  "New meeting day": "নতুন সভার দিন",
+  "No free slots": "কোনো খালি সময় নেই",
+  "No meeting days": "সভার কোনো দিন নেই",
+  "No meeting days open for booking": "সময় নির্ধারণের জন্য সভার কোনো দিন খোলা নেই",
+  "No meeting days planned": "সভার কোনো দিন পরিকল্পিত নেই",
+  "No upcoming meetings booked": "আসন্ন কোনো সভার সময় নির্ধারিত নেই",
+  "None of your child's teachers take part in this meeting.": "আপনার সন্তানের কোনো শিক্ষক এই সভায় অংশ নিচ্ছেন না।",
+  "Not held yet": "এখনও অনুষ্ঠিত হয়নি",
+  "Note: {teacher_note}": "নোট: {teacher_note}",
+  "of": "এর মধ্যে",
+  "Only parents of this class can book. Leave empty for every class.": "শুধু এই শ্রেণির অভিভাবকেরা সময় নিতে পারবেন। সব শ্রেণির জন্য খালি রাখুন।",
+  "Only staff can see this": "শুধু কর্মীরা এটি দেখতে পারবেন",
+  "Outcome": "ফলাফল",
+  "Parent did not come": "অভিভাবক আসেননি",
+  "Parent-teacher meetings you take part in": "যেসব অভিভাবক-শিক্ষক সভায় আপনি অংশ নেন",
+  "Parents have booked slots, so only the title and location can change.": "অভিভাবকেরা সময় নির্ধারণ করেছেন, তাই শুধু শিরোনাম ও স্থান পরিবর্তন করা যাবে।",
+  "Parents with bookings are emailed that the meeting is cancelled.": "যেসব অভিভাবক সময় নিয়েছেন তাদের ইমেইলে সভা বাতিলের খবর জানানো হবে।",
+  "Private note": "ব্যক্তিগত নোট",
+  "Record outcome": "ফলাফল লিপিবদ্ধ করুন",
+  "Show past days": "আগের দিনগুলো দেখান",
+  "Slots and bookings": "সময় ও নির্ধারণ",
+  "slots booked": "টি সময় নির্ধারিত",
+  "Teacher #{teacher_id}": "শিক্ষক #{teacher_id}",
+  "Teachers of the class": "শ্রেণির শিক্ষকগণ",
+  "Term 1 parent-teacher meeting": "টার্ম ১-এর অভিভাবক-শিক্ষক সভা",
+  "The parent and teacher are emailed.": "অভিভাবক ও শিক্ষককে ইমেইল পাঠানো হবে।",
+  "The school announces parent-teacher meetings on the academic calendar.": "বিদ্যালয় শিক্ষাবর্ষের ক্যালেন্ডারে অভিভাবক-শিক্ষক সভার ঘোষণা দেয়।",
+  "This meeting day is not for your child's class.": "সভার এই দিনটি আপনার সন্তানের শ্রেণির জন্য নয়।",
+  "What would you like to discuss? (optional)": "কী বিষয়ে আলোচনা করতে চান? (ঐচ্ছিক)",
+  "When the school plans a parent-teacher meeting with you, your slots appear here.": "বিদ্যালয় আপনার সাথে অভিভাবক-শিক্ষক সভার পরিকল্পনা করলে আপনার সময়গুলো এখানে দেখা যাবে।",
 };

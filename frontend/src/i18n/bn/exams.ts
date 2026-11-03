@@ -2,50 +2,50 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const exams: Record<string, string> = {
-  ". Recipients without a phone number are skipped.": "", // untranslated
-  "{count} message queued": "", // untranslated
-  "{count} messages queued": "", // untranslated
-  "{entered} of {length} entered": "", // untranslated
-  "{updated} marks imported": "", // untranslated
-  "An SMS service is required": "", // untranslated
-  "Choose a class and student": "", // untranslated
-  "Choose an exam and class": "", // untranslated
-  "Choose an exam, class, section and subject": "", // untranslated
-  "Class {className}": "", // untranslated
-  "Comment for {student_name}": "", // untranslated
-  "Each message lists the student's marks per subject for the chosen exam.": "", // untranslated
-  "Edit the paper to add its questions.": "", // untranslated
-  "Every {receiver} in the selected {value} with a phone number will receive a text.": "", // untranslated
-  "Every student's marks for the exam appear in one sheet.": "", // untranslated
-  "Exams of the running academic year": "", // untranslated
-  "Fix these rows in the file and import it again.": "", // untranslated
-  "Grades": "", // untranslated
-  "Import CSV": "", // untranslated
-  "Leave the section empty to send to the whole class.": "", // untranslated
-  "Mark from": "", // untranslated
-  "Mark up to": "", // untranslated
-  "Marks for {student_name}": "", // untranslated
-  "Marks saved": "", // untranslated
-  "Marksheet {year}": "", // untranslated
-  "Messages are only delivered when an SMS gateway (Clickatell, Twilio or MSG91) is selected and configured in": "", // untranslated
-  "No exams in this academic year": "", // untranslated
-  "No questions written yet": "", // untranslated
-  "Nothing was imported": "", // untranslated
-  "Only subjects assigned to you are listed": "", // untranslated
-  "Point": "", // untranslated
-  "Print question paper": "", // untranslated
-  "Question paper": "", // untranslated
-  "Question paper details": "", // untranslated
-  "Save marks": "", // untranslated
-  "Save or reset your changes first": "", // untranslated
-  "Section is optional": "", // untranslated
-  "Send results": "", // untranslated
-  "Send results by SMS?": "", // untranslated
-  "Send SMS": "", // untranslated
-  "Send to": "", // untranslated
-  "Text each student's exam results to students or their parents": "", // untranslated
-  "The mark sheet for that subject opens here.": "", // untranslated
-  "Their results for the running year appear here.": "", // untranslated
-  "Use all sections": "", // untranslated
-  "View & print": "", // untranslated
+  ". Recipients without a phone number are skipped.": "-এ। যাদের ফোন নম্বর নেই তাদের বাদ দেওয়া হয়।",
+  "{count} message queued": "{count}টি বার্তা পাঠানোর তালিকায় রাখা হয়েছে",
+  "{count} messages queued": "{count}টি বার্তা পাঠানোর তালিকায় রাখা হয়েছে",
+  "{entered} of {length} entered": "{length} জনের মধ্যে {entered} জনের নম্বর দেওয়া হয়েছে",
+  "{updated} marks imported": "{updated}টি নম্বর ইমপোর্ট হয়েছে",
+  "An SMS service is required": "একটি এসএমএস সেবা প্রয়োজন",
+  "Choose a class and student": "শ্রেণি ও শিক্ষার্থী বেছে নিন",
+  "Choose an exam and class": "পরীক্ষা ও শ্রেণি বেছে নিন",
+  "Choose an exam, class, section and subject": "পরীক্ষা, শ্রেণি, শাখা ও বিষয় বেছে নিন",
+  "Class {className}": "শ্রেণি {className}",
+  "Comment for {student_name}": "{student_name}-এর জন্য মন্তব্য",
+  "Each message lists the student's marks per subject for the chosen exam.": "প্রতিটি বার্তায় নির্বাচিত পরীক্ষায় শিক্ষার্থীর বিষয়ভিত্তিক নম্বর থাকে।",
+  "Edit the paper to add its questions.": "প্রশ্ন যোগ করতে প্রশ্নপত্রটি সম্পাদনা করুন।",
+  "Every {receiver} in the selected {value} with a phone number will receive a text.": "নির্বাচিত {value}-এর ফোন নম্বরধারী প্রত্যেক {receiver} একটি এসএমএস পাবেন।",
+  "Every student's marks for the exam appear in one sheet.": "পরীক্ষায় প্রত্যেক শিক্ষার্থীর নম্বর একটি শিটে দেখা যাবে।",
+  "Exams of the running academic year": "চলতি শিক্ষাবর্ষের পরীক্ষা",
+  "Fix these rows in the file and import it again.": "ফাইলে এই সারিগুলো ঠিক করে আবার ইমপোর্ট করুন।",
+  "Grades": "গ্রেড",
+  "Import CSV": "CSV ইমপোর্ট",
+  "Leave the section empty to send to the whole class.": "পুরো শ্রেণিতে পাঠাতে শাখা খালি রাখুন।",
+  "Mark from": "নম্বর থেকে",
+  "Mark up to": "নম্বর পর্যন্ত",
+  "Marks for {student_name}": "{student_name}-এর নম্বর",
+  "Marks saved": "নম্বর সংরক্ষিত হয়েছে",
+  "Marksheet {year}": "মার্কশিট {year}",
+  "Messages are only delivered when an SMS gateway (Clickatell, Twilio or MSG91) is selected and configured in": "বার্তা শুধু তখনই পৌঁছায় যখন একটি এসএমএস গেটওয়ে (Clickatell, Twilio বা MSG91) নির্বাচন করে চালু করা থাকে",
+  "No exams in this academic year": "এই শিক্ষাবর্ষে কোনো পরীক্ষা নেই",
+  "No questions written yet": "এখনও কোনো প্রশ্ন লেখা হয়নি",
+  "Nothing was imported": "কিছুই ইমপোর্ট হয়নি",
+  "Only subjects assigned to you are listed": "শুধু আপনাকে দেওয়া বিষয়গুলো দেখানো হয়েছে",
+  "Point": "পয়েন্ট",
+  "Print question paper": "প্রশ্নপত্র প্রিন্ট",
+  "Question paper": "প্রশ্নপত্র",
+  "Question paper details": "প্রশ্নপত্রের বিবরণ",
+  "Save marks": "নম্বর সংরক্ষণ করুন",
+  "Save or reset your changes first": "আগে আপনার পরিবর্তন সংরক্ষণ বা রিসেট করুন",
+  "Section is optional": "শাখা ঐচ্ছিক",
+  "Send results": "ফলাফল পাঠান",
+  "Send results by SMS?": "এসএমএসে ফলাফল পাঠাবেন?",
+  "Send SMS": "এসএমএস পাঠান",
+  "Send to": "যাদের পাঠানো হবে",
+  "Text each student's exam results to students or their parents": "প্রত্যেক শিক্ষার্থীর পরীক্ষার ফলাফল শিক্ষার্থী বা অভিভাবকের কাছে এসএমএসে পাঠান",
+  "The mark sheet for that subject opens here.": "ওই বিষয়ের নম্বরপত্র এখানে খুলবে।",
+  "Their results for the running year appear here.": "চলতি বছরের ফলাফল এখানে দেখা যাবে।",
+  "Use all sections": "সব শাখা নিন",
+  "View & print": "দেখুন ও প্রিন্ট করুন",
 };

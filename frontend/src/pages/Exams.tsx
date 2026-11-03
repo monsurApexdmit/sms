@@ -503,7 +503,7 @@ export function TabulationPage() {
 
   return (
     <div className="space-y-6">
-      <style>{t("@media print { @page { size: landscape; } }")}</style>
+      <style>{"@media print { @page { size: landscape; } }"}</style>
       <PageHeader
         title={t("Tabulation sheet")}
         subtitle={t("Section is optional")}

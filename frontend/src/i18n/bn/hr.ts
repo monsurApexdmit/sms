@@ -2,80 +2,80 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const hr: Record<string, string> = {
-  "(incl. {leave_days} on leave)": "", // untranslated
-  "{label} amount": "", // untranslated
-  "{label} name": "", // untranslated
-  "{leave_days} on leave": "", // untranslated
-  "{staff} staff · {net}": "", // untranslated
-  "Absence deduction": "", // untranslated
-  "Allowances": "", // untranslated
-  "Authorised signature": "", // untranslated
-  "Bank transfer": "", // untranslated
-  "Basic": "", // untranslated
-  "Basic pay, allowances and deductions per staff member. For each month, the latest structure in effect is used.": "", // untranslated
-  "Basic salary": "", // untranslated
-  "Check in": "", // untranslated
-  "Check out": "", // untranslated
-  "Choose staff member": "", // untranslated
-  "Create a payroll for a month to calculate payslips.": "", // untranslated
-  "Create payroll": "", // untranslated
-  "Daily sheet": "", // untranslated
-  "Days (worked / working)": "", // untranslated
-  "Days worked:": "", // untranslated
-  "Deduct unpaid absences (basic ÷ working days per absent day, half for a half day)": "", // untranslated
-  "Deductions": "", // untranslated
-  "Delete salary structure?": "", // untranslated
-  "Delete the {month} payroll?": "", // untranslated
-  "Draft payroll created": "", // untranslated
-  "Each payslip is recorded once as a \"Salary\" expense in Income & expenses.": "", // untranslated
-  "Earnings": "", // untranslated
-  "Edit salary structure": "", // untranslated
-  "Effective from": "", // untranslated
-  "Employee": "", // untranslated
-  "Finalize": "", // untranslated
-  "Finalize the {month} payroll?": "", // untranslated
-  "Gross": "", // untranslated
-  "Half day": "", // untranslated
-  "In": "", // untranslated
-  "LV": "", // untranslated
-  "Mark as paid": "", // untranslated
-  "Mark payroll as paid": "", // untranslated
-  "Mark the rest present": "", // untranslated
-  "Monthly payslips from salary structures and staff attendance. Holidays and weekly days off are not working days.": "", // untranslated
-  "Monthly report": "", // untranslated
-  "Name:": "", // untranslated
-  "Net (before absences)": "", // untranslated
-  "Net pay": "", // untranslated
-  "New salary structure": "", // untranslated
-  "New structure": "", // untranslated
-  "No payroll selected": "", // untranslated
-  "No payroll yet": "", // untranslated
-  "No payslips yet": "", // untranslated
-  "No salary structures yet": "", // untranslated
-  "No staff": "", // untranslated
-  "No staff accounts yet": "", // untranslated
-  "No staff member has a salary structure for this month": "", // untranslated
-  "Not paid yet": "", // untranslated
-  "Out": "", // untranslated
-  "Paid on:": "", // untranslated
-  "Payroll deleted": "", // untranslated
-  "Payroll finalized": "", // untranslated
-  "Payroll paid and recorded as expenses": "", // untranslated
-  "Payslip – {dayjs}": "", // untranslated
-  "Payslip no:": "", // untranslated
-  "Payslip not available": "", // untranslated
-  "Payslips already created keep their amounts.": "", // untranslated
-  "Payslips can no longer be recalculated, and staff can see them.": "", // untranslated
-  "Payslips recalculated": "", // untranslated
-  "Recalculate": "", // untranslated
-  "Role:": "", // untranslated
-  "Salary structure saved": "", // untranslated
-  "Staff attendance saved": "", // untranslated
-  "Teachers, librarians and accountants. Absences can reduce pay when payroll deducts them.": "", // untranslated
-  "This day is not a working day and is not counted in payroll.": "", // untranslated
-  "Total deductions": "", // untranslated
-  "Unpaid absence ({absent_days} days)": "", // untranslated
-  "View payslip": "", // untranslated
-  "Working days:": "", // untranslated
-  "Working days: {working_days}": "", // untranslated
+  "(incl. {leave_days} on leave)": "(ছুটিতে {leave_days} দিনসহ)",
+  "{label} amount": "{label}-এর পরিমাণ",
+  "{label} name": "{label}-এর নাম",
+  "{leave_days} on leave": "ছুটিতে {leave_days} দিন",
+  "{staff} staff · {net}": "{staff} জন কর্মী · {net}",
+  "Absence deduction": "অনুপস্থিতির কর্তন",
+  "Allowances": "ভাতা",
+  "Authorised signature": "অনুমোদিত স্বাক্ষর",
+  "Bank transfer": "ব্যাংক ট্রান্সফার",
+  "Basic": "মূল বেতন",
+  "Basic pay, allowances and deductions per staff member. For each month, the latest structure in effect is used.": "প্রত্যেক কর্মীর মূল বেতন, ভাতা ও কর্তন। প্রতি মাসে তখন কার্যকর সর্বশেষ কাঠামো ব্যবহার করা হয়।",
+  "Basic salary": "মূল বেতন",
+  "Check in": "আগমন",
+  "Check out": "প্রস্থান",
+  "Choose staff member": "কর্মী বেছে নিন",
+  "Create a payroll for a month to calculate payslips.": "বেতন স্লিপ হিসাব করতে একটি মাসের বেতন প্রক্রিয়া তৈরি করুন।",
+  "Create payroll": "বেতন প্রক্রিয়া তৈরি করুন",
+  "Daily sheet": "দৈনিক খাতা",
+  "Days (worked / working)": "দিন (কাজ করেছেন / কার্যদিবস)",
+  "Days worked:": "কাজের দিন:",
+  "Deduct unpaid absences (basic ÷ working days per absent day, half for a half day)": "বিনা বেতনের অনুপস্থিতি কাটুন (প্রতিটি অনুপস্থিত দিনে মূল বেতন ÷ কার্যদিবস, অর্ধদিবসে অর্ধেক)",
+  "Deductions": "কর্তন",
+  "Delete salary structure?": "বেতন কাঠামো মুছে ফেলবেন?",
+  "Delete the {month} payroll?": "{month}-এর বেতন প্রক্রিয়া মুছে ফেলবেন?",
+  "Draft payroll created": "বেতন প্রক্রিয়ার খসড়া তৈরি হয়েছে",
+  "Each payslip is recorded once as a \"Salary\" expense in Income & expenses.": "প্রতিটি বেতন স্লিপ আয় ও ব্যয়ে একবার \"বেতন\" ব্যয় হিসেবে লিপিবদ্ধ হয়।",
+  "Earnings": "আয়",
+  "Edit salary structure": "বেতন কাঠামো সম্পাদনা",
+  "Effective from": "কার্যকর হবে",
+  "Employee": "কর্মী",
+  "Finalize": "চূড়ান্ত করুন",
+  "Finalize the {month} payroll?": "{month}-এর বেতন প্রক্রিয়া চূড়ান্ত করবেন?",
+  "Gross": "মোট",
+  "Half day": "অর্ধদিবস",
+  "In": "আগমন",
+  "LV": "ছু",
+  "Mark as paid": "পরিশোধিত চিহ্নিত করুন",
+  "Mark payroll as paid": "বেতন প্রক্রিয়া পরিশোধিত চিহ্নিত করুন",
+  "Mark the rest present": "বাকিদের উপস্থিত চিহ্নিত করুন",
+  "Monthly payslips from salary structures and staff attendance. Holidays and weekly days off are not working days.": "বেতন কাঠামো ও কর্মীদের উপস্থিতি থেকে মাসিক বেতন স্লিপ। ছুটি ও সাপ্তাহিক বন্ধের দিন কার্যদিবস নয়।",
+  "Monthly report": "মাসিক প্রতিবেদন",
+  "Name:": "নাম:",
+  "Net (before absences)": "নিট (অনুপস্থিতির আগে)",
+  "Net pay": "নিট বেতন",
+  "New salary structure": "নতুন বেতন কাঠামো",
+  "New structure": "নতুন কাঠামো",
+  "No payroll selected": "কোনো বেতন প্রক্রিয়া নির্বাচিত নয়",
+  "No payroll yet": "এখনও কোনো বেতন প্রক্রিয়া নেই",
+  "No payslips yet": "এখনও কোনো বেতন স্লিপ নেই",
+  "No salary structures yet": "এখনও কোনো বেতন কাঠামো নেই",
+  "No staff": "কোনো কর্মী নেই",
+  "No staff accounts yet": "এখনও কোনো কর্মীর অ্যাকাউন্ট নেই",
+  "No staff member has a salary structure for this month": "এ মাসের জন্য কোনো কর্মীর বেতন কাঠামো নেই",
+  "Not paid yet": "এখনও পরিশোধ হয়নি",
+  "Out": "প্রস্থান",
+  "Paid on:": "পরিশোধের তারিখ:",
+  "Payroll deleted": "বেতন প্রক্রিয়া মুছে ফেলা হয়েছে",
+  "Payroll finalized": "বেতন প্রক্রিয়া চূড়ান্ত হয়েছে",
+  "Payroll paid and recorded as expenses": "বেতন পরিশোধ করে ব্যয় হিসেবে লিপিবদ্ধ করা হয়েছে",
+  "Payslip – {dayjs}": "বেতন স্লিপ – {dayjs}",
+  "Payslip no:": "বেতন স্লিপ নং:",
+  "Payslip not available": "বেতন স্লিপ পাওয়া যাচ্ছে না",
+  "Payslips already created keep their amounts.": "আগে তৈরি বেতন স্লিপের পরিমাণ বদলাবে না।",
+  "Payslips can no longer be recalculated, and staff can see them.": "বেতন স্লিপ আর পুনরায় হিসাব করা যাবে না, এবং কর্মীরা সেগুলো দেখতে পাবেন।",
+  "Payslips recalculated": "বেতন স্লিপ পুনরায় হিসাব করা হয়েছে",
+  "Recalculate": "পুনরায় হিসাব করুন",
+  "Role:": "ভূমিকা:",
+  "Salary structure saved": "বেতন কাঠামো সংরক্ষিত হয়েছে",
+  "Staff attendance saved": "কর্মীদের উপস্থিতি সংরক্ষিত হয়েছে",
+  "Teachers, librarians and accountants. Absences can reduce pay when payroll deducts them.": "শিক্ষক, গ্রন্থাগারিক ও হিসাবরক্ষক। বেতন প্রক্রিয়ায় কর্তন চালু থাকলে অনুপস্থিতিতে বেতন কমতে পারে।",
+  "This day is not a working day and is not counted in payroll.": "এই দিনটি কার্যদিবস নয় এবং বেতন প্রক্রিয়ায় গণনা করা হয় না।",
+  "Total deductions": "মোট কর্তন",
+  "Unpaid absence ({absent_days} days)": "বিনা বেতনের অনুপস্থিতি ({absent_days} দিন)",
+  "View payslip": "বেতন স্লিপ দেখুন",
+  "Working days:": "কার্যদিবস:",
+  "Working days: {working_days}": "কার্যদিবস: {working_days}",
 };

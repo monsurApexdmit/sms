@@ -2,473 +2,472 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const common: Record<string, string> = {
-  "· {section_name}": "", // untranslated
-  "· Roll {roll}": "", // untranslated
-  "{billed_this_month} billed this month": "", // untranslated
-  "{from}–{to} of {total}": "", // untranslated
-  "{label} · {dayjs}": "", // untranslated
-  "{label} is required": "", // untranslated
-  "{label} is still processing your payment. The invoice will update once it is confirmed.": "", // untranslated
-  "{label} payment cancelled. Your invoice has not been charged.": "", // untranslated
-  "{label} payment did not go through. Your invoice has not been charged.": "", // untranslated
-  "{label} reports that the payment failed. Your invoice has not been charged.": "", // untranslated
-  "{label}: {what} expired {count} day ago": "", // untranslated
-  "{label}: {what} expired {count} days ago": "", // untranslated
-  "{label}: {what} expires in {count} day": "", // untranslated
-  "{label}: {what} expires in {count} days": "", // untranslated
-  "{label}: {what} expires today": "", // untranslated
-  "{label}. Check each question and answer before adding it.": "", // untranslated
-  "{label}. Click one to put it in the remark box, then edit and save it.": "", // untranslated
-  "{recovery_codes_left} of 10 recovery codes left.{value}": "", // untranslated
-  "{requests_this_month} used this month": "", // untranslated
-  "{titleCase} portal": "", // untranslated
-  "{total} students": "", // untranslated
-  "@media print { @page { size: landscape; } }": "", // untranslated
-  "/ {section_name}": "", // untranslated
-  "+{value} more": "", // untranslated
-  "A": "", // untranslated
-  "About us": "", // untranslated
-  "Absent": "", // untranslated
-  "Absent today": "", // untranslated
-  "Academic": "", // untranslated
-  "Academic calendar": "", // untranslated
-  "Accountant": "", // untranslated
-  "Active": "", // untranslated
-  "Add": "", // untranslated
-  "Add {toLowerCase}": "", // untranslated
-  "Added": "", // untranslated
-  "Address": "", // untranslated
-  "Admin": "", // untranslated
-  "Admissions": "", // untranslated
-  "After your password, also ask for a code from an authenticator app on your phone.": "", // untranslated
-  "AI assistant": "", // untranslated
-  "AI assistant settings saved": "", // untranslated
-  "AI usage": "", // untranslated
-  "AI-generated, may contain mistakes": "", // untranslated
-  "All": "", // untranslated
-  "All classes": "", // untranslated
-  "Amount": "", // untranslated
-  "Analytics": "", // untranslated
-  "and {value} more": "", // untranslated
-  "Answer: {correct_answers}": "", // untranslated
-  "Anthropic API key": "", // untranslated
-  "Application": "", // untranslated
-  "Approved": "", // untranslated
-  "At least 8 characters": "", // untranslated
-  "Attachment": "", // untranslated
-  "Attendance": "", // untranslated
-  "Attendance can't be taken for a future date": "", // untranslated
-  "Attendance for {name}": "", // untranslated
-  "Attendance report": "", // untranslated
-  "Audit log": "", // untranslated
-  "Back": "", // untranslated
-  "Bank Transfer": "", // untranslated
-  "Billed": "", // untranslated
-  "Birthday": "", // untranslated
-  "Bkash": "", // untranslated
-  "Blood group": "", // untranslated
-  "Book": "", // untranslated
-  "Book a meeting": "", // untranslated
-  "Books": "", // untranslated
-  "breadcrumb": "", // untranslated
-  "Brief": "", // untranslated
-  "Campus": "", // untranslated
-  "Cancel": "", // untranslated
-  "Cancelled": "", // untranslated
-  "Card": "", // untranslated
-  "Cash": "", // untranslated
-  "Category": "", // untranslated
-  "Certificates": "", // untranslated
-  "Check-in kiosk": "", // untranslated
-  "Cheque": "", // untranslated
-  "Child": "", // untranslated
-  "Choose a child": "", // untranslated
-  "Choose a class": "", // untranslated
-  "Choose a person": "", // untranslated
-  "Choose a student": "", // untranslated
-  "Choose child": "", // untranslated
-  "Choose class": "", // untranslated
-  "Choose exam": "", // untranslated
-  "Choose section": "", // untranslated
-  "Choose student": "", // untranslated
-  "Choose subject": "", // untranslated
-  "Choose…": "", // untranslated
-  "Class": "", // untranslated
-  "Class routine": "", // untranslated
-  "Class teacher": "", // untranslated
-  "Classes": "", // untranslated
-  "Classes & sections": "", // untranslated
-  "Clear": "", // untranslated
-  "Clear selection": "", // untranslated
-  "Close": "", // untranslated
-  "Closed": "", // untranslated
-  "Code from the app": "", // untranslated
-  "Code from your app, or a recovery code": "", // untranslated
-  "Code from your authenticator app": "", // untranslated
-  "Collected": "", // untranslated
-  "Command Palette": "", // untranslated
-  "Comment": "", // untranslated
-  "Contact": "", // untranslated
-  "Continue": "", // untranslated
-  "Copy": "", // untranslated
-  "Copy failed. Select the codes and copy them by hand.": "", // untranslated
-  "Create codes": "", // untranslated
-  "Created": "", // untranslated
-  "Daily attendance": "", // untranslated
-  "Dashboard": "", // untranslated
-  "Date": "", // untranslated
-  "Date of birth": "", // untranslated
-  "Day": "", // untranslated
-  "Delete": "", // untranslated
-  "Delete \"{title}\"?": "", // untranslated
-  "Delete {name}?": "", // untranslated
-  "Delete {toLowerCase}?": "", // untranslated
-  "Deleted": "", // untranslated
-  "Description": "", // untranslated
-  "Details": "", // untranslated
-  "Difficulty": "", // untranslated
-  "Disabled": "", // untranslated
-  "Displays the mobile sidebar.": "", // untranslated
-  "Documents": "", // untranslated
-  "Done": "", // untranslated
-  "Dormitory": "", // untranslated
-  "Download": "", // untranslated
-  "Download template": "", // untranslated
-  "Draft": "", // untranslated
-  "Draft again": "", // untranslated
-  "Draft questions": "", // untranslated
-  "Draft remarks": "", // untranslated
-  "Draft with AI": "", // untranslated
-  "Drafts report-card remarks, exam questions and progress summaries with Claude (Anthropic). Staff review every draft before it is saved. Student names, contact details, health and counselling records are never sent.": "", // untranslated
-  "driving licence": "", // untranslated
-  "Due": "", // untranslated
-  "Due date": "", // untranslated
-  "e.g. helps classmates, needs to read more": "", // untranslated
-  "Easy": "", // untranslated
-  "Edit": "", // untranslated
-  "Edit {toLowerCase}": "", // untranslated
-  "Email": "", // untranslated
-  "Email is required": "", // untranslated
-  "Encouraging": "", // untranslated
-  "Ends": "", // untranslated
-  "Enrol": "", // untranslated
-  "Enter the 6-digit code the app shows.": "", // untranslated
-  "Events": "", // untranslated
-  "Everyone": "", // untranslated
-  "Exam": "", // untranslated
-  "Exam questions": "", // untranslated
-  "Exam timetable": "", // untranslated
-  "Exams": "", // untranslated
-  "Exams & grades": "", // untranslated
-  "Export to Excel": "", // untranslated
-  "Failed": "", // untranslated
-  "Fare": "", // untranslated
-  "Fax": "", // untranslated
-  "Feature": "", // untranslated
-  "Fee setup": "", // untranslated
-  "Fees": "", // untranslated
-  "Fees collected this month": "", // untranslated
-  "Female": "", // untranslated
-  "Fill in the blanks": "", // untranslated
-  "Finalized": "", // untranslated
-  "Finance": "", // untranslated
-  "fitness certificate": "", // untranslated
-  "Formal": "", // untranslated
-  "Fri": "", // untranslated
-  "Friday": "", // untranslated
-  "From": "", // untranslated
-  "From console.anthropic.com": "", // untranslated
-  "Gallery": "", // untranslated
-  "Gender": "", // untranslated
-  "Go to next page": "", // untranslated
-  "Go to previous page": "", // untranslated
-  "GPA": "", // untranslated
-  "GPA {average_grade_point}": "", // untranslated
-  "Grade": "", // untranslated
-  "Grade point": "", // untranslated
-  "Guardian": "", // untranslated
-  "Hard": "", // untranslated
-  "Health & certificates": "", // untranslated
-  "High risk; {at_risk_medium} more at medium": "", // untranslated
-  "Highest": "", // untranslated
-  "Holiday: {holiday}": "", // untranslated
-  "Homework": "", // untranslated
-  "How many": "", // untranslated
-  "HR": "", // untranslated
-  "I've saved them": "", // untranslated
-  "ID": "", // untranslated
-  "ID cards": "", // untranslated
-  "ID cards & devices": "", // untranslated
-  "Image": "", // untranslated
-  "Income & expenses": "", // untranslated
-  "Input tokens": "", // untranslated
-  "Instalment": "", // untranslated
-  "Instructions": "", // untranslated
-  "insurance": "", // untranslated
-  "Invoice": "", // untranslated
-  "Invoices": "", // untranslated
-  "Issue": "", // untranslated
-  "Issued": "", // untranslated
-  "Keep these somewhere safe. Each code signs you in once if you lose your phone. They won't be shown again.": "", // untranslated
-  "Key": "", // untranslated
-  "L": "", // untranslated
-  "Late": "", // untranslated
-  "Latest notices": "", // untranslated
-  "Leave": "", // untranslated
-  "Leave empty to keep the current image": "", // untranslated
-  "Leave empty to keep the current password": "", // untranslated
-  "Librarian": "", // untranslated
-  "Library": "", // untranslated
-  "Loading…": "", // untranslated
-  "Log out": "", // untranslated
-  "Male": "", // untranslated
-  "Mark all read": "", // untranslated
-  "Marks": "", // untranslated
-  "Marks by SMS": "", // untranslated
-  "Marks each": "", // untranslated
-  "Marks entry": "", // untranslated
-  "Marksheet": "", // untranslated
-  "Medium": "", // untranslated
-  "Meeting": "", // untranslated
-  "Message": "", // untranslated
-  "Messages": "", // untranslated
-  "Method": "", // untranslated
-  "Model": "", // untranslated
-  "Mon": "", // untranslated
-  "Monday": "", // untranslated
-  "Month": "", // untranslated
-  "More": "", // untranslated
-  "More pages": "", // untranslated
-  "Multiple choice": "", // untranslated
-  "My meeting slots": "", // untranslated
-  "My payslips": "", // untranslated
-  "My profile": "", // untranslated
-  "My requests": "", // untranslated
-  "My routine": "", // untranslated
-  "Nagad": "", // untranslated
-  "Name": "", // untranslated
-  "Net": "", // untranslated
-  "New password": "", // untranslated
-  "New recovery codes": "", // untranslated
-  "News": "", // untranslated
-  "Next": "", // untranslated
-  "Next page": "", // untranslated
-  "No": "", // untranslated
-  "No AI requests yet": "", // untranslated
-  "No invoices": "", // untranslated
-  "No notices": "", // untranslated
-  "No payments recorded": "", // untranslated
-  "No records yet": "", // untranslated
-  "No requests": "", // untranslated
-  "No students enrolled": "", // untranslated
-  "No students enrolled in this section": "", // untranslated
-  "No students found": "", // untranslated
-  "No students in this class": "", // untranslated
-  "No subjects assigned to you": "", // untranslated
-  "Nobody has turned it on yet": "", // untranslated
-  "None": "", // untranslated
-  "Not enrolled": "", // untranslated
-  "Not set": "", // untranslated
-  "Note": "", // untranslated
-  "Notes": "", // untranslated
-  "Nothing found": "", // untranslated
-  "Notice": "", // untranslated
-  "Noticeboard": "", // untranslated
-  "Notifications": "", // untranslated
-  "Notifications are blocked in this browser.": "", // untranslated
-  "Notifications, {unread} unread": "", // untranslated
-  "Obtained": "", // untranslated
-  "Off": "", // untranslated
-  "On": "", // untranslated
-  "On leave": "", // untranslated
-  "Online": "", // untranslated
-  "Online exams": "", // untranslated
-  "Open": "", // untranslated
-  "Open an authenticator app (Google Authenticator, Microsoft Authenticator, Authy…).": "", // untranslated
-  "Open transport": "", // untranslated
-  "Opened": "", // untranslated
-  "Optional": "", // untranslated
-  "Other": "", // untranslated
-  "Output tokens": "", // untranslated
-  "Outstanding": "", // untranslated
-  "Overdue": "", // untranslated
-  "P": "", // untranslated
-  "Page not found": "", // untranslated
-  "pagination": "", // untranslated
-  "Paid": "", // untranslated
-  "Paid on": "", // untranslated
-  "Parent": "", // untranslated
-  "Parent phone": "", // untranslated
-  "Parent-teacher meetings": "", // untranslated
-  "Parents": "", // untranslated
-  "Partially Paid": "", // untranslated
-  "Password": "", // untranslated
-  "Passwords do not match": "", // untranslated
-  "Payment history": "", // untranslated
-  "Payment received. Thank you!": "", // untranslated
-  "Payments": "", // untranslated
-  "Paypal": "", // untranslated
-  "PayPal": "", // untranslated
-  "Payroll": "", // untranslated
-  "PDF, Office documents, images, audio/video or zip; max 10 MB": "", // untranslated
-  "Pending": "", // untranslated
-  "People": "", // untranslated
-  "Period attendance": "", // untranslated
-  "Phone": "", // untranslated
-  "Photo updated": "", // untranslated
-  "Pick a date": "", // untranslated
-  "Present": "", // untranslated
-  "Present today": "", // untranslated
-  "Previous": "", // untranslated
-  "Previous page": "", // untranslated
-  "Previous school": "", // untranslated
-  "Principal": "", // untranslated
-  "Print": "", // untranslated
-  "Print / save as PDF": "", // untranslated
-  "Privacy policy": "", // untranslated
-  "Progress summaries": "", // untranslated
-  "Progress summary": "", // untranslated
-  "Promotion": "", // untranslated
-  "Public website": "", // untranslated
-  "QR code for your authenticator app": "", // untranslated
-  "Question papers": "", // untranslated
-  "Questions": "", // untranslated
-  "Reason": "", // untranslated
-  "Recommended for staff accounts.": "", // untranslated
-  "Recovery codes (each works once)\n\n{text}": "", // untranslated
-  "Recovery codes copied": "", // untranslated
-  "Reference": "", // untranslated
-  "Refresh": "", // untranslated
-  "Reject": "", // untranslated
-  "Rejected": "", // untranslated
-  "Religion": "", // untranslated
-  "Remove": "", // untranslated
-  "Report cards": "", // untranslated
-  "Report-card remarks": "", // untranslated
-  "Requests": "", // untranslated
-  "Requests and tokens per month. Prompts and answers are not stored.": "", // untranslated
-  "Requests per month (whole school)": "", // untranslated
-  "Requests per person per day": "", // untranslated
-  "Required": "", // untranslated
-  "Reset": "", // untranslated
-  "Reset two-factor authentication for {value}?": "", // untranslated
-  "Result": "", // untranslated
-  "Results": "", // untranslated
-  "Review & add": "", // untranslated
-  "Role": "", // untranslated
-  "Roll": "", // untranslated
-  "Roll {roll}": "", // untranslated
-  "Room": "", // untranslated
-  "Route": "", // untranslated
-  "Salary structures": "", // untranslated
-  "Sat": "", // untranslated
-  "Saturday": "", // untranslated
-  "Save": "", // untranslated
-  "Save changes": "", // untranslated
-  "Saved": "", // untranslated
-  "Saved; type to replace": "", // untranslated
-  "Scan this code, or type the key below.": "", // untranslated
-  "School": "", // untranslated
-  "School years": "", // untranslated
-  "Search for a command to run...": "", // untranslated
-  "Search name or email": "", // untranslated
-  "Search…": "", // untranslated
-  "Section": "", // untranslated
-  "Section {section_name}": "", // untranslated
-  "Section {sectionName}": "", // untranslated
-  "See all": "", // untranslated
-  "Select…": "", // untranslated
-  "Send": "", // untranslated
-  "Send request": "", // untranslated
-  "Session": "", // untranslated
-  "Session {running_year}": "", // untranslated
-  "Setting up": "", // untranslated
-  "Settings": "", // untranslated
-  "Settings saved": "", // untranslated
-  "Shared with the AI service. Don't include names or private details.": "", // untranslated
-  "Shared with the AI service. Paste the topic, learning objectives or a short passage.": "", // untranslated
-  "Show on public website": "", // untranslated
-  "Sidebar": "", // untranslated
-  "Since": "", // untranslated
-  "Single student (optional)": "", // untranslated
-  "SMS": "", // untranslated
-  "Source": "", // untranslated
-  "Sslcommerz": "", // untranslated
-  "SSLCommerz": "", // untranslated
-  "Staff": "", // untranslated
-  "Staff accounts": "", // untranslated
-  "Staff attendance": "", // untranslated
-  "Staff member": "", // untranslated
-  "Starts": "", // untranslated
-  "Status": "", // untranslated
-  "Status updated": "", // untranslated
-  "Stripe": "", // untranslated
-  "Student": "", // untranslated
-  "Student profile": "", // untranslated
-  "Students": "", // untranslated
-  "Students at risk": "", // untranslated
-  "Study material": "", // untranslated
-  "Subject": "", // untranslated
-  "Subjects": "", // untranslated
-  "Submitted": "", // untranslated
-  "Summarise progress": "", // untranslated
-  "Sun": "", // untranslated
-  "Sunday": "", // untranslated
-  "Syllabus": "", // untranslated
-  "System settings": "", // untranslated
-  "Tabulation sheet": "", // untranslated
-  "Teacher": "", // untranslated
-  "Teachers": "", // untranslated
-  "Terms & conditions": "", // untranslated
-  "Text": "", // untranslated
-  "They can sign in with the password alone (or must set it up again if their role requires it). Use this when a phone is lost.": "", // untranslated
-  "This cannot be undone.": "", // untranslated
-  "Thu": "", // untranslated
-  "Thursday": "", // untranslated
-  "Time": "", // untranslated
-  "Title": "", // untranslated
-  "To": "", // untranslated
-  "Today": "", // untranslated
-  "Toggle Sidebar": "", // untranslated
-  "Tone": "", // untranslated
-  "Topic or syllabus text": "", // untranslated
-  "Total": "", // untranslated
-  "Total {total}": "", // untranslated
-  "Transport": "", // untranslated
-  "Transport & dormitory": "", // untranslated
-  "Transport documents need renewing": "", // untranslated
-  "True / false": "", // untranslated
-  "Try again": "", // untranslated
-  "Tue": "", // untranslated
-  "Tuesday": "", // untranslated
-  "Turn off": "", // untranslated
-  "Turn off two-factor authentication": "", // untranslated
-  "Turn on": "", // untranslated
-  "Turn on the AI assistant": "", // untranslated
-  "Turn on two-factor authentication": "", // untranslated
-  "Two-factor authentication": "", // untranslated
-  "Two-factor authentication reset": "", // untranslated
-  "Two-factor authentication turned off": "", // untranslated
-  "Type": "", // untranslated
-  "Unknown": "", // untranslated
-  "Unpaid": "", // untranslated
-  "Unsaved changes": "", // untranslated
-  "Upload": "", // untranslated
-  "Using the ANTHROPIC_API_KEY from the server environment": "", // untranslated
-  "Vehicles": "", // untranslated
-  "Website": "", // untranslated
-  "Wed": "", // untranslated
-  "Wednesday": "", // untranslated
-  "Weekly day off": "", // untranslated
-  "When": "", // untranslated
-  "Working days {working_days}": "", // untranslated
-  "Year": "", // untranslated
-  "Yes": "", // untranslated
-  "You are not allowed to do that.": "", // untranslated
-  "You're all caught up": "", // untranslated
-  "Your notes (optional)": "", // untranslated
-  "Your old recovery codes stop working.": "", // untranslated
-  "Your recovery codes": "", // untranslated
-  "Your school requires it for your role.": "", // untranslated
-  "Your school requires two-factor authentication for your role.": "", // untranslated
+  "· {section_name}": "· {section_name}",
+  "· Roll {roll}": "· রোল {roll}",
+  "{billed_this_month} billed this month": "এই মাসে বিল করা হয়েছে {billed_this_month}",
+  "{from}–{to} of {total}": "{total}টির মধ্যে {from}–{to}",
+  "{label} · {dayjs}": "{label} · {dayjs}",
+  "{label} is required": "{label} আবশ্যক",
+  "{label} is still processing your payment. The invoice will update once it is confirmed.": "{label} এখনও আপনার পেমেন্ট প্রক্রিয়া করছে। নিশ্চিত হলে ইনভয়েস হালনাগাদ হবে।",
+  "{label} payment cancelled. Your invoice has not been charged.": "{label} পেমেন্ট বাতিল হয়েছে। আপনার ইনভয়েস থেকে কোনো টাকা কাটা হয়নি।",
+  "{label} payment did not go through. Your invoice has not been charged.": "{label} পেমেন্ট সম্পন্ন হয়নি। আপনার ইনভয়েস থেকে কোনো টাকা কাটা হয়নি।",
+  "{label} reports that the payment failed. Your invoice has not been charged.": "{label} জানিয়েছে যে পেমেন্ট ব্যর্থ হয়েছে। আপনার ইনভয়েস থেকে কোনো টাকা কাটা হয়নি।",
+  "{label}: {what} expired {count} day ago": "{label}: {what}-এর মেয়াদ {count} দিন আগে শেষ হয়েছে",
+  "{label}: {what} expired {count} days ago": "{label}: {what}-এর মেয়াদ {count} দিন আগে শেষ হয়েছে",
+  "{label}: {what} expires in {count} day": "{label}: {what}-এর মেয়াদ {count} দিনের মধ্যে শেষ হবে",
+  "{label}: {what} expires in {count} days": "{label}: {what}-এর মেয়াদ {count} দিনের মধ্যে শেষ হবে",
+  "{label}: {what} expires today": "{label}: {what}-এর মেয়াদ আজ শেষ হচ্ছে",
+  "{label}. Check each question and answer before adding it.": "{label}। যোগ করার আগে প্রতিটি প্রশ্ন ও উত্তর যাচাই করুন।",
+  "{label}. Click one to put it in the remark box, then edit and save it.": "{label}। একটিতে ক্লিক করলে তা মন্তব্যের ঘরে বসবে, তারপর সম্পাদনা করে সংরক্ষণ করুন।",
+  "{recovery_codes_left} of 10 recovery codes left.{value}": "১০টির মধ্যে {recovery_codes_left}টি রিকভারি কোড বাকি আছে।{value}",
+  "{requests_this_month} used this month": "এই মাসে ব্যবহৃত {requests_this_month}",
+  "{titleCase} portal": "{titleCase} পোর্টাল",
+  "{total} students": "{total} জন শিক্ষার্থী",
+  "/ {section_name}": "/ {section_name}",
+  "+{value} more": "আরও +{value}",
+  "A": "অ",
+  "About us": "আমাদের সম্পর্কে",
+  "Absent": "অনুপস্থিত",
+  "Absent today": "আজ অনুপস্থিত",
+  "Academic": "শিক্ষা কার্যক্রম",
+  "Academic calendar": "শিক্ষাবর্ষের ক্যালেন্ডার",
+  "Accountant": "হিসাবরক্ষক",
+  "Active": "সক্রিয়",
+  "Add": "যোগ করুন",
+  "Add {toLowerCase}": "{toLowerCase} যোগ করুন",
+  "Added": "যোগ করা হয়েছে",
+  "Address": "ঠিকানা",
+  "Admin": "অ্যাডমিন",
+  "Admissions": "ভর্তি",
+  "After your password, also ask for a code from an authenticator app on your phone.": "পাসওয়ার্ডের পরে আপনার ফোনের অথেনটিকেটর অ্যাপ থেকে একটি কোডও চাওয়া হবে।",
+  "AI assistant": "এআই সহকারী",
+  "AI assistant settings saved": "এআই সহকারীর সেটিংস সংরক্ষিত হয়েছে",
+  "AI usage": "এআই ব্যবহার",
+  "AI-generated, may contain mistakes": "এআই দিয়ে তৈরি, ভুল থাকতে পারে",
+  "All": "সব",
+  "All classes": "সব শ্রেণি",
+  "Amount": "পরিমাণ",
+  "Analytics": "বিশ্লেষণ",
+  "and {value} more": "এবং আরও {value}টি",
+  "Answer: {correct_answers}": "উত্তর: {correct_answers}",
+  "Anthropic API key": "Anthropic API কী",
+  "Application": "আবেদন",
+  "Approved": "অনুমোদিত",
+  "At least 8 characters": "কমপক্ষে ৮টি অক্ষর",
+  "Attachment": "সংযুক্তি",
+  "Attendance": "উপস্থিতি",
+  "Attendance can't be taken for a future date": "ভবিষ্যতের তারিখের উপস্থিতি নেওয়া যায় না",
+  "Attendance for {name}": "{name}-এর উপস্থিতি",
+  "Attendance report": "উপস্থিতির প্রতিবেদন",
+  "Audit log": "পরিবর্তনের লগ",
+  "Back": "ফিরে যান",
+  "Bank Transfer": "ব্যাংক ট্রান্সফার",
+  "Billed": "বিল করা হয়েছে",
+  "Birthday": "জন্মদিন",
+  "Bkash": "bKash",
+  "Blood group": "রক্তের গ্রুপ",
+  "Book": "বই",
+  "Book a meeting": "সভার সময় নিন",
+  "Books": "বই",
+  "breadcrumb": "পথনির্দেশ",
+  "Brief": "সংক্ষিপ্ত",
+  "Campus": "ক্যাম্পাস",
+  "Cancel": "বাতিল",
+  "Cancelled": "বাতিল হয়েছে",
+  "Card": "কার্ড",
+  "Cash": "নগদ",
+  "Category": "বিভাগ",
+  "Certificates": "সনদপত্র",
+  "Check-in kiosk": "চেক-ইন কিয়স্ক",
+  "Cheque": "চেক",
+  "Child": "সন্তান",
+  "Choose a child": "একজন সন্তান বেছে নিন",
+  "Choose a class": "একটি শ্রেণি বেছে নিন",
+  "Choose a person": "একজন ব্যক্তি বেছে নিন",
+  "Choose a student": "একজন শিক্ষার্থী বেছে নিন",
+  "Choose child": "সন্তান বেছে নিন",
+  "Choose class": "শ্রেণি বেছে নিন",
+  "Choose exam": "পরীক্ষা বেছে নিন",
+  "Choose section": "শাখা বেছে নিন",
+  "Choose student": "শিক্ষার্থী বেছে নিন",
+  "Choose subject": "বিষয় বেছে নিন",
+  "Choose…": "বেছে নিন…",
+  "Class": "শ্রেণি",
+  "Class routine": "ক্লাস রুটিন",
+  "Class teacher": "শ্রেণি শিক্ষক",
+  "Classes": "শ্রেণিসমূহ",
+  "Classes & sections": "শ্রেণি ও শাখা",
+  "Clear": "মুছে ফেলুন",
+  "Clear selection": "নির্বাচন মুছুন",
+  "Close": "বন্ধ করুন",
+  "Closed": "বন্ধ",
+  "Code from the app": "অ্যাপের কোড",
+  "Code from your app, or a recovery code": "অ্যাপের কোড, অথবা একটি রিকভারি কোড",
+  "Code from your authenticator app": "আপনার অথেনটিকেটর অ্যাপের কোড",
+  "Collected": "আদায় হয়েছে",
+  "Command Palette": "কমান্ড প্যালেট",
+  "Comment": "মন্তব্য",
+  "Contact": "যোগাযোগ",
+  "Continue": "চালিয়ে যান",
+  "Copy": "কপি করুন",
+  "Copy failed. Select the codes and copy them by hand.": "কপি করা যায়নি। কোডগুলো নির্বাচন করে নিজে কপি করুন।",
+  "Create codes": "কোড তৈরি করুন",
+  "Created": "তৈরি হয়েছে",
+  "Daily attendance": "দৈনিক উপস্থিতি",
+  "Dashboard": "ড্যাশবোর্ড",
+  "Date": "তারিখ",
+  "Date of birth": "জন্ম তারিখ",
+  "Day": "দিন",
+  "Delete": "মুছে ফেলুন",
+  "Delete \"{title}\"?": "\"{title}\" মুছে ফেলবেন?",
+  "Delete {name}?": "{name} মুছে ফেলবেন?",
+  "Delete {toLowerCase}?": "{toLowerCase} মুছে ফেলবেন?",
+  "Deleted": "মুছে ফেলা হয়েছে",
+  "Description": "বিবরণ",
+  "Details": "বিস্তারিত",
+  "Difficulty": "কাঠিন্য",
+  "Disabled": "বন্ধ",
+  "Displays the mobile sidebar.": "মোবাইলের সাইডবার দেখায়।",
+  "Documents": "কাগজপত্র",
+  "Done": "সম্পন্ন",
+  "Dormitory": "ছাত্রাবাস",
+  "Download": "ডাউনলোড",
+  "Download template": "টেমপ্লেট ডাউনলোড",
+  "Draft": "খসড়া",
+  "Draft again": "আবার খসড়া করুন",
+  "Draft questions": "প্রশ্নের খসড়া করুন",
+  "Draft remarks": "মন্তব্যের খসড়া করুন",
+  "Draft with AI": "এআই দিয়ে খসড়া",
+  "Drafts report-card remarks, exam questions and progress summaries with Claude (Anthropic). Staff review every draft before it is saved. Student names, contact details, health and counselling records are never sent.": "Claude (Anthropic) দিয়ে রিপোর্ট কার্ডের মন্তব্য, পরীক্ষার প্রশ্ন ও অগ্রগতির সারাংশের খসড়া তৈরি করে। সংরক্ষণের আগে কর্মীরা প্রতিটি খসড়া যাচাই করেন। শিক্ষার্থীর নাম, যোগাযোগের তথ্য, স্বাস্থ্য ও কাউন্সেলিংয়ের রেকর্ড কখনো পাঠানো হয় না।",
+  "driving licence": "ড্রাইভিং লাইসেন্স",
+  "Due": "বকেয়া",
+  "Due date": "শেষ তারিখ",
+  "e.g. helps classmates, needs to read more": "যেমন: সহপাঠীদের সাহায্য করে, আরও পড়া দরকার",
+  "Easy": "সহজ",
+  "Edit": "সম্পাদনা",
+  "Edit {toLowerCase}": "{toLowerCase} সম্পাদনা",
+  "Email": "ইমেইল",
+  "Email is required": "ইমেইল আবশ্যক",
+  "Encouraging": "উৎসাহব্যঞ্জক",
+  "Ends": "শেষ",
+  "Enrol": "ভর্তি করুন",
+  "Enter the 6-digit code the app shows.": "অ্যাপে দেখানো ৬ অঙ্কের কোডটি লিখুন।",
+  "Events": "অনুষ্ঠান",
+  "Everyone": "সবাই",
+  "Exam": "পরীক্ষা",
+  "Exam questions": "পরীক্ষার প্রশ্ন",
+  "Exam timetable": "পরীক্ষার সময়সূচি",
+  "Exams": "পরীক্ষা",
+  "Exams & grades": "পরীক্ষা ও গ্রেড",
+  "Export to Excel": "Excel-এ এক্সপোর্ট",
+  "Failed": "ব্যর্থ",
+  "Fare": "ভাড়া",
+  "Fax": "ফ্যাক্স",
+  "Feature": "সুবিধা",
+  "Fee setup": "ফি নির্ধারণ",
+  "Fees": "ফি",
+  "Fees collected this month": "এই মাসে আদায়কৃত ফি",
+  "Female": "মহিলা",
+  "Fill in the blanks": "শূন্যস্থান পূরণ",
+  "Finalized": "চূড়ান্ত",
+  "Finance": "হিসাব",
+  "fitness certificate": "ফিটনেস সনদ",
+  "Formal": "আনুষ্ঠানিক",
+  "Fri": "শুক্র",
+  "Friday": "শুক্রবার",
+  "From": "থেকে",
+  "From console.anthropic.com": "console.anthropic.com থেকে",
+  "Gallery": "গ্যালারি",
+  "Gender": "লিঙ্গ",
+  "Go to next page": "পরের পাতায় যান",
+  "Go to previous page": "আগের পাতায় যান",
+  "GPA": "জিপিএ",
+  "GPA {average_grade_point}": "জিপিএ {average_grade_point}",
+  "Grade": "গ্রেড",
+  "Grade point": "গ্রেড পয়েন্ট",
+  "Guardian": "অভিভাবক",
+  "Hard": "কঠিন",
+  "Health & certificates": "স্বাস্থ্য ও সনদপত্র",
+  "High risk; {at_risk_medium} more at medium": "উচ্চ ঝুঁকিতে; মাঝারি ঝুঁকিতে আরও {at_risk_medium} জন",
+  "Highest": "সর্বোচ্চ",
+  "Holiday: {holiday}": "ছুটি: {holiday}",
+  "Homework": "বাড়ির কাজ",
+  "How many": "কতগুলো",
+  "HR": "মানবসম্পদ",
+  "I've saved them": "আমি সংরক্ষণ করেছি",
+  "ID": "আইডি",
+  "ID cards": "আইডি কার্ড",
+  "ID cards & devices": "আইডি কার্ড ও ডিভাইস",
+  "Image": "ছবি",
+  "Income & expenses": "আয় ও ব্যয়",
+  "Input tokens": "ইনপুট টোকেন",
+  "Instalment": "কিস্তি",
+  "Instructions": "নির্দেশনা",
+  "insurance": "বিমা",
+  "Invoice": "ইনভয়েস",
+  "Invoices": "ইনভয়েস",
+  "Issue": "ইস্যু করুন",
+  "Issued": "ইস্যু করা হয়েছে",
+  "Keep these somewhere safe. Each code signs you in once if you lose your phone. They won't be shown again.": "এগুলো নিরাপদ কোথাও রাখুন। ফোন হারালে প্রতিটি কোড দিয়ে একবার সাইন ইন করা যাবে। এগুলো আর দেখানো হবে না।",
+  "Key": "কী",
+  "L": "দে",
+  "Late": "দেরিতে",
+  "Latest notices": "সাম্প্রতিক নোটিশ",
+  "Leave": "ছুটি",
+  "Leave empty to keep the current image": "বর্তমান ছবি রাখতে খালি রাখুন",
+  "Leave empty to keep the current password": "বর্তমান পাসওয়ার্ড রাখতে খালি রাখুন",
+  "Librarian": "গ্রন্থাগারিক",
+  "Library": "গ্রন্থাগার",
+  "Loading…": "লোড হচ্ছে…",
+  "Log out": "লগ আউট",
+  "Male": "পুরুষ",
+  "Mark all read": "সব পঠিত হিসেবে চিহ্নিত করুন",
+  "Marks": "নম্বর",
+  "Marks by SMS": "এসএমএসে নম্বর",
+  "Marks each": "প্রতিটির নম্বর",
+  "Marks entry": "নম্বর প্রদান",
+  "Marksheet": "মার্কশিট",
+  "Medium": "মাঝারি",
+  "Meeting": "সভা",
+  "Message": "বার্তা",
+  "Messages": "বার্তা",
+  "Method": "মাধ্যম",
+  "Model": "মডেল",
+  "Mon": "সোম",
+  "Monday": "সোমবার",
+  "Month": "মাস",
+  "More": "আরও",
+  "More pages": "আরও পাতা",
+  "Multiple choice": "বহুনির্বাচনি",
+  "My meeting slots": "আমার সভার সময়",
+  "My payslips": "আমার বেতন স্লিপ",
+  "My profile": "আমার প্রোফাইল",
+  "My requests": "আমার আবেদন",
+  "My routine": "আমার রুটিন",
+  "Nagad": "Nagad",
+  "Name": "নাম",
+  "Net": "নিট",
+  "New password": "নতুন পাসওয়ার্ড",
+  "New recovery codes": "নতুন রিকভারি কোড",
+  "News": "সংবাদ",
+  "Next": "পরবর্তী",
+  "Next page": "পরের পাতা",
+  "No": "না",
+  "No AI requests yet": "এখনও কোনো এআই অনুরোধ নেই",
+  "No invoices": "কোনো ইনভয়েস নেই",
+  "No notices": "কোনো নোটিশ নেই",
+  "No payments recorded": "কোনো পেমেন্ট লিপিবদ্ধ নেই",
+  "No records yet": "এখনও কোনো রেকর্ড নেই",
+  "No requests": "কোনো আবেদন নেই",
+  "No students enrolled": "কোনো শিক্ষার্থী ভর্তি নেই",
+  "No students enrolled in this section": "এই শাখায় কোনো শিক্ষার্থী ভর্তি নেই",
+  "No students found": "কোনো শিক্ষার্থী পাওয়া যায়নি",
+  "No students in this class": "এই শ্রেণিতে কোনো শিক্ষার্থী নেই",
+  "No subjects assigned to you": "আপনাকে কোনো বিষয় দেওয়া হয়নি",
+  "Nobody has turned it on yet": "এখনও কেউ এটি চালু করেননি",
+  "None": "কিছুই না",
+  "Not enrolled": "ভর্তি নয়",
+  "Not set": "নির্ধারিত নয়",
+  "Note": "নোট",
+  "Notes": "নোট",
+  "Nothing found": "কিছু পাওয়া যায়নি",
+  "Notice": "নোটিশ",
+  "Noticeboard": "নোটিশ বোর্ড",
+  "Notifications": "বিজ্ঞপ্তি",
+  "Notifications are blocked in this browser.": "এই ব্রাউজারে বিজ্ঞপ্তি বন্ধ করা আছে।",
+  "Notifications, {unread} unread": "বিজ্ঞপ্তি, {unread}টি অপঠিত",
+  "Obtained": "প্রাপ্ত",
+  "Off": "বন্ধ",
+  "On": "চালু",
+  "On leave": "ছুটিতে",
+  "Online": "অনলাইন",
+  "Online exams": "অনলাইন পরীক্ষা",
+  "Open": "খোলা",
+  "Open an authenticator app (Google Authenticator, Microsoft Authenticator, Authy…).": "একটি অথেনটিকেটর অ্যাপ খুলুন (Google Authenticator, Microsoft Authenticator, Authy…)।",
+  "Open transport": "পরিবহন খুলুন",
+  "Opened": "খোলা হয়েছে",
+  "Optional": "ঐচ্ছিক",
+  "Other": "অন্যান্য",
+  "Output tokens": "আউটপুট টোকেন",
+  "Outstanding": "বকেয়া",
+  "Overdue": "মেয়াদোত্তীর্ণ বকেয়া",
+  "P": "উ",
+  "Page not found": "পাতাটি পাওয়া যায়নি",
+  "pagination": "পাতা নির্বাচন",
+  "Paid": "পরিশোধিত",
+  "Paid on": "পরিশোধের তারিখ",
+  "Parent": "অভিভাবক",
+  "Parent phone": "অভিভাবকের ফোন",
+  "Parent-teacher meetings": "অভিভাবক-শিক্ষক সভা",
+  "Parents": "অভিভাবক",
+  "Partially Paid": "আংশিক পরিশোধিত",
+  "Password": "পাসওয়ার্ড",
+  "Passwords do not match": "পাসওয়ার্ড মেলেনি",
+  "Payment history": "পেমেন্টের ইতিহাস",
+  "Payment received. Thank you!": "পেমেন্ট পাওয়া গেছে। ধন্যবাদ!",
+  "Payments": "পেমেন্ট",
+  "Paypal": "PayPal",
+  "PayPal": "PayPal",
+  "Payroll": "বেতন প্রক্রিয়া",
+  "PDF, Office documents, images, audio/video or zip; max 10 MB": "PDF, Office ফাইল, ছবি, অডিও/ভিডিও বা zip; সর্বোচ্চ ১০ MB",
+  "Pending": "অপেক্ষমাণ",
+  "People": "ব্যক্তিবর্গ",
+  "Period attendance": "পিরিয়ডভিত্তিক উপস্থিতি",
+  "Phone": "ফোন",
+  "Photo updated": "ছবি হালনাগাদ হয়েছে",
+  "Pick a date": "তারিখ বেছে নিন",
+  "Present": "উপস্থিত",
+  "Present today": "আজ উপস্থিত",
+  "Previous": "পূর্ববর্তী",
+  "Previous page": "আগের পাতা",
+  "Previous school": "পূর্ববর্তী বিদ্যালয়",
+  "Principal": "প্রধান শিক্ষক",
+  "Print": "প্রিন্ট",
+  "Print / save as PDF": "প্রিন্ট / PDF হিসেবে সংরক্ষণ",
+  "Privacy policy": "গোপনীয়তা নীতি",
+  "Progress summaries": "অগ্রগতির সারাংশ",
+  "Progress summary": "অগ্রগতির সারাংশ",
+  "Promotion": "শ্রেণি উত্তরণ",
+  "Public website": "পাবলিক ওয়েবসাইট",
+  "QR code for your authenticator app": "আপনার অথেনটিকেটর অ্যাপের জন্য QR কোড",
+  "Question papers": "প্রশ্নপত্র",
+  "Questions": "প্রশ্ন",
+  "Reason": "কারণ",
+  "Recommended for staff accounts.": "কর্মীদের অ্যাকাউন্টের জন্য সুপারিশকৃত।",
+  "Recovery codes (each works once)\n\n{text}": "রিকভারি কোড (প্রতিটি একবার কাজ করে)\n\n{text}",
+  "Recovery codes copied": "রিকভারি কোড কপি হয়েছে",
+  "Reference": "রেফারেন্স",
+  "Refresh": "রিফ্রেশ",
+  "Reject": "প্রত্যাখ্যান করুন",
+  "Rejected": "প্রত্যাখ্যাত",
+  "Religion": "ধর্ম",
+  "Remove": "সরান",
+  "Report cards": "রিপোর্ট কার্ড",
+  "Report-card remarks": "রিপোর্ট কার্ডের মন্তব্য",
+  "Requests": "অনুরোধ",
+  "Requests and tokens per month. Prompts and answers are not stored.": "মাসভিত্তিক অনুরোধ ও টোকেন। প্রশ্ন ও উত্তর সংরক্ষণ করা হয় না।",
+  "Requests per month (whole school)": "মাসে অনুরোধ (পুরো বিদ্যালয়)",
+  "Requests per person per day": "প্রতিজনের দৈনিক অনুরোধ",
+  "Required": "আবশ্যক",
+  "Reset": "রিসেট",
+  "Reset two-factor authentication for {value}?": "{value}-এর দুই-ধাপের যাচাই রিসেট করবেন?",
+  "Result": "ফলাফল",
+  "Results": "ফলাফল",
+  "Review & add": "যাচাই করে যোগ করুন",
+  "Role": "ভূমিকা",
+  "Roll": "রোল",
+  "Roll {roll}": "রোল {roll}",
+  "Room": "কক্ষ",
+  "Route": "রুট",
+  "Salary structures": "বেতন কাঠামো",
+  "Sat": "শনি",
+  "Saturday": "শনিবার",
+  "Save": "সংরক্ষণ করুন",
+  "Save changes": "পরিবর্তন সংরক্ষণ করুন",
+  "Saved": "সংরক্ষিত হয়েছে",
+  "Saved; type to replace": "সংরক্ষিত আছে; বদলাতে নতুন করে লিখুন",
+  "Scan this code, or type the key below.": "এই কোডটি স্ক্যান করুন, অথবা নিচের কী-টি লিখুন।",
+  "School": "বিদ্যালয়",
+  "School years": "শিক্ষাবর্ষ",
+  "Search for a command to run...": "চালানোর জন্য কমান্ড খুঁজুন...",
+  "Search name or email": "নাম বা ইমেইল দিয়ে খুঁজুন",
+  "Search…": "খুঁজুন…",
+  "Section": "শাখা",
+  "Section {section_name}": "শাখা {section_name}",
+  "Section {sectionName}": "শাখা {sectionName}",
+  "See all": "সব দেখুন",
+  "Select…": "নির্বাচন করুন…",
+  "Send": "পাঠান",
+  "Send request": "আবেদন পাঠান",
+  "Session": "শিক্ষাবর্ষ",
+  "Session {running_year}": "শিক্ষাবর্ষ {running_year}",
+  "Setting up": "চালু করা হচ্ছে",
+  "Settings": "সেটিংস",
+  "Settings saved": "সেটিংস সংরক্ষিত হয়েছে",
+  "Shared with the AI service. Don't include names or private details.": "এআই সেবার সাথে শেয়ার করা হবে। নাম বা ব্যক্তিগত তথ্য দেবেন না।",
+  "Shared with the AI service. Paste the topic, learning objectives or a short passage.": "এআই সেবার সাথে শেয়ার করা হবে। বিষয়বস্তু, শিখনফল বা একটি ছোট অনুচ্ছেদ দিন।",
+  "Show on public website": "পাবলিক ওয়েবসাইটে দেখান",
+  "Sidebar": "সাইডবার",
+  "Since": "থেকে",
+  "Single student (optional)": "একজন শিক্ষার্থী (ঐচ্ছিক)",
+  "SMS": "এসএমএস",
+  "Source": "উৎস",
+  "Sslcommerz": "SSLCommerz",
+  "SSLCommerz": "SSLCommerz",
+  "Staff": "কর্মী",
+  "Staff accounts": "কর্মীদের অ্যাকাউন্ট",
+  "Staff attendance": "কর্মীদের উপস্থিতি",
+  "Staff member": "কর্মী",
+  "Starts": "শুরু",
+  "Status": "অবস্থা",
+  "Status updated": "অবস্থা হালনাগাদ হয়েছে",
+  "Stripe": "Stripe",
+  "Student": "শিক্ষার্থী",
+  "Student profile": "শিক্ষার্থীর প্রোফাইল",
+  "Students": "শিক্ষার্থী",
+  "Students at risk": "ঝুঁকিতে থাকা শিক্ষার্থী",
+  "Study material": "পাঠ্য উপকরণ",
+  "Subject": "বিষয়",
+  "Subjects": "বিষয়সমূহ",
+  "Submitted": "জমা দেওয়া হয়েছে",
+  "Summarise progress": "অগ্রগতির সারাংশ তৈরি করুন",
+  "Sun": "রবি",
+  "Sunday": "রবিবার",
+  "Syllabus": "পাঠ্যসূচি",
+  "System settings": "সিস্টেম সেটিংস",
+  "Tabulation sheet": "ট্যাবুলেশন শিট",
+  "Teacher": "শিক্ষক",
+  "Teachers": "শিক্ষক",
+  "Terms & conditions": "শর্তাবলি",
+  "Text": "লেখা",
+  "They can sign in with the password alone (or must set it up again if their role requires it). Use this when a phone is lost.": "তিনি শুধু পাসওয়ার্ড দিয়ে সাইন ইন করতে পারবেন (ভূমিকার জন্য আবশ্যক হলে আবার চালু করতে হবে)। ফোন হারালে এটি ব্যবহার করুন।",
+  "This cannot be undone.": "এটি আর ফেরানো যাবে না।",
+  "Thu": "বৃহঃ",
+  "Thursday": "বৃহস্পতিবার",
+  "Time": "সময়",
+  "Title": "শিরোনাম",
+  "To": "পর্যন্ত",
+  "Today": "আজ",
+  "Toggle Sidebar": "সাইডবার দেখান/লুকান",
+  "Tone": "ধরন",
+  "Topic or syllabus text": "বিষয়বস্তু বা পাঠ্যসূচির লেখা",
+  "Total": "মোট",
+  "Total {total}": "মোট {total}",
+  "Transport": "পরিবহন",
+  "Transport & dormitory": "পরিবহন ও ছাত্রাবাস",
+  "Transport documents need renewing": "পরিবহনের কাগজপত্র নবায়ন করা প্রয়োজন",
+  "True / false": "সত্য / মিথ্যা",
+  "Try again": "আবার চেষ্টা করুন",
+  "Tue": "মঙ্গল",
+  "Tuesday": "মঙ্গলবার",
+  "Turn off": "বন্ধ করুন",
+  "Turn off two-factor authentication": "দুই-ধাপের যাচাই বন্ধ করুন",
+  "Turn on": "চালু করুন",
+  "Turn on the AI assistant": "এআই সহকারী চালু করুন",
+  "Turn on two-factor authentication": "দুই-ধাপের যাচাই চালু করুন",
+  "Two-factor authentication": "দুই-ধাপের যাচাই",
+  "Two-factor authentication reset": "দুই-ধাপের যাচাই রিসেট হয়েছে",
+  "Two-factor authentication turned off": "দুই-ধাপের যাচাই বন্ধ হয়েছে",
+  "Type": "ধরন",
+  "Unknown": "অজানা",
+  "Unpaid": "অপরিশোধিত",
+  "Unsaved changes": "অসংরক্ষিত পরিবর্তন",
+  "Upload": "আপলোড",
+  "Using the ANTHROPIC_API_KEY from the server environment": "সার্ভারের পরিবেশ থেকে ANTHROPIC_API_KEY ব্যবহার করা হচ্ছে",
+  "Vehicles": "যানবাহন",
+  "Website": "ওয়েবসাইট",
+  "Wed": "বুধ",
+  "Wednesday": "বুধবার",
+  "Weekly day off": "সাপ্তাহিক ছুটি",
+  "When": "কখন",
+  "Working days {working_days}": "কার্যদিবস {working_days}",
+  "Year": "বছর",
+  "Yes": "হ্যাঁ",
+  "You are not allowed to do that.": "আপনার এটি করার অনুমতি নেই।",
+  "You're all caught up": "নতুন কিছু নেই",
+  "Your notes (optional)": "আপনার নোট (ঐচ্ছিক)",
+  "Your old recovery codes stop working.": "আপনার পুরোনো রিকভারি কোডগুলো আর কাজ করবে না।",
+  "Your recovery codes": "আপনার রিকভারি কোড",
+  "Your school requires it for your role.": "আপনার ভূমিকার জন্য বিদ্যালয় এটি বাধ্যতামূলক করেছে।",
+  "Your school requires two-factor authentication for your role.": "আপনার ভূমিকার জন্য বিদ্যালয় দুই-ধাপের যাচাই বাধ্যতামূলক করেছে।",
 };

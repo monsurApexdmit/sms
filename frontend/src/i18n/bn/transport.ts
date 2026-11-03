@@ -2,81 +2,81 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const transport: Record<string, string> = {
-  "· {driver_name}": "", // untranslated
-  "· {driver_phone}": "", // untranslated
-  "· fare {fare}": "", // untranslated
-  "({roll})": "", // untranslated
-  "{assigned} / {count} seat": "", // untranslated
-  "{assigned} / {count} seats": "", // untranslated
-  "{count} seat": "", // untranslated
-  "{count} seats": "", // untranslated
-  "{name} is not assigned to a route. Ask the school office to arrange it.": "", // untranslated
-  "{sequence}. {name}": "", // untranslated
-  "{value} · {length} students": "", // untranslated
-  "A number like 650 or 650.50": "", // untranslated
-  "Add stop": "", // untranslated
-  "Assign all": "", // untranslated
-  "Assign every student of this {value} to the route?": "", // untranslated
-  "Assigned": "", // untranslated
-  "Both": "", // untranslated
-  "Choose route": "", // untranslated
-  "Contact details shown to parents of students on the driver's route.": "", // untranslated
-  "Delete stop": "", // untranslated
-  "Delete stop \"{name}\"?": "", // untranslated
-  "Driver": "", // untranslated
-  "Drivers": "", // untranslated
-  "Drop-off": "", // untranslated
-  "drop-off {drop_time}": "", // untranslated
-  "Edit stop": "", // untranslated
-  "Empty: route fare": "", // untranslated
-  "Fare {route_fare}": "", // untranslated
-  "Fitness until": "", // untranslated
-  "In service": "", // untranslated
-  "Insurance until": "", // untranslated
-  "Its students and their routes appear here.": "", // untranslated
-  "Licence no.": "", // untranslated
-  "Licence until": "", // untranslated
-  "More students than seats on this route's vehicles": "", // untranslated
-  "Move down": "", // untranslated
-  "Move up": "", // untranslated
-  "My transport": "", // untranslated
-  "New route": "", // untranslated
-  "New stop on {value}": "", // untranslated
-  "No routes yet": "", // untranslated
-  "No stop": "", // untranslated
-  "No stop chosen": "", // untranslated
-  "No stops yet": "", // untranslated
-  "No times set": "", // untranslated
-  "No transport": "", // untranslated
-  "No vehicle assigned to this route yet.": "", // untranslated
-  "No vehicle on this route": "", // untranslated
-  "Nobody at this stop": "", // untranslated
-  "Not chosen yet": "", // untranslated
-  "Not using": "", // untranslated
-  "Not using school transport": "", // untranslated
-  "Pick-up": "", // untranslated
-  "pick-up {pickup_time}": "", // untranslated
-  "Registration": "", // untranslated
-  "Remove from transport": "", // untranslated
-  "Removed from transport": "", // untranslated
-  "Roster": "", // untranslated
-  "Roster: {value}": "", // untranslated
-  "Route added": "", // untranslated
-  "Route is over capacity: {assigned} students for {capacity} seats": "", // untranslated
-  "Route, stop, times and who to call": "", // untranslated
-  "Routes & stops": "", // untranslated
-  "Routes, stops, vehicles, drivers and who rides where. Students' route also shows on": "", // untranslated
-  "Seats": "", // untranslated
-  "Seats count towards each route's capacity. Insurance and fitness dates feed the renewal alert.": "", // untranslated
-  "Stop": "", // untranslated
-  "Stop deleted": "", // untranslated
-  "Students already on another route are moved.": "", // untranslated
-  "Students at this stop keep the route without a stop.": "", // untranslated
-  "Students on the route by stop, in route order": "", // untranslated
-  "Time not set": "", // untranslated
-  "Transport roster": "", // untranslated
-  "Trips": "", // untranslated
-  "Vehicle and driver": "", // untranslated
-  "You are not assigned to a route. Ask the school office to arrange it.": "", // untranslated
-  "Your child": "", // untranslated
+  "· {driver_name}": "· {driver_name}",
+  "· {driver_phone}": "· {driver_phone}",
+  "· fare {fare}": "· ভাড়া {fare}",
+  "({roll})": "({roll})",
+  "{assigned} / {count} seat": "{assigned} / {count} আসন",
+  "{assigned} / {count} seats": "{assigned} / {count} আসন",
+  "{count} seat": "{count} আসন",
+  "{count} seats": "{count} আসন",
+  "{name} is not assigned to a route. Ask the school office to arrange it.": "{name}-কে কোনো রুটে যুক্ত করা হয়নি। ব্যবস্থা করতে বিদ্যালয়ের অফিসে যোগাযোগ করুন।",
+  "{sequence}. {name}": "{sequence}. {name}",
+  "{value} · {length} students": "{value} · {length} জন শিক্ষার্থী",
+  "A number like 650 or 650.50": "650 বা 650.50-এর মতো একটি সংখ্যা",
+  "Add stop": "স্টপ যোগ করুন",
+  "Assign all": "সবাইকে যুক্ত করুন",
+  "Assign every student of this {value} to the route?": "এই {value}-এর সব শিক্ষার্থীকে রুটে যুক্ত করবেন?",
+  "Assigned": "যুক্ত",
+  "Both": "উভয়",
+  "Choose route": "রুট বেছে নিন",
+  "Contact details shown to parents of students on the driver's route.": "চালকের রুটের শিক্ষার্থীদের অভিভাবকদের যোগাযোগের তথ্য দেখানো হয়।",
+  "Delete stop": "স্টপ মুছে ফেলুন",
+  "Delete stop \"{name}\"?": "\"{name}\" স্টপটি মুছে ফেলবেন?",
+  "Driver": "চালক",
+  "Drivers": "চালক",
+  "Drop-off": "নামানো",
+  "drop-off {drop_time}": "নামানো {drop_time}",
+  "Edit stop": "স্টপ সম্পাদনা",
+  "Empty: route fare": "খালি রাখলে: রুটের ভাড়া",
+  "Fare {route_fare}": "ভাড়া {route_fare}",
+  "Fitness until": "ফিটনেসের মেয়াদ",
+  "In service": "চালু আছে",
+  "Insurance until": "বিমার মেয়াদ",
+  "Its students and their routes appear here.": "এর শিক্ষার্থী ও তাদের রুট এখানে দেখা যাবে।",
+  "Licence no.": "লাইসেন্স নং",
+  "Licence until": "লাইসেন্সের মেয়াদ",
+  "More students than seats on this route's vehicles": "এই রুটের যানবাহনে আসনের চেয়ে শিক্ষার্থী বেশি",
+  "Move down": "নিচে সরান",
+  "Move up": "উপরে সরান",
+  "My transport": "আমার পরিবহন",
+  "New route": "নতুন রুট",
+  "New stop on {value}": "{value}-এ নতুন স্টপ",
+  "No routes yet": "এখনও কোনো রুট নেই",
+  "No stop": "কোনো স্টপ নেই",
+  "No stop chosen": "কোনো স্টপ বেছে নেওয়া হয়নি",
+  "No stops yet": "এখনও কোনো স্টপ নেই",
+  "No times set": "কোনো সময় নির্ধারিত নেই",
+  "No transport": "কোনো পরিবহন নেই",
+  "No vehicle assigned to this route yet.": "এই রুটে এখনও কোনো যানবাহন দেওয়া হয়নি।",
+  "No vehicle on this route": "এই রুটে কোনো যানবাহন নেই",
+  "Nobody at this stop": "এই স্টপে কেউ নেই",
+  "Not chosen yet": "এখনও বেছে নেওয়া হয়নি",
+  "Not using": "ব্যবহার করে না",
+  "Not using school transport": "বিদ্যালয়ের পরিবহন ব্যবহার করে না",
+  "Pick-up": "তোলা",
+  "pick-up {pickup_time}": "তোলা {pickup_time}",
+  "Registration": "রেজিস্ট্রেশন",
+  "Remove from transport": "পরিবহন থেকে সরান",
+  "Removed from transport": "পরিবহন থেকে সরানো হয়েছে",
+  "Roster": "তালিকা",
+  "Roster: {value}": "তালিকা: {value}",
+  "Route added": "রুট যোগ করা হয়েছে",
+  "Route is over capacity: {assigned} students for {capacity} seats": "রুটে ধারণক্ষমতার বেশি: {capacity} আসনের জন্য {assigned} জন শিক্ষার্থী",
+  "Route, stop, times and who to call": "রুট, স্টপ, সময় এবং কাকে ফোন করবেন",
+  "Routes & stops": "রুট ও স্টপ",
+  "Routes, stops, vehicles, drivers and who rides where. Students' route also shows on": "রুট, স্টপ, যানবাহন, চালক এবং কে কোথায় যাতায়াত করে। শিক্ষার্থীদের রুট এখানেও দেখা যায়:",
+  "Seats": "আসন",
+  "Seats count towards each route's capacity. Insurance and fitness dates feed the renewal alert.": "আসন প্রতিটি রুটের ধারণক্ষমতায় গণনা হয়। বিমা ও ফিটনেসের তারিখ থেকে নবায়নের সতর্কতা দেওয়া হয়।",
+  "Stop": "স্টপ",
+  "Stop deleted": "স্টপ মুছে ফেলা হয়েছে",
+  "Students already on another route are moved.": "অন্য রুটে থাকা শিক্ষার্থীদের সরিয়ে আনা হবে।",
+  "Students at this stop keep the route without a stop.": "এই স্টপের শিক্ষার্থীরা স্টপ ছাড়া রুটে থেকে যাবে।",
+  "Students on the route by stop, in route order": "রুটের ক্রম অনুযায়ী স্টপভিত্তিক শিক্ষার্থী",
+  "Time not set": "সময় নির্ধারিত নয়",
+  "Transport roster": "পরিবহনের তালিকা",
+  "Trips": "যাত্রা",
+  "Vehicle and driver": "যানবাহন ও চালক",
+  "You are not assigned to a route. Ask the school office to arrange it.": "আপনাকে কোনো রুটে যুক্ত করা হয়নি। ব্যবস্থা করতে বিদ্যালয়ের অফিসে যোগাযোগ করুন।",
+  "Your child": "আপনার সন্তান",
 };

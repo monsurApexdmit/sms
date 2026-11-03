@@ -2,69 +2,68 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const students: Record<string, string> = {
-  "· {classLabel}": "", // untranslated
-  "· room {dormitory_room_number}": "", // untranslated
-  "(same as the old template).": "", // untranslated
-  "{created} students created": "", // untranslated
-  "{value}{value2}": "", // untranslated
-  "@media print { @page { size: A4 portrait; margin: 8mm; } }": "", // untranslated
-  "#{transport_id}": "", // untranslated
-  "Add student": "", // untranslated
-  "Any dormitory": "", // untranslated
-  "Any route": "", // untranslated
-  "auto if empty": "", // untranslated
-  "Barcode {value}": "", // untranslated
-  "Bulk import": "", // untranslated
-  "Bulk import students": "", // untranslated
-  "Choose a .csv file": "", // untranslated
-  "Choose year": "", // untranslated
-  "Could not load marks": "", // untranslated
-  "Create the student account and enrol them in the running year.": "", // untranslated
-  "CSV columns:": "", // untranslated
-  "CSV file": "", // untranslated
-  "Current class": "", // untranslated
-  "Due {due}": "", // untranslated
-  "Edit student": "", // untranslated
-  "Enrol students of the running year ({value}) into next year's classes": "", // untranslated
-  "Exam results for {value}{value2}": "", // untranslated
-  "Health, records & certificates": "", // untranslated
-  "ID card": "", // untranslated
-  "ID no.": "", // untranslated
-  "Import": "", // untranslated
-  "Into academic year": "", // untranslated
-  "Leave empty to keep": "", // untranslated
-  "N/A": "", // untranslated
-  "Name, email or ID": "", // untranslated
-  "No exam results for {value}.": "", // untranslated
-  "No later year configured": "", // untranslated
-  "No marks yet": "", // untranslated
-  "No subjects for this class": "", // untranslated
-  "not enrolled": "", // untranslated
-  "Parent information is not available.": "", // untranslated
-  "Pick a class (and optionally a section) to generate cards.": "", // untranslated
-  "Pick the class to promote, its default target class and the new academic year.": "", // untranslated
-  "Print student identity cards for a class or section": "", // untranslated
-  "Promote to class": "", // untranslated
-  "Promotion settings": "", // untranslated
-  "Room number": "", // untranslated
-  "Search": "", // untranslated
-  "Single student card": "", // untranslated
-  "Student added": "", // untranslated
-  "Student deleted": "", // untranslated
-  "Student ID no.": "", // untranslated
-  "Student not found": "", // untranslated
-  "Student promotion": "", // untranslated
-  "Student updated": "", // untranslated
-  "students": "", // untranslated
-  "Students enrolled for the new year": "", // untranslated
-  "Students of the selected class appear here with their exam results.": "", // untranslated
-  "Target class": "", // untranslated
-  "the running year": "", // untranslated
-  "This also removes the student's marks, attendance, invoices, payments and messages.": "", // untranslated
-  "Total paid": "", // untranslated
-  "Transport route": "", // untranslated
-  "Upload a CSV to create many students in one class at once.": "", // untranslated
-  "Valid email required": "", // untranslated
-  "View profile": "", // untranslated
-  "Whole class": "", // untranslated
+  "· {classLabel}": "· {classLabel}",
+  "· room {dormitory_room_number}": "· কক্ষ {dormitory_room_number}",
+  "(same as the old template).": "(পুরোনো টেমপ্লেটের মতোই)।",
+  "{created} students created": "{created} জন শিক্ষার্থী তৈরি হয়েছে",
+  "{value}{value2}": "{value}{value2}",
+  "#{transport_id}": "#{transport_id}",
+  "Add student": "শিক্ষার্থী যোগ করুন",
+  "Any dormitory": "যেকোনো ছাত্রাবাস",
+  "Any route": "যেকোনো রুট",
+  "auto if empty": "খালি থাকলে স্বয়ংক্রিয়",
+  "Barcode {value}": "বারকোড {value}",
+  "Bulk import": "একসাথে ইমপোর্ট",
+  "Bulk import students": "একসাথে শিক্ষার্থী ইমপোর্ট",
+  "Choose a .csv file": "একটি .csv ফাইল বেছে নিন",
+  "Choose year": "বছর বেছে নিন",
+  "Could not load marks": "নম্বর লোড করা যায়নি",
+  "Create the student account and enrol them in the running year.": "শিক্ষার্থীর অ্যাকাউন্ট তৈরি করে চলতি বছরে ভর্তি করুন।",
+  "CSV columns:": "CSV কলাম:",
+  "CSV file": "CSV ফাইল",
+  "Current class": "বর্তমান শ্রেণি",
+  "Due {due}": "বকেয়া {due}",
+  "Edit student": "শিক্ষার্থী সম্পাদনা",
+  "Enrol students of the running year ({value}) into next year's classes": "চলতি বছরের ({value}) শিক্ষার্থীদের পরের বছরের শ্রেণিতে ভর্তি করুন",
+  "Exam results for {value}{value2}": "{value}{value2}-এর পরীক্ষার ফলাফল",
+  "Health, records & certificates": "স্বাস্থ্য, রেকর্ড ও সনদপত্র",
+  "ID card": "আইডি কার্ড",
+  "ID no.": "আইডি নম্বর",
+  "Import": "ইমপোর্ট",
+  "Into academic year": "যে শিক্ষাবর্ষে",
+  "Leave empty to keep": "অপরিবর্তিত রাখতে খালি রাখুন",
+  "N/A": "প্রযোজ্য নয়",
+  "Name, email or ID": "নাম, ইমেইল বা আইডি",
+  "No exam results for {value}.": "{value}-এর কোনো পরীক্ষার ফলাফল নেই।",
+  "No later year configured": "পরবর্তী কোনো বছর নির্ধারিত নেই",
+  "No marks yet": "এখনও কোনো নম্বর নেই",
+  "No subjects for this class": "এই শ্রেণির কোনো বিষয় নেই",
+  "not enrolled": "ভর্তি নয়",
+  "Parent information is not available.": "অভিভাবকের তথ্য পাওয়া যায়নি।",
+  "Pick a class (and optionally a section) to generate cards.": "কার্ড তৈরি করতে একটি শ্রেণি (এবং চাইলে একটি শাখা) বেছে নিন।",
+  "Pick the class to promote, its default target class and the new academic year.": "যে শ্রেণি উত্তীর্ণ হবে, তার ডিফল্ট লক্ষ্য শ্রেণি ও নতুন শিক্ষাবর্ষ বেছে নিন।",
+  "Print student identity cards for a class or section": "শ্রেণি বা শাখার শিক্ষার্থীদের পরিচয়পত্র প্রিন্ট করুন",
+  "Promote to class": "যে শ্রেণিতে উত্তীর্ণ",
+  "Promotion settings": "উত্তরণের সেটিংস",
+  "Room number": "কক্ষ নম্বর",
+  "Search": "খুঁজুন",
+  "Single student card": "একজন শিক্ষার্থীর কার্ড",
+  "Student added": "শিক্ষার্থী যোগ করা হয়েছে",
+  "Student deleted": "শিক্ষার্থী মুছে ফেলা হয়েছে",
+  "Student ID no.": "শিক্ষার্থীর আইডি নম্বর",
+  "Student not found": "শিক্ষার্থী পাওয়া যায়নি",
+  "Student promotion": "শিক্ষার্থী উত্তরণ",
+  "Student updated": "শিক্ষার্থীর তথ্য হালনাগাদ হয়েছে",
+  "students": "শিক্ষার্থী",
+  "Students enrolled for the new year": "নতুন বছরে ভর্তি হওয়া শিক্ষার্থী",
+  "Students of the selected class appear here with their exam results.": "নির্বাচিত শ্রেণির শিক্ষার্থীরা তাদের পরীক্ষার ফলাফলসহ এখানে দেখা যাবে।",
+  "Target class": "লক্ষ্য শ্রেণি",
+  "the running year": "চলতি বছর",
+  "This also removes the student's marks, attendance, invoices, payments and messages.": "এতে শিক্ষার্থীর নম্বর, উপস্থিতি, ইনভয়েস, পেমেন্ট ও বার্তাও মুছে যাবে।",
+  "Total paid": "মোট পরিশোধিত",
+  "Transport route": "পরিবহনের রুট",
+  "Upload a CSV to create many students in one class at once.": "একটি শ্রেণিতে একসাথে অনেক শিক্ষার্থী তৈরি করতে CSV আপলোড করুন।",
+  "Valid email required": "সঠিক ইমেইল দিন",
+  "View profile": "প্রোফাইল দেখুন",
+  "Whole class": "পুরো শ্রেণি",
 };

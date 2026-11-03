@@ -717,7 +717,7 @@ export function CertificatePrintPage() {
   const s = settings.data;
   return (
     <div className="space-y-4">
-      <style>{tr("@media print { @page { size: A4; margin: 16mm; } }")}</style>
+      <style>{"@media print { @page { size: A4; margin: 16mm; } }"}</style>
       <div className="no-print flex flex-wrap items-center justify-between gap-2">
         <Button variant="outline" onClick={() => navigate(-1)}>
           <ArrowLeftIcon />

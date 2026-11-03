@@ -2,34 +2,34 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const auth: Record<string, string> = {
-  "abcd-efgh": "", // untranslated
-  "Back to sign in": "", // untranslated
-  "Check your inbox": "", // untranslated
-  "Choose a new password": "", // untranslated
-  "Classes, attendance, exams, fees and messages for admins, teachers, students and parents.": "", // untranslated
-  "Code": "", // untranslated
-  "Confirm password": "", // untranslated
-  "Enter one of your recovery codes.": "", // untranslated
-  "Enter the 6-digit code from your authenticator app.": "", // untranslated
-  "Enter your account email and we'll send you a reset link.": "", // untranslated
-  "Everything your school runs on, in one place.": "", // untranslated
-  "Forgot password?": "", // untranslated
-  "Hide password": "", // untranslated
-  "If an account exists for that email, a reset link has been sent. It is valid for 30 minutes.": "", // untranslated
-  "Password is required": "", // untranslated
-  "Recovery code": "", // untranslated
-  "Reset password": "", // untranslated
-  "Save password": "", // untranslated
-  "Save your recovery codes": "", // untranslated
-  "Send reset link": "", // untranslated
-  "Set up two-factor authentication": "", // untranslated
-  "Show password": "", // untranslated
-  "Sign in": "", // untranslated
-  "Start over": "", // untranslated
-  "Use a recovery code": "", // untranslated
-  "Use at least 8 characters.": "", // untranslated
-  "Use the authenticator app": "", // untranslated
-  "Use the email and password your school gave you.": "", // untranslated
-  "Verify": "", // untranslated
-  "Your school requires a second step at sign-in for your account.": "", // untranslated
+  "abcd-efgh": "abcd-efgh",
+  "Back to sign in": "সাইন ইনে ফিরে যান",
+  "Check your inbox": "আপনার ইনবক্স দেখুন",
+  "Choose a new password": "নতুন পাসওয়ার্ড দিন",
+  "Classes, attendance, exams, fees and messages for admins, teachers, students and parents.": "অ্যাডমিন, শিক্ষক, শিক্ষার্থী ও অভিভাবকদের জন্য ক্লাস, উপস্থিতি, পরীক্ষা, ফি ও বার্তা।",
+  "Code": "কোড",
+  "Confirm password": "পাসওয়ার্ড নিশ্চিত করুন",
+  "Enter one of your recovery codes.": "আপনার একটি রিকভারি কোড লিখুন।",
+  "Enter the 6-digit code from your authenticator app.": "অথেনটিকেটর অ্যাপের ৬ অঙ্কের কোডটি লিখুন।",
+  "Enter your account email and we'll send you a reset link.": "আপনার অ্যাকাউন্টের ইমেইল দিন, আমরা রিসেট লিংক পাঠিয়ে দেব।",
+  "Everything your school runs on, in one place.": "আপনার বিদ্যালয়ের সব কাজ, এক জায়গায়।",
+  "Forgot password?": "পাসওয়ার্ড ভুলে গেছেন?",
+  "Hide password": "পাসওয়ার্ড লুকান",
+  "If an account exists for that email, a reset link has been sent. It is valid for 30 minutes.": "এই ইমেইলে কোনো অ্যাকাউন্ট থাকলে রিসেট লিংক পাঠানো হয়েছে। এটি ৩০ মিনিট কার্যকর থাকবে।",
+  "Password is required": "পাসওয়ার্ড আবশ্যক",
+  "Recovery code": "রিকভারি কোড",
+  "Reset password": "পাসওয়ার্ড রিসেট",
+  "Save password": "পাসওয়ার্ড সংরক্ষণ করুন",
+  "Save your recovery codes": "আপনার রিকভারি কোড সংরক্ষণ করুন",
+  "Send reset link": "রিসেট লিংক পাঠান",
+  "Set up two-factor authentication": "দুই-ধাপের যাচাই চালু করুন",
+  "Show password": "পাসওয়ার্ড দেখান",
+  "Sign in": "সাইন ইন",
+  "Start over": "আবার শুরু করুন",
+  "Use a recovery code": "রিকভারি কোড ব্যবহার করুন",
+  "Use at least 8 characters.": "কমপক্ষে ৮টি অক্ষর ব্যবহার করুন।",
+  "Use the authenticator app": "অথেনটিকেটর অ্যাপ ব্যবহার করুন",
+  "Use the email and password your school gave you.": "বিদ্যালয় থেকে দেওয়া ইমেইল ও পাসওয়ার্ড ব্যবহার করুন।",
+  "Verify": "যাচাই করুন",
+  "Your school requires a second step at sign-in for your account.": "আপনার অ্যাকাউন্টে সাইন ইনের সময় বিদ্যালয় দ্বিতীয় একটি ধাপ বাধ্যতামূলক করেছে।",
 };

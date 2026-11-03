@@ -2,52 +2,52 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const campus: Record<string, string> = {
-  "· {length}": "", // untranslated
-  "{pending} pending": "", // untranslated
-  "Also send as SMS": "", // untranslated
-  "Archived": "", // untranslated
-  "Author": "", // untranslated
-  "Available": "", // untranslated
-  "Boarding houses and their rooms.": "", // untranslated
-  "Book requests": "", // untranslated
-  "Book returned": "", // untranslated
-  "Books in the school library and how many copies are out.": "", // untranslated
-  "Copies": "", // untranslated
-  "Delete notice?": "", // untranslated
-  "Dormitories": "", // untranslated
-  "Edit notice": "", // untranslated
-  "Hidden": "", // untranslated
-  "Issue or reject requests from students, then mark books as returned.": "", // untranslated
-  "Listed on the school website's notice page": "", // untranslated
-  "Mark returned": "", // untranslated
-  "Must be after the start date": "", // untranslated
-  "New notice": "", // untranslated
-  "No archived notices": "", // untranslated
-  "No running notices": "", // untranslated
-  "No students assigned": "", // untranslated
-  "Not available": "", // untranslated
-  "Notice saved": "", // untranslated
-  "Off moves the notice to Archived": "", // untranslated
-  "Price": "", // untranslated
-  "Published": "", // untranslated
-  "Read more": "", // untranslated
-  "Request": "", // untranslated
-  "Request book": "", // untranslated
-  "Request sent to the librarian": "", // untranslated
-  "Returned": "", // untranslated
-  "Rooms": "", // untranslated
-  "Running": "", // untranslated
-  "School announcements and circulars.": "", // untranslated
-  "School bus routes, vehicles and fares.": "", // untranslated
-  "Show less": "", // untranslated
-  "Students staying in this dormitory": "", // untranslated
-  "Students using this route": "", // untranslated
-  "Texts the title and date to everyone with a phone number": "", // untranslated
-  "The librarian will issue the book or let you know if it is not available.": "", // untranslated
-  "Track the books you asked the librarian for.": "", // untranslated
-  "Transport routes": "", // untranslated
-  "Unpublished notices are archived and hidden from students, parents and staff.": "", // untranslated
-  "Until": "", // untranslated
-  "Updated": "", // untranslated
-  "View attachment": "", // untranslated
+  "· {length}": "· {length}",
+  "{pending} pending": "{pending}টি অপেক্ষমাণ",
+  "Also send as SMS": "এসএমএস হিসেবেও পাঠান",
+  "Archived": "আর্কাইভ করা",
+  "Author": "লেখক",
+  "Available": "পাওয়া যাচ্ছে",
+  "Boarding houses and their rooms.": "আবাসিক ভবন ও তার কক্ষ।",
+  "Book requests": "বইয়ের অনুরোধ",
+  "Book returned": "বই ফেরত দেওয়া হয়েছে",
+  "Books in the school library and how many copies are out.": "বিদ্যালয়ের গ্রন্থাগারের বই এবং কতগুলো কপি বাইরে আছে।",
+  "Copies": "কপি",
+  "Delete notice?": "নোটিশটি মুছে ফেলবেন?",
+  "Dormitories": "ছাত্রাবাস",
+  "Edit notice": "নোটিশ সম্পাদনা",
+  "Hidden": "লুকানো",
+  "Issue or reject requests from students, then mark books as returned.": "শিক্ষার্থীদের অনুরোধ অনুযায়ী বই ইস্যু বা প্রত্যাখ্যান করুন, তারপর বই ফেরত চিহ্নিত করুন।",
+  "Listed on the school website's notice page": "বিদ্যালয়ের ওয়েবসাইটের নোটিশ পাতায় দেখানো হয়",
+  "Mark returned": "ফেরত চিহ্নিত করুন",
+  "Must be after the start date": "শুরুর তারিখের পরে হতে হবে",
+  "New notice": "নতুন নোটিশ",
+  "No archived notices": "আর্কাইভ করা কোনো নোটিশ নেই",
+  "No running notices": "চলমান কোনো নোটিশ নেই",
+  "No students assigned": "কোনো শিক্ষার্থী যুক্ত নেই",
+  "Not available": "পাওয়া যাচ্ছে না",
+  "Notice saved": "নোটিশ সংরক্ষিত হয়েছে",
+  "Off moves the notice to Archived": "বন্ধ করলে নোটিশটি আর্কাইভে চলে যাবে",
+  "Price": "মূল্য",
+  "Published": "প্রকাশিত",
+  "Read more": "আরও পড়ুন",
+  "Request": "অনুরোধ",
+  "Request book": "বইয়ের অনুরোধ করুন",
+  "Request sent to the librarian": "গ্রন্থাগারিকের কাছে অনুরোধ পাঠানো হয়েছে",
+  "Returned": "ফেরত দেওয়া হয়েছে",
+  "Rooms": "কক্ষ",
+  "Running": "চলমান",
+  "School announcements and circulars.": "বিদ্যালয়ের ঘোষণা ও বিজ্ঞপ্তি।",
+  "School bus routes, vehicles and fares.": "স্কুলবাসের রুট, যানবাহন ও ভাড়া।",
+  "Show less": "কম দেখান",
+  "Students staying in this dormitory": "এই ছাত্রাবাসে থাকা শিক্ষার্থী",
+  "Students using this route": "এই রুট ব্যবহারকারী শিক্ষার্থী",
+  "Texts the title and date to everyone with a phone number": "ফোন নম্বর আছে এমন সবাইকে শিরোনাম ও তারিখ এসএমএসে পাঠায়",
+  "The librarian will issue the book or let you know if it is not available.": "গ্রন্থাগারিক বইটি ইস্যু করবেন, অথবা না থাকলে আপনাকে জানাবেন।",
+  "Track the books you asked the librarian for.": "গ্রন্থাগারিকের কাছে চাওয়া বইয়ের খোঁজ রাখুন।",
+  "Transport routes": "পরিবহনের রুট",
+  "Unpublished notices are archived and hidden from students, parents and staff.": "অপ্রকাশিত নোটিশ আর্কাইভে থাকে এবং শিক্ষার্থী, অভিভাবক ও কর্মীদের কাছে লুকানো থাকে।",
+  "Until": "পর্যন্ত",
+  "Updated": "হালনাগাদ হয়েছে",
+  "View attachment": "সংযুক্তি দেখুন",
 };

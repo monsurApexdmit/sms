@@ -2,74 +2,74 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const analytics: Record<string, string> = {
-  "{complete} of {students}": "", // untranslated
-  "{l} days late": "", // untranslated
-  "{m} outstanding": "", // untranslated
-  "{plan} · {invoices} invoices": "", // untranslated
-  "{total} students owe {m} past the due date": "", // untranslated
-  "All my classes": "", // untranslated
-  "At risk": "", // untranslated
-  "Attendance in {monthLabel}": "", // untranslated
-  "Attendance rate, last 6 months": "", // untranslated
-  "Average": "", // untranslated
-  "Average result by class": "", // untranslated
-  "Below {threshold}% this month, with at least 3 days marked": "", // untranslated
-  "Billed and collected by month": "", // untranslated
-  "Billed in {year}": "", // untranslated
-  "By class and section": "", // untranslated
-  "Chronic absentees": "", // untranslated
-  "Collection rate": "", // untranslated
-  "Complete": "", // untranslated
-  "Days late": "", // untranslated
-  "Defaulters": "", // untranslated
-  "Every subject mark in the exam": "", // untranslated
-  "Fee plan instalments": "", // untranslated
-  "Grade {l}": "", // untranslated
-  "Grade distribution": "", // untranslated
-  "High": "", // untranslated
-  "High risk": "", // untranslated
-  "Homework set": "", // untranslated
-  "Latest exam": "", // untranslated
-  "Leave days": "", // untranslated
-  "Low": "", // untranslated
-  "Low concern": "", // untranslated
-  "Lowest pass rate first": "", // untranslated
-  "Medium risk": "", // untranslated
-  "Meetings": "", // untranslated
-  "Need the most help": "", // untranslated
-  "No attendance taken this month": "", // untranslated
-  "No invoices generated from fee plans yet": "", // untranslated
-  "No marks": "", // untranslated
-  "No marks entered this year yet": "", // untranslated
-  "No overdue fees": "", // untranslated
-  "No students at risk": "", // untranslated
-  "No teachers": "", // untranslated
-  "Nobody below the threshold": "", // untranslated
-  "Not enough complete results": "", // untranslated
-  "Not marked today": "", // untranslated
-  "Nothing outstanding": "", // untranslated
-  "of {enrolled} enrolled": "", // untranslated
-  "Oldest due": "", // untranslated
-  "One minor signal": "", // untranslated
-  "Outstanding by class": "", // untranslated
-  "Overdue by days late": "", // untranslated
-  "Pass rate": "", // untranslated
-  "Past the due date, all years": "", // untranslated
-  "Periods / week": "", // untranslated
-  "Present out of days marked": "", // untranslated
-  "Risk": "", // untranslated
-  "Score 25–49": "", // untranslated
-  "Score 50 or more": "", // untranslated
-  "Score out of 100: attendance below 75% over the last 30 days (30, or 40 when below 60%), failing subjects in the latest exam (20 + 5 each), results down 10+ points (15), overdue fees (10), under 60% of homework handed in (10), 10+ days of leave (5). High is 50 or more.": "", // untranslated
-  "Students owing": "", // untranslated
-  "Students who need attention, fee collection, attendance, results and workload for the running year.": "", // untranslated
-  "Students with every mark entered": "", // untranslated
-  "Table view": "", // untranslated
-  "To mark": "", // untranslated
-  "Top performers": "", // untranslated
-  "was {fmtPct}": "", // untranslated
-  "Why": "", // untranslated
-  "Workload": "", // untranslated
-  "You can only see classes you teach": "", // untranslated
-  "Your classes and your own workload, for the running year.": "", // untranslated
+  "{complete} of {students}": "{students} জনের মধ্যে {complete} জন",
+  "{l} days late": "{l} দিন দেরি",
+  "{m} outstanding": "বকেয়া {m}",
+  "{plan} · {invoices} invoices": "{plan} · {invoices}টি ইনভয়েস",
+  "{total} students owe {m} past the due date": "শেষ তারিখ পেরিয়ে {total} জন শিক্ষার্থীর কাছে {m} বকেয়া",
+  "All my classes": "আমার সব শ্রেণি",
+  "At risk": "ঝুঁকিতে",
+  "Attendance in {monthLabel}": "{monthLabel}-এ উপস্থিতি",
+  "Attendance rate, last 6 months": "উপস্থিতির হার, গত ৬ মাস",
+  "Average": "গড়",
+  "Average result by class": "শ্রেণিভিত্তিক গড় ফলাফল",
+  "Below {threshold}% this month, with at least 3 days marked": "এ মাসে {threshold}%-এর নিচে, অন্তত ৩ দিন উপস্থিতি নেওয়া হয়েছে",
+  "Billed and collected by month": "মাসভিত্তিক বিল ও আদায়",
+  "Billed in {year}": "{year}-এ বিল করা হয়েছে",
+  "By class and section": "শ্রেণি ও শাখা অনুযায়ী",
+  "Chronic absentees": "নিয়মিত অনুপস্থিত",
+  "Collection rate": "আদায়ের হার",
+  "Complete": "সম্পূর্ণ",
+  "Days late": "দিন দেরি",
+  "Defaulters": "বকেয়াদার",
+  "Every subject mark in the exam": "পরীক্ষার প্রতিটি বিষয়ের নম্বর",
+  "Fee plan instalments": "ফি পরিকল্পনার কিস্তি",
+  "Grade {l}": "গ্রেড {l}",
+  "Grade distribution": "গ্রেড বণ্টন",
+  "High": "উচ্চ",
+  "High risk": "উচ্চ ঝুঁকি",
+  "Homework set": "দেওয়া বাড়ির কাজ",
+  "Latest exam": "সর্বশেষ পরীক্ষা",
+  "Leave days": "ছুটির দিন",
+  "Low": "নিম্ন",
+  "Low concern": "কম উদ্বেগ",
+  "Lowest pass rate first": "সবচেয়ে কম পাসের হার আগে",
+  "Medium risk": "মাঝারি ঝুঁকি",
+  "Meetings": "সভা",
+  "Need the most help": "সবচেয়ে বেশি সহায়তা প্রয়োজন",
+  "No attendance taken this month": "এ মাসে কোনো উপস্থিতি নেওয়া হয়নি",
+  "No invoices generated from fee plans yet": "ফি পরিকল্পনা থেকে এখনও কোনো ইনভয়েস তৈরি হয়নি",
+  "No marks": "কোনো নম্বর নেই",
+  "No marks entered this year yet": "এ বছর এখনও কোনো নম্বর দেওয়া হয়নি",
+  "No overdue fees": "কোনো মেয়াদোত্তীর্ণ বকেয়া ফি নেই",
+  "No students at risk": "কোনো শিক্ষার্থী ঝুঁকিতে নেই",
+  "No teachers": "কোনো শিক্ষক নেই",
+  "Nobody below the threshold": "সীমার নিচে কেউ নেই",
+  "Not enough complete results": "যথেষ্ট সম্পূর্ণ ফলাফল নেই",
+  "Not marked today": "আজ চিহ্নিত হয়নি",
+  "Nothing outstanding": "কোনো বকেয়া নেই",
+  "of {enrolled} enrolled": "ভর্তি {enrolled} জনের মধ্যে",
+  "Oldest due": "সবচেয়ে পুরোনো বকেয়া",
+  "One minor signal": "একটি ছোট লক্ষণ",
+  "Outstanding by class": "শ্রেণিভিত্তিক বকেয়া",
+  "Overdue by days late": "দেরির দিন অনুযায়ী বকেয়া",
+  "Pass rate": "পাসের হার",
+  "Past the due date, all years": "শেষ তারিখ পেরোনো, সব বছরের",
+  "Periods / week": "পিরিয়ড / সপ্তাহ",
+  "Present out of days marked": "চিহ্নিত দিনের মধ্যে উপস্থিত",
+  "Risk": "ঝুঁকি",
+  "Score 25–49": "স্কোর ২৫–৪৯",
+  "Score 50 or more": "স্কোর ৫০ বা তার বেশি",
+  "Score out of 100: attendance below 75% over the last 30 days (30, or 40 when below 60%), failing subjects in the latest exam (20 + 5 each), results down 10+ points (15), overdue fees (10), under 60% of homework handed in (10), 10+ days of leave (5). High is 50 or more.": "১০০-এর মধ্যে স্কোর: গত ৩০ দিনে উপস্থিতি ৭৫%-এর নিচে (৩০, আর ৬০%-এর নিচে হলে ৪০), সর্বশেষ পরীক্ষায় অকৃতকার্য বিষয় (২০ + প্রতিটিতে ৫), ফলাফল ১০+ পয়েন্ট কমা (১৫), মেয়াদোত্তীর্ণ বকেয়া ফি (১০), ৬০%-এর কম বাড়ির কাজ জমা (১০), ১০+ দিন ছুটি (৫)। ৫০ বা তার বেশি হলে উচ্চ ঝুঁকি।",
+  "Students owing": "বকেয়াদার শিক্ষার্থী",
+  "Students who need attention, fee collection, attendance, results and workload for the running year.": "চলতি বছরে যেসব শিক্ষার্থীর প্রতি নজর দরকার, ফি আদায়, উপস্থিতি, ফলাফল ও কাজের চাপ।",
+  "Students with every mark entered": "সব নম্বর দেওয়া হয়েছে এমন শিক্ষার্থী",
+  "Table view": "সারণি আকারে",
+  "To mark": "মূল্যায়ন বাকি",
+  "Top performers": "সেরা ফলাফলকারী",
+  "was {fmtPct}": "আগে ছিল {fmtPct}",
+  "Why": "কারণ",
+  "Workload": "কাজের চাপ",
+  "You can only see classes you teach": "আপনি শুধু নিজের পড়ানো শ্রেণিগুলো দেখতে পারবেন",
+  "Your classes and your own workload, for the running year.": "চলতি বছরে আপনার শ্রেণি ও আপনার নিজের কাজের চাপ।",
 };

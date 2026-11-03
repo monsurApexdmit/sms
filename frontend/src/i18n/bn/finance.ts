@@ -2,72 +2,72 @@
 // Keep {placeholders} exactly as in the key. Run `npm run i18n` after changing source strings.
 
 export const finance: Record<string, string> = {
-  "{name} (roll {roll})": "", // untranslated
-  "{unpaid_invoices} unpaid invoices": "", // untranslated
-  "{value} invoices": "", // untranslated
-  "{value} partially paid": "", // untranslated
-  "#{invoice_id}": "", // untranslated
-  "Add expense": "", // untranslated
-  "At most {due}": "", // untranslated
-  "Balance": "", // untranslated
-  "Bill one student or a whole group at once.": "", // untranslated
-  "Bill students, take payments and review payment history.": "", // untranslated
-  "Bill to": "", // untranslated
-  "Categories": "", // untranslated
-  "Choose a class and a student to see their invoices and payments.": "", // untranslated
-  "Choose a class first": "", // untranslated
-  "Choose at least one student": "", // untranslated
-  "Choose category": "", // untranslated
-  "Choose students": "", // untranslated
-  "Class {class_name}": "", // untranslated
-  "Create": "", // untranslated
-  "Delete expense?": "", // untranslated
-  "Delete invoice?": "", // untranslated
-  "Details, payments and a printable copy.": "", // untranslated
-  "Edit expense": "", // untranslated
-  "Edit invoice": "", // untranslated
-  "Enter an amount": "", // untranslated
-  "Expense categories": "", // untranslated
-  "Expenses": "", // untranslated
-  "Income": "", // untranslated
-  "Invoice created": "", // untranslated
-  "Invoice deleted": "", // untranslated
-  "Invoice updated": "", // untranslated
-  "Invoices of your children": "", // untranslated
-  "Its payments are deleted too.": "", // untranslated
-  "Many students": "", // untranslated
-  "Monthly breakdown": "", // untranslated
-  "New invoice": "", // untranslated
-  "No invoices for this student": "", // untranslated
-  "No payments yet.": "", // untranslated
-  "No transactions this year": "", // untranslated
-  "Nothing recorded": "", // untranslated
-  "One student": "", // untranslated
-  "Open invoices": "", // untranslated
-  "Outstanding dues": "", // untranslated
-  "Paid now": "", // untranslated
-  "Partial": "", // untranslated
-  "Pay online": "", // untranslated
-  "Pay with PayPal": "", // untranslated
-  "Payment recorded": "", // untranslated
-  "PayPal is still processing your payment. The invoice will update once it is confirmed.": "", // untranslated
-  "PayPal payment cancelled. Your invoice has not been charged.": "", // untranslated
-  "Pick a student": "", // untranslated
-  "Receipt": "", // untranslated
-  "Record payment": "", // untranslated
-  "Running-year totals, monthly breakdown and the expense ledger.": "", // untranslated
-  "Search student, title or number": "", // untranslated
-  "Session {year}": "", // untranslated
-  "Student history": "", // untranslated
-  "Summary": "", // untranslated
-  "Take payment": "", // untranslated
-  "Thank you": "", // untranslated
-  "Total amount": "", // untranslated
-  "Total expenses": "", // untranslated
-  "Total income": "", // untranslated
-  "Total received": "", // untranslated
-  "View": "", // untranslated
-  "View invoice": "", // untranslated
-  "Your invoices and payments": "", // untranslated
-  "Your payment is being confirmed and the invoice will update in a moment.": "", // untranslated
+  "{name} (roll {roll})": "{name} (রোল {roll})",
+  "{unpaid_invoices} unpaid invoices": "{unpaid_invoices}টি অপরিশোধিত ইনভয়েস",
+  "{value} invoices": "{value}টি ইনভয়েস",
+  "{value} partially paid": "{value}টি আংশিক পরিশোধিত",
+  "#{invoice_id}": "#{invoice_id}",
+  "Add expense": "ব্যয় যোগ করুন",
+  "At most {due}": "সর্বোচ্চ {due}",
+  "Balance": "স্থিতি",
+  "Bill one student or a whole group at once.": "একজন শিক্ষার্থী বা পুরো দলকে একসাথে বিল করুন।",
+  "Bill students, take payments and review payment history.": "শিক্ষার্থীদের বিল করুন, পেমেন্ট নিন এবং পেমেন্টের ইতিহাস দেখুন।",
+  "Bill to": "যাকে বিল করা হবে",
+  "Categories": "বিভাগসমূহ",
+  "Choose a class and a student to see their invoices and payments.": "ইনভয়েস ও পেমেন্ট দেখতে শ্রেণি ও শিক্ষার্থী বেছে নিন।",
+  "Choose a class first": "আগে একটি শ্রেণি বেছে নিন",
+  "Choose at least one student": "অন্তত একজন শিক্ষার্থী বেছে নিন",
+  "Choose category": "বিভাগ বেছে নিন",
+  "Choose students": "শিক্ষার্থী বেছে নিন",
+  "Class {class_name}": "শ্রেণি {class_name}",
+  "Create": "তৈরি করুন",
+  "Delete expense?": "ব্যয়টি মুছে ফেলবেন?",
+  "Delete invoice?": "ইনভয়েসটি মুছে ফেলবেন?",
+  "Details, payments and a printable copy.": "বিস্তারিত, পেমেন্ট ও প্রিন্টযোগ্য কপি।",
+  "Edit expense": "ব্যয় সম্পাদনা",
+  "Edit invoice": "ইনভয়েস সম্পাদনা",
+  "Enter an amount": "পরিমাণ লিখুন",
+  "Expense categories": "ব্যয়ের বিভাগ",
+  "Expenses": "ব্যয়",
+  "Income": "আয়",
+  "Invoice created": "ইনভয়েস তৈরি হয়েছে",
+  "Invoice deleted": "ইনভয়েস মুছে ফেলা হয়েছে",
+  "Invoice updated": "ইনভয়েস হালনাগাদ হয়েছে",
+  "Invoices of your children": "আপনার সন্তানদের ইনভয়েস",
+  "Its payments are deleted too.": "এর পেমেন্টগুলোও মুছে যাবে।",
+  "Many students": "একাধিক শিক্ষার্থী",
+  "Monthly breakdown": "মাসভিত্তিক হিসাব",
+  "New invoice": "নতুন ইনভয়েস",
+  "No invoices for this student": "এই শিক্ষার্থীর কোনো ইনভয়েস নেই",
+  "No payments yet.": "এখনও কোনো পেমেন্ট নেই।",
+  "No transactions this year": "এ বছরে কোনো লেনদেন নেই",
+  "Nothing recorded": "কিছু লিপিবদ্ধ নেই",
+  "One student": "একজন শিক্ষার্থী",
+  "Open invoices": "অপরিশোধিত ইনভয়েস",
+  "Outstanding dues": "বকেয়া পাওনা",
+  "Paid now": "এখন পরিশোধিত",
+  "Partial": "আংশিক",
+  "Pay online": "অনলাইনে পরিশোধ করুন",
+  "Pay with PayPal": "PayPal দিয়ে পরিশোধ করুন",
+  "Payment recorded": "পেমেন্ট লিপিবদ্ধ হয়েছে",
+  "PayPal is still processing your payment. The invoice will update once it is confirmed.": "PayPal এখনও আপনার পেমেন্ট প্রক্রিয়া করছে। নিশ্চিত হলে ইনভয়েস হালনাগাদ হবে।",
+  "PayPal payment cancelled. Your invoice has not been charged.": "PayPal পেমেন্ট বাতিল হয়েছে। আপনার ইনভয়েস থেকে কোনো টাকা কাটা হয়নি।",
+  "Pick a student": "একজন শিক্ষার্থী বেছে নিন",
+  "Receipt": "রসিদ",
+  "Record payment": "পেমেন্ট লিপিবদ্ধ করুন",
+  "Running-year totals, monthly breakdown and the expense ledger.": "চলতি বছরের মোট হিসাব, মাসভিত্তিক হিসাব ও ব্যয়ের খাতা।",
+  "Search student, title or number": "শিক্ষার্থী, শিরোনাম বা নম্বর দিয়ে খুঁজুন",
+  "Session {year}": "শিক্ষাবর্ষ {year}",
+  "Student history": "শিক্ষার্থীর ইতিহাস",
+  "Summary": "সারাংশ",
+  "Take payment": "পেমেন্ট নিন",
+  "Thank you": "ধন্যবাদ",
+  "Total amount": "মোট পরিমাণ",
+  "Total expenses": "মোট ব্যয়",
+  "Total income": "মোট আয়",
+  "Total received": "মোট প্রাপ্তি",
+  "View": "দেখুন",
+  "View invoice": "ইনভয়েস দেখুন",
+  "Your invoices and payments": "আপনার ইনভয়েস ও পেমেন্ট",
+  "Your payment is being confirmed and the invoice will update in a moment.": "আপনার পেমেন্ট নিশ্চিত করা হচ্ছে, কিছুক্ষণের মধ্যে ইনভয়েস হালনাগাদ হবে।",
 };
