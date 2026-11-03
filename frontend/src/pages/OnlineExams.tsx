@@ -14,6 +14,7 @@ import {
   PlusIcon,
   PrinterIcon,
   SendIcon,
+  SparklesIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
@@ -24,8 +25,9 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 
 import { api, errorMessage } from "../api/client";
 import { useAction, useClasses, useGet, useSections, useSubjects } from "../api/hooks";
-import type { OnlineExam, Question } from "../api/types";
+import type { OnlineExam, Question, QuestionDraft } from "../api/types";
 import { useUser } from "../auth/AuthContext";
+import { AiQuestionDrafts, useAiFeature } from "../components/Ai";
 import { Combobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
@@ -379,14 +381,23 @@ export function OnlineExamsPage() {
   );
 }
 
-function QuestionForm({ examId, question, onDone }: { examId: number; question: Question | null; onDone: () => void }) {
-  const [type, setType] = useState<Question["type"]>(question?.type ?? "multiple_choice");
-  const [title, setTitle] = useState(question?.question_title ?? "");
-  const [mark, setMark] = useState(question ? String(Number(question.mark)) : "1");
-  const [options, setOptions] = useState<string[]>(question?.type === "multiple_choice" ? parseList(question.options) : ["", "", "", ""]);
-  const [correct, setCorrect] = useState<string[]>(question?.type === "multiple_choice" ? parseList(question.correct_answers) : []);
-  const [truth, setTruth] = useState(question?.type === "true_false" ? (question.correct_answers ?? "true") : "true");
-  const [words, setWords] = useState(question?.type === "fill_in_the_blanks" ? parseList(question.correct_answers).join(", ") : "");
+/** Add or edit a question; `draft` (an AI-drafted question) prefills a new one. */
+function QuestionForm({ examId, question, draft, onDone }: { examId: number; question: Question | null; draft?: QuestionDraft; onDone: () => void }) {
+  const [type, setType] = useState<Question["type"]>(question?.type ?? draft?.type ?? "multiple_choice");
+  const [title, setTitle] = useState(question?.question_title ?? draft?.question_title ?? "");
+  const [mark, setMark] = useState(question ? String(Number(question.mark)) : draft ? String(draft.mark) : "1");
+  const [options, setOptions] = useState<string[]>(
+    question?.type === "multiple_choice" ? parseList(question.options) : draft?.type === "multiple_choice" ? draft.options : ["", "", "", ""],
+  );
+  const [correct, setCorrect] = useState<string[]>(
+    question?.type === "multiple_choice" ? parseList(question.correct_answers) : draft?.type === "multiple_choice" ? draft.correct_answers : [],
+  );
+  const [truth, setTruth] = useState(
+    question?.type === "true_false" ? (question.correct_answers ?? "true") : draft?.type === "true_false" ? (draft.correct_answers[0] ?? "true") : "true",
+  );
+  const [words, setWords] = useState(
+    question?.type === "fill_in_the_blanks" ? parseList(question.correct_answers).join(", ") : draft?.type === "fill_in_the_blanks" ? draft.correct_answers.join(", ") : "",
+  );
   const save = useAction(
     () => {
       const correct_answers =
@@ -534,7 +545,9 @@ export function OnlineExamDetailPage() {
   const classes = useClasses();
   const sections = useSections(data?.exam.class_id);
   const [editExam, setEditExam] = useState(false);
-  const [question, setQuestion] = useState<Question | null | "new">(null);
+  const [question, setQuestion] = useState<Question | null | "new" | { draft: QuestionDraft }>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const ai = useAiFeature("questions");
   const [printAnswers, setPrintAnswers] = useState(true);
   const setStatus = useAction((status: string) => api.put(`/online-exams/${id}/status`, { status }), {
     success: "Status updated",
@@ -679,10 +692,18 @@ export function OnlineExamDetailPage() {
                 </CardContent>
               </Card>
             ))}
-            <Button variant="secondary" onClick={() => setQuestion("new")}>
-              <PlusIcon />
-              Add question
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" onClick={() => setQuestion("new")}>
+                <PlusIcon />
+                Add question
+              </Button>
+              {ai.available && (
+                <Button variant="outline" onClick={() => setAiOpen(true)}>
+                  <SparklesIcon />
+                  Draft with AI
+                </Button>
+              )}
+            </div>
           </TabsContent>
           <TabsContent value="results">
             <Card className="gap-0 overflow-hidden py-0">
@@ -771,11 +792,25 @@ export function OnlineExamDetailPage() {
       <Dialog open={question !== null} onOpenChange={(o) => !o && setQuestion(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>{question === "new" ? "Add question" : "Edit question"}</DialogTitle>
+            <DialogTitle>{question === "new" || (question && "draft" in question) ? "Add question" : "Edit question"}</DialogTitle>
           </DialogHeader>
           {question !== null && (
-            <QuestionForm examId={exam.online_exam_id} question={question === "new" ? null : question} onDone={() => setQuestion(null)} />
+            <QuestionForm
+              examId={exam.online_exam_id}
+              question={question === "new" || "draft" in question ? null : question}
+              draft={question !== "new" && "draft" in question ? question.draft : undefined}
+              onDone={() => setQuestion(null)}
+            />
           )}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={aiOpen} onOpenChange={setAiOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Draft questions with AI</DialogTitle>
+          </DialogHeader>
+          {/* stays mounted while a draft is reviewed so the remaining drafts are kept */}
+          <AiQuestionDrafts examId={exam.online_exam_id} onReview={(draft) => setQuestion({ draft })} />
         </DialogContent>
       </Dialog>
     </>

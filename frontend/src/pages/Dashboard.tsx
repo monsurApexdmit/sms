@@ -21,6 +21,7 @@ import {
 
 import { useGet } from "../api/hooks";
 import { useUser } from "../auth/AuthContext";
+import { AiProgressSummary } from "../components/Ai";
 import { AnalyticsTiles } from "../components/AnalyticsTiles";
 import { PageHeader } from "../components/PageHeader";
 import { EmptyState } from "../components/states";
@@ -189,7 +190,12 @@ export function DashboardPage() {
           </div>
         )}
         {data?.student && <StudentCard s={data.student} currency={currency} />}
-        {data?.children?.map((c) => <StudentCard key={c.student_id} s={c} currency={currency} />)}
+        {data?.children?.map((c) => (
+          <div key={c.student_id} className="space-y-3">
+            <StudentCard s={c} currency={currency} />
+            <AiProgressSummary studentId={c.student_id} />
+          </div>
+        ))}
         {data?.children?.length === 0 && (
           <EmptyState icon={UsersIcon} title="No children linked yet">
             No children are linked to your account yet.

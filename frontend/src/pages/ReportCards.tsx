@@ -7,6 +7,7 @@ import { api } from "../api/client";
 import { useAction, useExams, useGet, useList, useSubjects } from "../api/hooks";
 import type { AdmitCard, ExamPaper, ExamWeights, ReportCard, Student } from "../api/types";
 import { useUser } from "../auth/AuthContext";
+import { AiRemarkDrafts } from "../components/Ai";
 import { Combobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
@@ -491,6 +492,7 @@ function RemarkDialog({ card, onClose }: { card: ReportCard | null; onClose: () 
           <DialogDescription>{card?.kind === "annual" ? `Annual report ${card.year}` : card?.exam?.name}</DialogDescription>
         </DialogHeader>
         <Textarea rows={4} maxLength={2000} value={text} onChange={(e) => setText(e.target.value)} aria-label="Remark" />
+        {card && <AiRemarkDrafts key={`${card.student.student_id}-${card.exam?.exam_id ?? "annual"}`} studentId={card.student.student_id} examId={card.exam?.exam_id ?? null} year={card.year} onPick={setText} />}
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button loading={save.isPending} onClick={() => save.mutate(undefined)}>Save</Button>

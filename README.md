@@ -165,6 +165,14 @@ Absence alerts, leave decisions, graded homework, fee reminders, meeting booking
 - **WhatsApp**: Meta WhatsApp Cloud API. In Meta's WhatsApp Manager create a phone number and a permanent system-user token, then enter the phone number ID and token under **Delivery channels**. Meta only allows free-form text to people who messaged the school in the last 24 hours, so for alerts create and get approved a *Utility* template whose body has one variable (`{{1}}`) and enter its name (and language, default `en`); the notification text fills the variable. Numbers are taken from each account's phone field and must include the country code.
 - **Installable app (PWA)**: `frontend/public/manifest.webmanifest`, icons in `frontend/public/icons`, service worker `frontend/public/sw.js`. The worker caches only the app shell and the hashed `/assets/` files; `/api/` responses are never cached. Bump `VERSION` in `sw.js` to drop old caches. nginx serves `sw.js` and the manifest uncached.
 
+## AI assistant
+
+Optional drafts written with Claude (Anthropic API, `anthropic` Python SDK): report-card remarks (**Draft with AI** in the remark dialog), online-exam questions (**Draft with AI** on an exam's Questions tab) and student progress summaries (student profile for staff; a gentler version on the parent dashboard). Every result is a draft labelled "AI-generated, may contain mistakes": remarks fill the remark box and questions open the normal question form, and nothing is saved until a person saves it. Teachers can use it only for classes and subjects they teach; parents only for their own children.
+
+- **Setup**: admin → **System settings → AI assistant**: turn it on and enter an Anthropic API key (or leave the key empty and set `ANTHROPIC_API_KEY` in the API's environment). Model defaults to `claude-opus-5-5`; `claude-sonnet-5-5` and `claude-haiku-5-5` are cheaper. Opus and Sonnet requests use the API's server-side refusal fallback.
+- **Limits**: 2000 requests a month for the school and 50 per person per day by default (429 when reached). Usage per month and feature is on the same screen.
+- **Data sent**: never names, contact details, health or counselling records. Remarks: subject marks and grades, GPA, result, position, attendance %, previous exam %, plus the teacher's optional notes. Questions: subject, class, the teacher's topic text and options. Summaries: attendance %, exam percentages and grades, homework hand-in rate, leave days. Prompts and answers are not stored; `ai_request` keeps only who, which feature, status and token counts.
+
 ## Docker
 
 ```bash

@@ -30,6 +30,7 @@ import type {
   StudentRecordEntry,
 } from "../api/types";
 import { useUser } from "../auth/AuthContext";
+import { AiProgressSummary } from "../components/Ai";
 import { Combobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
@@ -368,6 +369,7 @@ function ProfileView({ studentId, printBase, extra }: { studentId: number; print
           {extra && <div className="ml-auto">{extra(data)}</div>}
         </CardContent>
       </Card>
+      <AiProgressSummary studentId={studentId} />
       <Tabs defaultValue="health" className="gap-4">
         <TabsList>
           <TabsTrigger value="health">Health</TabsTrigger>

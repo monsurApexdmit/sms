@@ -945,3 +945,49 @@ export interface NotificationPreferences {
   items: { category: string; label: string; in_app: boolean; email: boolean; sms: boolean; push: boolean; whatsapp: boolean }[];
   available: Record<"in_app" | "email" | "sms" | "push" | "whatsapp", boolean>;
 }
+
+export type AiFeature = "report_remark" | "questions" | "progress_summary";
+
+export interface AiStatus {
+  enabled: boolean;
+  features: AiFeature[];
+  label: string;
+}
+
+export interface AiSettings {
+  ai_enabled: boolean;
+  anthropic_api_key: string;
+  uses_environment_key: boolean;
+  ai_model: string;
+  models: string[];
+  ai_monthly_cap: number;
+  ai_daily_user_cap: number;
+  configured: boolean;
+  requests_this_month: number;
+}
+
+export interface AiUsageRow {
+  month: string;
+  feature: AiFeature;
+  requests: number;
+  failed: number;
+  input_tokens: number;
+  output_tokens: number;
+}
+
+/** A drafted question in the create-question body shape. */
+export interface QuestionDraft {
+  type: Question["type"];
+  question_title: string;
+  mark: number;
+  options: string[];
+  correct_answers: string[];
+}
+
+export interface ProgressSummary {
+  summary: string;
+  suggestions: string[];
+  audience: "staff" | "parent";
+  generated_at: string;
+  label: string;
+}

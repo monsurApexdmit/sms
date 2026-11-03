@@ -1234,3 +1234,27 @@ class PushSubscription(Base):
     user_agent: Mapped[str | None] = mapped_column(String(300), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     last_success_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+# --- AI assistant -------------------------------------------------------------------
+
+
+class AiRequest(Base):
+    """One call to the Claude API, for usage caps and the admin usage view. Prompts and
+    answers are not stored (they can hold student data); only who, what and token counts.
+    status = ok | refused | invalid | error."""
+
+    __tablename__ = "ai_request"
+    __table_args__ = (
+        Index("ix_ai_request_created_at", "created_at"),
+        Index("ix_ai_request_user", "user_role", "user_id", "created_at"),
+    )
+    ai_request_id: Mapped[int] = pk()
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    user_role: Mapped[str] = mapped_column(String(20), nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    feature: Mapped[str] = mapped_column(String(30), nullable=False)
+    model: Mapped[str] = mapped_column(String(60), nullable=False)
+    status: Mapped[str] = mapped_column(String(12), nullable=False)
+    input_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

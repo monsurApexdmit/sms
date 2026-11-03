@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { api } from "../api/client";
 import { useAction, useGet, usePagedList, usePublicSettings } from "../api/hooks";
 import type { AuditEntry } from "../api/types";
+import { AiSettingsCard } from "../components/Ai";
 import { Combobox, MultiCombobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
@@ -173,8 +174,13 @@ export function SystemSettingsPage() {
             <TabsTrigger value="email">Email (SMTP)</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
             <TabsTrigger value="logo">Logo</TabsTrigger>
+            <TabsTrigger value="ai">AI assistant</TabsTrigger>
           </TabsList>
         </div>
+
+        <TabsContent value="ai">
+          <AiSettingsCard />
+        </TabsContent>
 
         <TabsContent value="general">
           <SettingsCard

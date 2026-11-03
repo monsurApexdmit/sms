@@ -15,6 +15,7 @@ SECRET_KEYS = {
     "purchase_code",
     "whatsapp_token",
     "vapid_private_key",
+    "anthropic_api_key",
 }
 PUBLIC_KEYS = {
     "system_name", "system_title", "currency", "language", "text_align", "running_year", "address", "phone",
