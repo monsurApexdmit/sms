@@ -1,0 +1,79 @@
+name: school-update-system
+
+# By default the API uses the existing `central_mysql` server on the host
+# (database `sms`, imported from ../sqldatabase/sms.sql). Put DATABASE_URL and
+# SECRET_KEY in update_system/.env.
+#
+# To use a throwaway bundled database instead:
+#   DATABASE_URL=mysql+pymysql://sms:sms@db:3306/sms?charset=utf8mb4 docker compose --profile localdb up
+
+x-backend: &backend
+  build: ./backend
+  environment:
+    # production refuses to start without a random SECRET_KEY, COOKIE_SECURE=true and REDIS_URL
+    ENVIRONMENT: ${ENVIRONMENT:-production}
+    DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://sms:CHANGE_ME@host.docker.internal:3306/sms?charset=utf8mb4}
+    SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in update_system/.env}
+    REDIS_URL: redis://redis:6379/0
+    UPLOAD_DIR: /data/uploads
+    FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+    CORS_ORIGINS: '["${FRONTEND_URL:-http://localhost:8080}"]'
+    # Browsers accept Secure cookies on http://localhost; anywhere else serve the site over HTTPS.
+    COOKIE_SECURE: ${COOKIE_SECURE:-true}
+    STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    SCHOOL_TIMEZONE: ${SCHOOL_TIMEZONE:-UTC}
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  volumes:
+    # Shared with the legacy app so existing photos/documents keep working.
+    - ../uploads:/data/uploads
+  depends_on:
+    - redis
+  restart: unless-stopped
+
+services:
+  # Runs `alembic upgrade head` before starting (see backend/Dockerfile).
+  api:
+    <<: *backend
+
+  # Sends queued emails/SMS and retries failures after 1, 5 and 30 minutes.
+  worker:
+    <<: *backend
+    command: ["rq", "worker", "--with-scheduler", "--url", "redis://redis:6379/0", "notifications"]
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  db:
+    profiles: ["localdb"]
+    image: mariadb:10.11
+    environment:
+      MARIADB_DATABASE: sms
+      MARIADB_USER: sms
+      MARIADB_PASSWORD: sms
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-change-me-root}
+    volumes:
+      - ../sqldatabase/sms.sql:/docker-entrypoint-initdb.d/01-sms.sql:ro
+      - dbdata:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3307:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  dbdata:
+  redisdata:

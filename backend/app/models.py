@@ -1,0 +1,533 @@
+"""ORM mapping of the existing `sms` database (sqldatabase/sms.sql).
+
+The schema is used as-is so the legacy CodeIgniter app and this API can share one
+database during migration. Column names (including typos such as `reciever`) and
+types (unix timestamps stored as text, `year` as "2020-2021") are kept verbatim.
+Tables added by this system are at the end of the file and are created by the
+Alembic migrations in `migrations/`; the legacy app ignores them.
+"""
+
+from datetime import datetime
+
+from sqlalchemy import DateTime, Index, Integer, LargeBinary, String, Text
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db import Base
+
+Txt = Mapped[str | None]
+Int = Mapped[int | None]
+
+
+def pk() -> Mapped[int]:
+    return mapped_column(Integer, primary_key=True, autoincrement=True)
+
+
+def txt() -> Txt:
+    return mapped_column(Text, nullable=True)
+
+
+def num() -> Int:
+    return mapped_column(Integer, nullable=True)
+
+
+# --- accounts -----------------------------------------------------------------
+
+
+class Admin(Base):
+    __tablename__ = "admin"
+    admin_id: Mapped[int] = pk()
+    name: Txt = txt()
+    email: Txt = txt()
+    password: Txt = txt()
+    level: Txt = txt()
+    authentication_key: Txt = txt()
+    phone: Txt = txt()
+    address: Txt = txt()
+
+
+class Teacher(Base):
+    __tablename__ = "teacher"
+    teacher_id: Mapped[int] = pk()
+    name: Txt = txt()
+    birthday: Txt = txt()
+    sex: Txt = txt()
+    religion: Txt = txt()
+    blood_group: Txt = txt()
+    address: Txt = txt()
+    phone: Txt = txt()
+    email: Txt = txt()
+    password: Txt = txt()
+    authentication_key: Txt = txt()
+    designation: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    social_links: Txt = txt()
+    about: Txt = txt()
+    show_on_website: Int = mapped_column(Integer, nullable=True, default=0)
+
+
+class Student(Base):
+    __tablename__ = "student"
+    student_id: Mapped[int] = pk()
+    student_code: Txt = txt()
+    name: Txt = txt()
+    birthday: Txt = txt()
+    sex: Txt = txt()
+    religion: Txt = txt()
+    blood_group: Txt = txt()
+    address: Txt = txt()
+    phone: Txt = txt()
+    email: Txt = txt()
+    password: Txt = txt()
+    parent_id: Int = num()
+    dormitory_id: Int = num()
+    transport_id: Int = num()
+    dormitory_room_number: Txt = txt()
+    authentication_key: Txt = txt()
+
+
+class Parent(Base):
+    __tablename__ = "parent"
+    parent_id: Mapped[int] = pk()
+    name: Txt = txt()
+    email: Txt = txt()
+    password: Txt = txt()
+    phone: Txt = txt()
+    address: Txt = txt()
+    profession: Txt = txt()
+    authentication_key: Txt = txt()
+
+
+class Librarian(Base):
+    __tablename__ = "librarian"
+    librarian_id: Mapped[int] = pk()
+    name: Txt = txt()
+    email: Txt = txt()
+    password: Txt = txt()
+
+
+class Accountant(Base):
+    __tablename__ = "accountant"
+    accountant_id: Mapped[int] = pk()
+    name: Txt = txt()
+    email: Txt = txt()
+    password: Txt = txt()
+
+
+# --- academic -----------------------------------------------------------------
+
+
+class SchoolClass(Base):
+    __tablename__ = "class"
+    class_id: Mapped[int] = pk()
+    name: Mapped[str | None] = mapped_column(String(11), nullable=True, default="")
+    name_numeric: Mapped[str | None] = mapped_column(String(3), nullable=True, default="")
+    teacher_id: Int = num()
+
+
+class Section(Base):
+    __tablename__ = "section"
+    section_id: Mapped[int] = pk()
+    name: Txt = txt()
+    nick_name: Txt = txt()
+    class_id: Int = num()
+    teacher_id: Int = num()
+
+
+class Subject(Base):
+    __tablename__ = "subject"
+    subject_id: Mapped[int] = pk()
+    name: Txt = txt()
+    class_id: Int = num()
+    teacher_id: Int = num()
+    year: Txt = txt()
+
+
+class Enroll(Base):
+    __tablename__ = "enroll"
+    enroll_id: Mapped[int] = pk()
+    enroll_code: Txt = txt()
+    student_id: Int = num()
+    class_id: Int = num()
+    section_id: Int = num()
+    roll: Int = num()
+    date_added: Txt = txt()
+    year: Txt = txt()
+
+
+class ClassRoutine(Base):
+    __tablename__ = "class_routine"
+    class_routine_id: Mapped[int] = pk()
+    class_id: Int = num()
+    section_id: Int = num()
+    subject_id: Int = num()
+    time_start: Int = num()
+    time_end: Int = num()
+    time_start_min: Int = num()
+    time_end_min: Int = num()
+    day: Txt = txt()
+    year: Txt = txt()
+
+
+class AcademicSyllabus(Base):
+    __tablename__ = "academic_syllabus"
+    academic_syllabus_id: Mapped[int] = pk()
+    academic_syllabus_code: Txt = txt()
+    title: Txt = txt()
+    description: Txt = txt()
+    class_id: Int = num()
+    uploader_type: Txt = txt()
+    uploader_id: Int = num()
+    year: Txt = txt()
+    timestamp: Txt = txt()
+    file_name: Txt = txt()
+    subject_id: Int = num()
+
+
+class Document(Base):
+    """Study material."""
+
+    __tablename__ = "document"
+    document_id: Mapped[int] = pk()
+    title: Txt = txt()
+    description: Txt = txt()
+    file_name: Txt = txt()
+    file_type: Txt = txt()
+    class_id: Txt = txt()
+    teacher_id: Int = num()
+    timestamp: Txt = txt()
+    subject_id: Int = num()
+
+
+# --- exams --------------------------------------------------------------------
+
+
+class Exam(Base):
+    __tablename__ = "exam"
+    exam_id: Mapped[int] = pk()
+    name: Txt = txt()
+    date: Txt = txt()
+    year: Txt = txt()
+    comment: Txt = txt()
+
+
+class Grade(Base):
+    __tablename__ = "grade"
+    grade_id: Mapped[int] = pk()
+    name: Txt = txt()
+    grade_point: Txt = txt()
+    mark_from: Int = num()
+    mark_upto: Int = num()
+    comment: Txt = txt()
+
+
+class Mark(Base):
+    __tablename__ = "mark"
+    mark_id: Mapped[int] = pk()
+    student_id: Int = num()
+    subject_id: Int = num()
+    class_id: Int = num()
+    section_id: Int = num()
+    exam_id: Int = num()
+    mark_obtained: Int = num()
+    mark_total: Int = num()
+    comment: Txt = txt()
+    year: Txt = txt()
+
+
+class QuestionPaper(Base):
+    __tablename__ = "question_paper"
+    question_paper_id: Mapped[int] = pk()
+    title: Txt = txt()
+    question_paper: Txt = txt()
+    class_id: Int = num()
+    exam_id: Int = num()
+    teacher_id: Int = num()
+
+
+class OnlineExam(Base):
+    __tablename__ = "online_exam"
+    online_exam_id: Mapped[int] = pk()
+    code: Mapped[str | None] = mapped_column(String(255), nullable=True, default="")
+    title: Txt = txt()
+    class_id: Int = num()
+    section_id: Int = num()
+    subject_id: Int = num()
+    exam_date: Int = num()
+    time_start: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    time_end: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    duration: Txt = txt()
+    minimum_percentage: Txt = txt()
+    instruction: Txt = txt()
+    status: Mapped[str | None] = mapped_column(String(255), nullable=True, default="pending")
+    running_year: Mapped[str | None] = mapped_column(String(255), nullable=True, default="")
+
+
+class QuestionBank(Base):
+    __tablename__ = "question_bank"
+    question_bank_id: Mapped[int] = pk()
+    online_exam_id: Int = num()
+    question_title: Txt = txt()
+    type: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    number_of_options: Int = num()
+    options: Txt = txt()
+    correct_answers: Txt = txt()
+    mark: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+
+class OnlineExamResult(Base):
+    __tablename__ = "online_exam_result"
+    online_exam_result_id: Mapped[int] = pk()
+    online_exam_id: Int = num()
+    student_id: Int = num()
+    answer_script: Txt = txt()
+    obtained_mark: Txt = txt()
+    status: Txt = txt()
+    exam_started_timestamp: Txt = txt()
+    result: Txt = txt()
+
+
+# --- attendance ---------------------------------------------------------------
+
+
+class Attendance(Base):
+    __tablename__ = "attendance"
+    attendance_id: Mapped[int] = pk()
+    timestamp: Txt = txt()
+    year: Txt = txt()
+    class_id: Int = num()
+    section_id: Int = num()
+    student_id: Int = num()
+    class_routine_id: Int = num()
+    # 0/NULL = not taken, 1 = present, 2 = absent
+    status: Int = num()
+
+
+# --- finance ------------------------------------------------------------------
+
+
+class Invoice(Base):
+    __tablename__ = "invoice"
+    invoice_id: Mapped[int] = pk()
+    student_id: Int = num()
+    title: Txt = txt()
+    description: Txt = txt()
+    amount: Int = num()
+    amount_paid: Txt = txt()
+    due: Txt = txt()
+    creation_timestamp: Int = num()
+    payment_timestamp: Txt = txt()
+    payment_method: Txt = txt()
+    payment_details: Txt = txt()
+    status: Txt = txt()  # "paid" | "unpaid"
+    year: Txt = txt()
+
+
+class Payment(Base):
+    __tablename__ = "payment"
+    payment_id: Mapped[int] = pk()
+    expense_category_id: Int = num()
+    title: Txt = txt()
+    payment_type: Txt = txt()  # "income" | "expense"
+    invoice_id: Int = num()
+    student_id: Int = num()
+    method: Txt = txt()
+    description: Txt = txt()
+    amount: Txt = txt()
+    timestamp: Txt = txt()
+    year: Txt = txt()
+
+
+class ExpenseCategory(Base):
+    __tablename__ = "expense_category"
+    expense_category_id: Mapped[int] = pk()
+    name: Txt = txt()
+
+
+# --- library / facilities -----------------------------------------------------
+
+
+class Book(Base):
+    __tablename__ = "book"
+    book_id: Mapped[int] = pk()
+    name: Txt = txt()
+    description: Txt = txt()
+    author: Txt = txt()
+    class_id: Txt = txt()
+    price: Txt = txt()
+    total_copies: Int = num()
+    issued_copies: Int = num()
+    status: Txt = txt()
+    file_name: Txt = txt()
+
+
+class BookRequest(Base):
+    __tablename__ = "book_request"
+    book_request_id: Mapped[int] = pk()
+    book_id: Int = num()
+    student_id: Int = num()
+    issue_start_date: Txt = txt()
+    issue_end_date: Txt = txt()
+    # 0 = pending, 1 = issued, 2 = rejected
+    status: Int = num()
+
+
+class Transport(Base):
+    __tablename__ = "transport"
+    transport_id: Mapped[int] = pk()
+    route_name: Txt = txt()
+    number_of_vehicle: Txt = txt()
+    description: Txt = txt()
+    route_fare: Txt = txt()
+
+
+class Dormitory(Base):
+    __tablename__ = "dormitory"
+    dormitory_id: Mapped[int] = pk()
+    name: Txt = txt()
+    number_of_room: Txt = txt()
+    description: Txt = txt()
+
+
+# --- communication ------------------------------------------------------------
+
+
+class Noticeboard(Base):
+    __tablename__ = "noticeboard"
+    notice_id: Mapped[int] = pk()
+    notice_title: Txt = txt()
+    notice: Txt = txt()
+    create_timestamp: Txt = txt()
+    status: Int = mapped_column(Integer, nullable=True, default=1)
+    show_on_website: Int = mapped_column(Integer, nullable=True, default=0)
+    image: Txt = txt()
+
+
+class MessageThread(Base):
+    __tablename__ = "message_thread"
+    message_thread_id: Mapped[int] = pk()
+    message_thread_code: Txt = txt()
+    sender: Txt = txt()  # "role-id"
+    reciever: Txt = txt()  # "role-id" (legacy spelling)
+    last_message_timestamp: Txt = txt()
+
+
+class Message(Base):
+    __tablename__ = "message"
+    message_id: Mapped[int] = pk()
+    message_thread_code: Txt = txt()
+    message: Txt = txt()
+    sender: Txt = txt()
+    timestamp: Txt = txt()
+    read_status: Int = num()
+    attached_file_name: Txt = txt()
+
+
+class GroupMessageThread(Base):
+    __tablename__ = "group_message_thread"
+    group_message_thread_id: Mapped[int] = pk()
+    group_message_thread_code: Txt = txt()
+    members: Txt = txt()  # JSON list of "role_id" (underscore, legacy format)
+    group_name: Txt = txt()
+    last_message_timestamp: Txt = txt()
+    created_timestamp: Txt = txt()
+
+
+class GroupMessage(Base):
+    __tablename__ = "group_message"
+    group_message_id: Mapped[int] = pk()
+    group_message_thread_code: Txt = txt()
+    sender: Txt = txt()
+    message: Txt = txt()
+    timestamp: Txt = txt()
+    read_status: Int = num()
+    attached_file_name: Txt = txt()
+
+
+# --- settings / website -------------------------------------------------------
+
+
+class Setting(Base):
+    __tablename__ = "settings"
+    settings_id: Mapped[int] = pk()
+    type: Txt = txt()
+    description: Txt = txt()
+
+
+class FrontendGeneralSetting(Base):
+    __tablename__ = "frontend_general_settings"
+    frontend_general_settings_id: Mapped[int] = pk()
+    type: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    description: Txt = txt()
+
+
+class FrontendNews(Base):
+    __tablename__ = "frontend_news"
+    frontend_news_id: Mapped[int] = pk()
+    title: Txt = txt()
+    description: Txt = txt()
+    date_added: Int = num()
+    image: Txt = txt()
+
+
+class FrontendEvent(Base):
+    __tablename__ = "frontend_events"
+    frontend_events_id: Mapped[int] = pk()
+    title: Txt = txt()
+    timestamp: Int = num()
+    status: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+
+class FrontendGallery(Base):
+    __tablename__ = "frontend_gallery"
+    frontend_gallery_id: Mapped[int] = pk()
+    title: Txt = txt()
+    description: Txt = txt()
+    date_added: Int = num()
+    image: Txt = txt()
+    show_on_website: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+
+class FrontendGalleryImage(Base):
+    __tablename__ = "frontend_gallery_image"
+    frontend_gallery_image_id: Mapped[int] = pk()
+    frontend_gallery_id: Int = num()
+    title: Txt = txt()
+    image: Txt = txt()
+
+
+class Language(Base):
+    __tablename__ = "language"
+    id: Mapped[int] = pk()
+    english: Mapped[str] = mapped_column(String(255))
+    bangali: Mapped[str] = mapped_column(String(255))
+
+
+class CiSession(Base):
+    """Legacy CodeIgniter sessions; not used by the new API."""
+
+    __tablename__ = "ci_sessions"
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    ip_address: Mapped[str] = mapped_column(String(45))
+    timestamp: Mapped[int] = mapped_column(Integer, default=0)
+    data: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+# --- added by this system (Alembic migrations) ----------------------------------
+
+
+class AuditLog(Base):
+    """One row per insert/update/delete of an audited table (see app/services/audit.py)."""
+
+    __tablename__ = "audit_log"
+    __table_args__ = (
+        Index("ix_audit_log_record", "table_name", "row_id"),
+        Index("ix_audit_log_created_at", "created_at"),
+    )
+    audit_id: Mapped[int] = pk()
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    # "role-id" of the signed-in user; NULL for changes without one (webhooks, password reset, scripts)
+    actor: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    action: Mapped[str] = mapped_column(String(10), nullable=False)
+    table_name: Mapped[str] = mapped_column(String(64), nullable=False)
+    row_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    # JSON: {column: value} for insert/delete, {column: [old, new]} for update
+    changes: Txt = txt()
