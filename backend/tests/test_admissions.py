@@ -25,7 +25,7 @@ FORM = {
 def outbox(monkeypatch):
     mails: list[tuple[str, str, str]] = []
     fake = lambda to, subject, body: mails.append((to, subject, body))  # noqa: E731
-    monkeypatch.setattr("app.api.routers.admissions.send_email", fake)
+    monkeypatch.setattr("app.api.v1.endpoints.admissions.send_email", fake)
     monkeypatch.setattr("app.services.notify.send_email", fake)  # status emails go through notifications
     return mails
 
@@ -88,7 +88,7 @@ def test_public_application_recaptcha(client, as_role, opened, monkeypatch):
     def fake_post(url, data=None, timeout=None):
         return httpx.Response(200, json={"success": data["response"] == "good"}, request=httpx.Request("POST", url))
 
-    monkeypatch.setattr("app.api.routers.cms.httpx.post", fake_post)
+    monkeypatch.setattr("app.api.v1.endpoints.cms.httpx.post", fake_post)
     assert _apply(client).status_code == 400
     assert _apply(client, recaptcha_token="bad").status_code == 400
     assert _apply(client, recaptcha_token="good").status_code == 201

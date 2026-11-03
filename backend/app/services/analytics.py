@@ -28,7 +28,7 @@ from datetime import date, datetime, timedelta, timezone
 from sqlalchemy import BigInteger, Numeric, and_, case, cast, func, or_, select, true
 from sqlalchemy.orm import Session
 
-from app.core.deps import CurrentUser
+from app.api.deps import CurrentUser
 from app.models import (
     AcademicYear,
     Attendance,

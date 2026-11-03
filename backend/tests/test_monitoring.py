@@ -4,7 +4,7 @@ import time
 
 import sentry_sdk
 
-from app import main
+from app.api.v1.endpoints import health
 from app.core import monitoring
 from app.core.config import get_settings
 
@@ -19,14 +19,14 @@ def test_ready_is_503_when_a_dependency_fails(client, monkeypatch):
     def broken():
         raise OSError("connection refused")
 
-    monkeypatch.setattr(main, "_check_database", broken)
+    monkeypatch.setattr(health, "_check_database", broken)
     r = client.get("/api/health/ready")
     assert r.status_code == 503 and r.json()["checks"]["database"] == "error"
 
 
 def test_ready_times_out_instead_of_hanging(client, monkeypatch):
-    monkeypatch.setattr(main, "READY_TIMEOUT", 0.2)
-    monkeypatch.setattr(main, "_check_database", lambda: time.sleep(2))
+    monkeypatch.setattr(health, "READY_TIMEOUT", 0.2)
+    monkeypatch.setattr(health, "_check_database", lambda: time.sleep(2))
     started = time.monotonic()
     r = client.get("/api/health/ready")
     assert r.status_code == 503 and r.json()["checks"]["database"] == "timeout"

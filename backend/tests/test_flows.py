@@ -2,7 +2,7 @@ import json
 import time
 from datetime import date
 
-from app.api.routers.online_exams import grade, is_correct
+from app.api.v1.endpoints.online_exams import grade, is_correct
 from app.db.session import SessionLocal
 from app.models import OnlineExam, QuestionBank
 

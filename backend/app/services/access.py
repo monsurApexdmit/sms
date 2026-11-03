@@ -3,7 +3,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.deps import CurrentUser, forbid
+from app.api.deps import CurrentUser, forbid
 from app.models import Enroll, Student, Subject
 from app.services.settings import running_year
 

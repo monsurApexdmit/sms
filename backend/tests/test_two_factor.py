@@ -4,7 +4,7 @@ import pyotp
 import pytest
 from sqlalchemy import select
 
-from app.api.routers import mfa as mfa_router
+from app.api.v1.endpoints import mfa as mfa_router
 from app.core.security import create_token, password_fingerprint
 from app.db.session import SessionLocal
 from app.models import AuditLog, Teacher, UserTotp

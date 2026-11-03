@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.api.routers.attendance import day_ts
+from app.api.v1.endpoints.attendance import day_ts
 from app.core.config import get_settings
 from app.models import Attendance, AttendancePunch, IdCard, StaffAttendance
 from app.services.access import current_enroll

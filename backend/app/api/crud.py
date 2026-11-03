@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, create_model
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.core.deps import DB, require_roles
+from app.api.deps import DB, require_roles
 from app.db.base import Base
 
 
@@ -64,7 +64,7 @@ def apply_filters(stmt, model: type[Base], params: dict[str, str], allowed: Iter
 
 
 def get_or_404(db: Session, model: type[Base], obj_id: int, label: str = "Record"):
-    from app.core.deps import not_found
+    from app.api.deps import not_found
 
     obj = db.get(model, obj_id)
     if obj is None:

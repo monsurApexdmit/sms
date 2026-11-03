@@ -3,7 +3,7 @@
 Every feature returns a draft that a person reviews and saves through the normal screens;
 nothing here writes school data. Only the minimum data needed is sent: no student names,
 contact details, health or counselling records (see the context builders in
-app/api/routers/ai.py). Prompts and answers are not stored; `ai_request` keeps who used
+app/api/v1/endpoints/ai.py). Prompts and answers are not stored; `ai_request` keeps who used
 which feature and the token counts, for the usage caps and the admin usage view.
 
 Settings (System settings -> AI assistant): `ai_enabled` ("1"), `anthropic_api_key`
@@ -24,7 +24,7 @@ from pydantic import BaseModel, ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.core.deps import CurrentUser
+from app.api.deps import CurrentUser
 from app.models import AiRequest
 from app.services.settings import get_setting
 

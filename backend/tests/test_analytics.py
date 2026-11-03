@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 import pytest
 from openpyxl import load_workbook
 
-from app.api.routers import analytics as analytics_router
+from app.api.v1.endpoints import analytics as analytics_router
 from app.core.security import hash_password
 from app.db.session import SessionLocal
 from app.models import (

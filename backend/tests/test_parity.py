@@ -9,7 +9,7 @@ import httpx
 import pytest
 from sqlalchemy import select
 
-from app.api.routers.students import BULK_COLUMNS
+from app.api.v1.endpoints.students import BULK_COLUMNS
 from app.db.session import SessionLocal
 from app.models import ClassRoutine, Invoice, OnlineExam, Parent, Payment, QuestionBank, Setting, Student, Teacher
 from app.services import jobs, notify
@@ -117,7 +117,7 @@ def test_exam_marks_sms(client, as_role, monkeypatch):
     assert client.post("/api/exams/1/marks-sms", headers=admin, json=body).status_code == 400  # SMS disabled
 
     _set(active_sms_service="twilio")
-    monkeypatch.setattr("app.api.routers.exams.send_sms", lambda phone, text: sent.append((phone, text)))
+    monkeypatch.setattr("app.api.v1.endpoints.exams.send_sms", lambda phone, text: sent.append((phone, text)))
     r = client.post("/api/exams/1/marks-sms", headers=admin, json=body)
     assert r.json() == {"queued": 1}  # Kid Two has no marks
     assert sent == [("+111", "Kid One: Term 1 results – Math 78")]
@@ -283,7 +283,7 @@ def test_answer_script_available_once_end_time_passed(client, as_role):
 @pytest.fixture
 def outbox(monkeypatch):
     mails: list[tuple[str, str, str]] = []
-    monkeypatch.setattr("app.api.routers.cms.send_email", lambda to, subject, body: mails.append((to, subject, body)))
+    monkeypatch.setattr("app.api.v1.endpoints.cms.send_email", lambda to, subject, body: mails.append((to, subject, body)))
     return mails
 
 
@@ -339,7 +339,7 @@ def test_contact_recaptcha(client, as_role, outbox, monkeypatch):
         ok = data["response"] == "good-token"
         return httpx.Response(200, json={"success": ok}, request=httpx.Request("POST", url))
 
-    monkeypatch.setattr("app.api.routers.cms.httpx.post", fake_post)
+    monkeypatch.setattr("app.api.v1.endpoints.cms.httpx.post", fake_post)
     r = client.post("/api/public/contact", json=MSG)
     assert r.status_code == 400 and outbox == []
     assert client.post("/api/public/contact", json={**MSG, "recaptcha_token": "bad"}).status_code == 400

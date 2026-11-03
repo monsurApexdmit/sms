@@ -64,7 +64,7 @@ def test_refresh_cookie_flow(client):
 
 def test_password_reset_link_is_single_use(client, monkeypatch):
     sent = {}
-    monkeypatch.setattr("app.api.routers.auth.send_email", lambda to, subject, body: sent.update(body=body))
+    monkeypatch.setattr("app.api.v1.endpoints.auth.send_email", lambda to, subject, body: sent.update(body=body))
     assert client.post("/api/auth/forgot-password", json={"email": "t1@example.com"}).status_code == 202
     token = re.search(r"token=(\S+)", sent["body"]).group(1)
     assert client.post("/api/auth/reset-password", json={"token": token, "new_password": "NewPass@123"}).status_code == 204

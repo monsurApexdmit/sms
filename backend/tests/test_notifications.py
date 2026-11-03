@@ -6,7 +6,7 @@ from fastapi import BackgroundTasks
 from pywebpush import WebPushException
 from sqlalchemy import select
 
-from app.api.routers.homework import school_today
+from app.api.v1.endpoints.homework import school_today
 from app.db.session import SessionLocal
 from app.models import Notification, Parent, PushSubscription, Setting, Student
 from app.services import notifications as svc
