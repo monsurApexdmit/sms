@@ -84,6 +84,12 @@ Teachers set homework for a class (or one section) in a subject they teach, with
 
 Students apply for their own leave, parents for their children, and teachers, librarians and accountants for themselves (**Attendance → Leave**). Student leave is decided by an admin or any teacher with a subject in the student's current class; staff leave by an admin. Leave an admin records is approved at once. A request counts school days only (holidays and weekly days off are skipped), may span at most 60 days and may not overlap another pending or approved request for the same person; the applicant can cancel it while it is pending. Approved leave shows as "On leave" on the daily attendance sheet, and no absence SMS is sent for those students. The parent (or the member of staff) is emailed the decision, and texted when SMS is set up.
 
+## Import and export
+
+- **Excel export**: the Students, Teachers, Parents, Invoices, Income & expenses, Attendance report, Tabulation sheet and Audit log screens have an *Export to Excel* button (`GET /api/export/<name>.xlsx`). It downloads what the screen's filters select, with the same access rules; numbers and dates are real spreadsheet values. Exports stop at 50,000 rows.
+- **Marks import**: on *Marks entry*, *Download template* gives a CSV of the section's students with their current marks (`student_id, roll, name, mark_obtained, comment`). Fill it in and use *Import CSV*. Every row is checked first (student in that section, whole-number mark within the same limits as the screen, no duplicates); if any row is wrong nothing is saved and the errors are listed. A blank mark clears it; without a `comment` column existing comments are kept.
+- **Student import**: *Students → Bulk import* (unchanged).
+
 ## Docker
 
 ```bash

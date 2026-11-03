@@ -1,16 +1,20 @@
-import { ChartColumnIcon, ClipboardListIcon, EyeIcon, InfoIcon, PrinterIcon, SaveIcon, SendIcon, UndoIcon } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { ChartColumnIcon, ClipboardListIcon, DownloadIcon, EyeIcon, InfoIcon, PrinterIcon, SaveIcon, SendIcon, UndoIcon, UploadIcon } from "lucide-react";
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
-import { api } from "../api/client";
+import { api, errorMessage } from "../api/client";
 import { useAction, useClasses, useExams, useGet, useList, useSections } from "../api/hooks";
 import type { Student } from "../api/types";
 import { useUser } from "../auth/AuthContext";
 import { Combobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { CrudPage, IconAction } from "../components/CrudPage";
+import { downloadFile, ExportButton } from "../components/ExportButton";
 import { Field } from "../components/field";
+import { FileButton } from "../components/file-button";
 import { PageHeader } from "../components/PageHeader";
 import { ClassPicker, type Selection } from "../components/Pickers";
 import { Dash, EmptyState, TableState } from "../components/states";
@@ -175,6 +179,68 @@ interface MarkRow {
   comment: string | null;
 }
 
+/** Download the section's mark sheet as CSV, fill it in a spreadsheet, and import it back (all rows or none). */
+function MarksImport({ params, disabled }: { params: Record<string, string | null | undefined>; disabled?: boolean }) {
+  const qc = useQueryClient();
+  const [errors, setErrors] = useState<string[] | null>(null);
+  const [busy, setBusy] = useState(false);
+  const template = async () => {
+    try {
+      await downloadFile("/marks/import-template", params, "marks.csv");
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+  const upload = async (file: File | null) => {
+    if (!file) return;
+    const body = new FormData();
+    Object.entries(params).forEach(([k, v]) => body.append(k, String(v ?? "")));
+    body.append("file", file);
+    setBusy(true);
+    try {
+      const { data } = await api.post<{ updated: number }>("/marks/import", body);
+      toast.success(`${data.updated} marks imported`);
+      qc.invalidateQueries({ queryKey: ["/marks"] });
+    } catch (error) {
+      const detail = axios.isAxiosError(error) ? (error.response?.data as { detail?: { errors?: string[] } })?.detail : undefined;
+      if (detail?.errors) setErrors(detail.errors);
+      else toast.error(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <>
+      <Button variant="outline" onClick={template}>
+        <DownloadIcon />
+        Download template
+      </Button>
+      <FileButton onChange={upload} accept=".csv,text/csv">
+        {(props) => (
+          <Button variant="outline" loading={busy} disabled={disabled} title={disabled ? "Save or reset your changes first" : undefined} {...props}>
+            <UploadIcon />
+            Import CSV
+          </Button>
+        )}
+      </FileButton>
+      <Dialog open={errors !== null} onOpenChange={(open) => !open && setErrors(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nothing was imported</DialogTitle>
+            <DialogDescription>Fix these rows in the file and import it again.</DialogDescription>
+          </DialogHeader>
+          <ul className="max-h-80 list-disc space-y-1 overflow-y-auto pl-5 text-sm">
+            {errors?.map((e) => <li key={e}>{e}</li>)}
+          </ul>
+          <DialogFooter>
+            <Button onClick={() => setErrors(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 export function MarksPage() {
   const user = useUser();
   const [sel, setSel] = useState<Selection>({ classId: null, sectionId: null, subjectId: null, examId: null });
@@ -204,7 +270,11 @@ export function MarksPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Marks entry" subtitle={user.role === "teacher" ? "Only subjects assigned to you are listed" : undefined} />
+      <PageHeader
+        title="Marks entry"
+        subtitle={user.role === "teacher" ? "Only subjects assigned to you are listed" : undefined}
+        actions={ready && <MarksImport params={params} disabled={dirty} />}
+      />
       <Card className="py-4">
         <CardContent className="px-4">
           <ClassPicker value={sel} onChange={setSel} withSubject withExam teacherId={user.role === "teacher" ? user.id : undefined} />
@@ -449,10 +519,13 @@ export function TabulationPage() {
         subtitle="Section is optional"
         actions={
           data && (
-            <Button variant="outline" onClick={() => window.print()}>
-              <PrinterIcon />
-              Print
-            </Button>
+            <>
+              <ExportButton size="default" path="/export/tabulation.xlsx" params={{ class_id: sel.classId, exam_id: sel.examId, section_id: sel.sectionId || undefined }} />
+              <Button variant="outline" onClick={() => window.print()}>
+                <PrinterIcon />
+                Print
+              </Button>
+            </>
           )
         }
       />

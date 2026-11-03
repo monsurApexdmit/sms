@@ -36,6 +36,7 @@ import { Combobox, type Option } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
 import { DatePicker } from "../components/date-picker";
+import { ExportButton } from "../components/ExportButton";
 import { Field } from "../components/field";
 import { FileButton } from "../components/file-button";
 import { PageHeader } from "../components/PageHeader";
@@ -671,10 +672,11 @@ export function StudentsPage() {
   const [bulkOpen, setBulkOpen] = useState(false);
   const transports = useList<{ transport_id: number; route_name: string }>("/transports");
   const dorms = useList<{ dormitory_id: number; name: string }>("/dormitories");
-  const { data, isLoading } = useList<Student>("/students", {
+  const filters = {
     class_id: sel.classId || undefined, section_id: sel.sectionId || undefined, q: q || undefined,
-    transport_id: transportId || undefined, dormitory_id: dormitoryId || undefined, limit: 500,
-  });  // prettier-ignore
+    transport_id: transportId || undefined, dormitory_id: dormitoryId || undefined,
+  };  // prettier-ignore
+  const { data, isLoading } = useList<Student>("/students", { ...filters, limit: 500 });
   const remove = useAction((id: number) => api.delete(`/students/${id}`), { success: "Student deleted", invalidate: [["/students"]] });
 
   return (
@@ -683,23 +685,26 @@ export function StudentsPage() {
         title="Students"
         subtitle={data ? `${data.total} students` : undefined}
         actions={
-          admin && (
-            <>
-              <Button variant="outline" onClick={() => setBulkOpen(true)}>
-                <UploadIcon />
-                Bulk import
-              </Button>
-              <Button
-                onClick={() => {
-                  setEditing(null);
-                  setFormOpen(true);
-                }}
-              >
-                <PlusIcon />
-                Add student
-              </Button>
-            </>
-          )
+          <>
+            <ExportButton size="default" path="/export/students.xlsx" params={filters} />
+            {admin && (
+              <>
+                <Button variant="outline" onClick={() => setBulkOpen(true)}>
+                  <UploadIcon />
+                  Bulk import
+                </Button>
+                <Button
+                  onClick={() => {
+                    setEditing(null);
+                    setFormOpen(true);
+                  }}
+                >
+                  <PlusIcon />
+                  Add student
+                </Button>
+              </>
+            )}
+          </>
         }
       />
       <Card className="gap-0 overflow-hidden py-0">

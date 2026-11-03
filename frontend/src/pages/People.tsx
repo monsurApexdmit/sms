@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import { useAction } from "../api/hooks";
 import { useUser } from "../auth/AuthContext";
 import { CrudPage, IconAction, type FieldDef } from "../components/CrudPage";
+import { ExportButton } from "../components/ExportButton";
 import { FileButton } from "../components/file-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 
@@ -52,6 +53,7 @@ export function TeachersPage() {
       canWrite={admin}
       searchable
       avatar
+      headerExtra={<ExportButton size="default" path="/export/teachers.xlsx" />}
       extraActions={admin ? (row) => <PhotoButton path="/teachers" id={row.teacher_id} /> : undefined}
       fields={account([
         { name: "designation", label: "Designation" },
@@ -75,6 +77,7 @@ export function ParentsPage() {
       path="/parents"
       idField="parent_id"
       searchable
+      headerExtra={<ExportButton size="default" path="/export/parents.xlsx" />}
       fields={account([
         { name: "phone", label: "Phone" },
         { name: "profession", label: "Profession" },

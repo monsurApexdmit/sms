@@ -9,6 +9,7 @@ import { Combobox, MultiCombobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
 import { DatePicker } from "../components/date-picker";
+import { ExportButton } from "../components/ExportButton";
 import { Field } from "../components/field";
 import { FileButton } from "../components/file-button";
 import { PageHeader } from "../components/PageHeader";
@@ -997,14 +998,19 @@ export function AuditLogPage() {
   const [action, setAction] = useState<string | null>(null);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const { data, isLoading, page, setPage, pageSize } = usePagedList<AuditEntry>("/audit-log", {
+  const filters = {
     table_name: table ?? undefined, action: action ?? undefined, date_from: dateFrom || undefined, date_to: dateTo || undefined,
-  });  // prettier-ignore
+  };  // prettier-ignore
+  const { data, isLoading, page, setPage, pageSize } = usePagedList<AuditEntry>("/audit-log", filters);
   const rows = data?.items ?? [];
 
   return (
     <>
-      <PageHeader title="Audit log" subtitle="Who changed marks, attendance, invoices, payments, enrolments, accounts and settings in this system, and what changed." />
+      <PageHeader
+        title="Audit log"
+        subtitle="Who changed marks, attendance, invoices, payments, enrolments, accounts and settings in this system, and what changed."
+        actions={<ExportButton size="default" path="/export/audit-log.xlsx" params={filters} />}
+      />
       <Card className="gap-0 overflow-hidden py-0">
         <div className="grid gap-3 border-b p-3 sm:grid-cols-2 lg:grid-cols-4">
           <Combobox data={(tables.data ?? []).map((t) => ({ value: t, label: t }))} value={table} onChange={setTable} clearable placeholder="All tables" />

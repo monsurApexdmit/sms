@@ -31,6 +31,7 @@ import { Combobox, MultiCombobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { CrudPage, IconAction } from "../components/CrudPage";
 import { DatePicker } from "../components/date-picker";
+import { ExportButton } from "../components/ExportButton";
 import { Field } from "../components/field";
 import { PageHeader } from "../components/PageHeader";
 import { Pager } from "../components/Pager";
@@ -659,10 +660,13 @@ export function InvoicesPage() {
         title="Invoices"
         subtitle="Bill students, take payments and review payment history."
         actions={
-          <Button onClick={() => setCreateOpen(true)}>
-            <PlusIcon />
-            New invoice
-          </Button>
+          <>
+            <ExportButton size="default" path="/export/invoices.xlsx" params={{ status: status === "all" ? undefined : status, q: q || undefined }} />
+            <Button onClick={() => setCreateOpen(true)}>
+              <PlusIcon />
+              New invoice
+            </Button>
+          </>
         }
       />
       <Tabs defaultValue="invoices" className="gap-6">
@@ -841,12 +845,15 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
           <span className="text-muted-foreground">{type === "income" ? "Total income" : "Total expenses"}: </span>
           <span className="font-semibold tabular-nums">{money(total, currency)}</span>
         </div>
-        {type === "expense" && (
-          <Button size="sm" onClick={() => openForm("new")}>
-            <PlusIcon />
-            Add expense
-          </Button>
-        )}
+        <div className="flex gap-2">
+          <ExportButton path="/export/payments.xlsx" params={{ payment_type: type }} />
+          {type === "expense" && (
+            <Button size="sm" onClick={() => openForm("new")}>
+              <PlusIcon />
+              Add expense
+            </Button>
+          )}
+        </div>
       </div>
       <Table className="min-w-[700px]">
         <TableHeader className="bg-muted/50">
