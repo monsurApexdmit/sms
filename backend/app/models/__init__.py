@@ -4,7 +4,7 @@ The schema is used as-is so the legacy CodeIgniter app and this API can share on
 database during migration. Column names (including typos such as `reciever`) and
 types (unix timestamps stored as text, `year` as "2020-2021") are kept verbatim.
 Models are grouped by area, one module each; tables added by this system are created
-by the Alembic migrations in `migrations/` and the legacy app ignores them. Everything
+by the Alembic migrations in `alembic/` and the legacy app ignores them. Everything
 is re-exported here, so `from app.models import Student` works and Alembic sees every table.
 """
 
