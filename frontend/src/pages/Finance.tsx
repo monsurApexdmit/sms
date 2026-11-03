@@ -53,11 +53,12 @@ import { Textarea } from "../components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { cn } from "../lib/utils";
 import { fromUnix, money, toOptions } from "../utils";
+import { t, tn } from "../i18n";
 
 const METHODS = ["cash", "cheque", "card", "bank", "mobile"].map((m) => ({ value: m, label: m[0].toUpperCase() + m.slice(1) }));
 // legacy rows store 1/2/3 for cash/cheque/card
 const LEGACY_METHODS: Record<string, string> = {
-  "1": "Cash", "2": "Cheque", "3": "Card", paypal: "PayPal", stripe: "Stripe", ...GATEWAY_LABELS,
+  "1": t("Cash"), "2": t("Cheque"), "3": t("Card"), paypal: t("PayPal"), stripe: t("Stripe"), ...GATEWAY_LABELS,
 };  // prettier-ignore
 export const methodLabel = (m: string | null | undefined) => (m ? LEGACY_METHODS[m] ?? METHODS.find((o) => o.value === m)?.label ?? m : "—");
 const today = () => dayjs().format("YYYY-MM-DD");
@@ -72,9 +73,9 @@ function invoiceState(inv: Pick<Invoice, "status" | "amount_paid">): InvoiceStat
 }
 
 const STATE_STYLE: Record<InvoiceState, [string, string]> = {
-  paid: ["Paid", "border-transparent bg-success/15 text-success"],
-  partial: ["Partial", "border-transparent bg-warning/20 text-amber-700 dark:text-amber-300"],
-  unpaid: ["Unpaid", "border-destructive/50 text-destructive"],
+  paid: [t("Paid"), "border-transparent bg-success/15 text-success"],
+  partial: [t("Partial"), "border-transparent bg-warning/20 text-amber-700 dark:text-amber-300"],
+  unpaid: [t("Unpaid"), "border-destructive/50 text-destructive"],
 };
 
 function StatusBadge({ invoice }: { invoice: Pick<Invoice, "status" | "amount_paid"> }) {
@@ -148,7 +149,7 @@ function InvoiceForm({ onDone }: { onDone: () => void }) {
         ? api.post("/invoices", { ...base, student_id: Number(v.student_id) })
         : api.post("/invoices/mass", { ...base, student_ids: v.student_ids.map(Number) });
     },
-    { success: "Invoice created", invalidate: [["/invoices"], ["/finance/summary"]], onSuccess: onDone },
+    { success: t("Invoice created"), invalidate: [["/invoices"], ["/finance/summary"]], onSuccess: onDone },
   );
   const options = toOptions(students.data?.items, "student_id", "name");
 
@@ -161,18 +162,18 @@ function InvoiceForm({ onDone }: { onDone: () => void }) {
         onValueChange={(v) => v && setMode(v as "single" | "mass")}
         className="w-full"
       >
-        <ToggleGroupItem value="single" className="flex-1">One student</ToggleGroupItem>
-        <ToggleGroupItem value="mass" className="flex-1">Many students</ToggleGroupItem>
+        <ToggleGroupItem value="single" className="flex-1">{t("One student")}</ToggleGroupItem>
+        <ToggleGroupItem value="mass" className="flex-1">{t("Many students")}</ToggleGroupItem>
       </ToggleGroup>
       <ClassPicker value={sel} onChange={setSel} />
       {mode === "single" ? (
         <Controller
           control={form.control}
           name="student_id"
-          rules={{ validate: (v) => (mode === "single" && !v ? "Choose a student" : true) }}
+          rules={{ validate: (v) => (mode === "single" && !v ? t("Choose a student") : true) }}
           render={({ field, fieldState }) => (
-            <Field label="Student" required error={fieldState.error?.message}>
-              <Combobox data={options} value={field.value} onChange={field.onChange} placeholder={sel.classId ? "Choose student" : "Choose a class first"} disabled={!sel.classId} aria-invalid={!!fieldState.error} />
+            <Field label={t("Student")} required error={fieldState.error?.message}>
+              <Combobox data={options} value={field.value} onChange={field.onChange} placeholder={sel.classId ? t("Choose student") : t("Choose a class first")} disabled={!sel.classId} aria-invalid={!!fieldState.error} />
             </Field>
           )}
         />
@@ -180,37 +181,36 @@ function InvoiceForm({ onDone }: { onDone: () => void }) {
         <Controller
           control={form.control}
           name="student_ids"
-          rules={{ validate: (v) => (mode === "mass" && !v.length ? "Choose at least one student" : true) }}
+          rules={{ validate: (v) => (mode === "mass" && !v.length ? t("Choose at least one student") : true) }}
           render={({ field, fieldState }) => (
-            <Field label="Students" required error={fieldState.error?.message}>
+            <Field label={t("Students")} required error={fieldState.error?.message}>
               <div className="flex items-start gap-2">
-                <MultiCombobox data={options} value={field.value} onChange={field.onChange} placeholder={sel.classId ? "Choose students" : "Choose a class first"} disabled={!sel.classId} className="flex-1" />
+                <MultiCombobox data={options} value={field.value} onChange={field.onChange} placeholder={sel.classId ? t("Choose students") : t("Choose a class first")} disabled={!sel.classId} className="flex-1" />
                 <Button type="button" variant="secondary" disabled={!options.length} onClick={() => field.onChange(options.map((o) => o.value))}>
-                  All
-                </Button>
+                  {t("All")}</Button>
               </div>
             </Field>
           )}
         />
       )}
-      <Field label="Title" htmlFor="inv-title" required error={errors.title?.message}>
-        <Input id="inv-title" aria-invalid={!!errors.title} {...form.register("title", { required: "Required" })} />
+      <Field label={t("Title")} htmlFor="inv-title" required error={errors.title?.message}>
+        <Input id="inv-title" aria-invalid={!!errors.title} {...form.register("title", { required: t("Required") })} />
       </Field>
-      <Field label="Description" htmlFor="inv-desc">
+      <Field label={t("Description")} htmlFor="inv-desc">
         <Textarea id="inv-desc" rows={2} {...form.register("description")} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Total amount" htmlFor="inv-amount" required error={errors.amount?.message}>
-          <Input id="inv-amount" type="number" step="0.01" min={0} aria-invalid={!!errors.amount} {...form.register("amount", { validate: (v) => (Number(v) > 0 ? true : "Enter an amount") })} />
+        <Field label={t("Total amount")} htmlFor="inv-amount" required error={errors.amount?.message}>
+          <Input id="inv-amount" type="number" step="0.01" min={0} aria-invalid={!!errors.amount} {...form.register("amount", { validate: (v) => (Number(v) > 0 ? true : t("Enter an amount")) })} />
         </Field>
-        <Field label="Paid now" htmlFor="inv-paid">
+        <Field label={t("Paid now")} htmlFor="inv-paid">
           <Input id="inv-paid" type="number" step="0.01" min={0} {...form.register("amount_paid")} />
         </Field>
         <Controller
           control={form.control}
           name="method"
           render={({ field }) => (
-            <Field label="Method">
+            <Field label={t("Method")}>
               <Combobox data={METHODS} value={field.value} onChange={(v) => field.onChange(v ?? "cash")} />
             </Field>
           )}
@@ -219,15 +219,15 @@ function InvoiceForm({ onDone }: { onDone: () => void }) {
           control={form.control}
           name="date"
           render={({ field }) => (
-            <Field label="Date">
+            <Field label={t("Date")}>
               <DatePicker value={field.value} onChange={field.onChange} />
             </Field>
           )}
         />
       </div>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={save.isPending}>Create</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("Cancel")}</Button>
+        <Button type="submit" loading={save.isPending}>{t("Create")}</Button>
       </DialogFooter>
     </form>
   );
@@ -240,7 +240,7 @@ function PaymentForm({ invoice, currency, onDone }: { invoice: Invoice; currency
   const pay = useAction(
     (v: { amount: string; method: string; date: string; description: string }) =>
       api.post(`/invoices/${invoice.invoice_id}/payments`, { amount: Number(v.amount), method: v.method, date: v.date || null, description: v.description || null }),
-    { success: "Payment recorded", invalidate: [["/invoices"], ["/finance/summary"], ["/payments"]], onSuccess: onDone },
+    { success: t("Payment recorded"), invalidate: [["/invoices"], ["/finance/summary"], ["/payments"]], onSuccess: onDone },
   );
   return (
     <form onSubmit={form.handleSubmit((v) => pay.mutate(v))} className="grid gap-4">
@@ -249,19 +249,19 @@ function PaymentForm({ invoice, currency, onDone }: { invoice: Invoice; currency
           {invoice.student_name ?? "—"} · {invoice.title}
         </div>
         <div>
-          <div className="text-muted-foreground text-xs">Total</div>
+          <div className="text-muted-foreground text-xs">{t("Total")}</div>
           {money(invoice.amount, currency)}
         </div>
         <div>
-          <div className="text-muted-foreground text-xs">Paid</div>
+          <div className="text-muted-foreground text-xs">{t("Paid")}</div>
           {money(invoice.amount_paid, currency)}
         </div>
         <div>
-          <div className="text-muted-foreground text-xs">Due</div>
+          <div className="text-muted-foreground text-xs">{t("Due")}</div>
           <span className="font-semibold">{money(due, currency)}</span>
         </div>
       </div>
-      <Field label="Amount" htmlFor="pay-amount" required error={errors.amount?.message}>
+      <Field label={t("Amount")} htmlFor="pay-amount" required error={errors.amount?.message}>
         <Input
           id="pay-amount"
           type="number"
@@ -269,7 +269,7 @@ function PaymentForm({ invoice, currency, onDone }: { invoice: Invoice; currency
           min={0.01}
           max={due}
           aria-invalid={!!errors.amount}
-          {...form.register("amount", { validate: (v) => (Number(v) <= 0 ? "Enter an amount" : Number(v) > due + 0.001 ? `At most ${money(due, currency)}` : true) })}
+          {...form.register("amount", { validate: (v) => (Number(v) <= 0 ? t("Enter an amount") : Number(v) > due + 0.001 ? t("At most {due}", { due: money(due, currency) }) : true) })}
         />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -277,7 +277,7 @@ function PaymentForm({ invoice, currency, onDone }: { invoice: Invoice; currency
           control={form.control}
           name="method"
           render={({ field }) => (
-            <Field label="Method">
+            <Field label={t("Method")}>
               <Combobox data={METHODS} value={field.value} onChange={(v) => field.onChange(v ?? "cash")} />
             </Field>
           )}
@@ -286,21 +286,20 @@ function PaymentForm({ invoice, currency, onDone }: { invoice: Invoice; currency
           control={form.control}
           name="date"
           render={({ field }) => (
-            <Field label="Date">
+            <Field label={t("Date")}>
               <DatePicker value={field.value} onChange={field.onChange} />
             </Field>
           )}
         />
       </div>
-      <Field label="Note" htmlFor="pay-note">
+      <Field label={t("Note")} htmlFor="pay-note">
         <Input id="pay-note" {...form.register("description")} />
       </Field>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("Cancel")}</Button>
         <Button type="submit" loading={pay.isPending}>
           <BanknoteIcon />
-          Record payment
-        </Button>
+          {t("Record payment")}</Button>
       </DialogFooter>
     </form>
   );
@@ -311,18 +310,18 @@ function EditInvoice({ invoice, loading, onCancel, onSave }: { invoice: Invoice;
   const { errors } = form.formState;
   return (
     <form onSubmit={form.handleSubmit((v) => onSave({ ...v, amount: Number(v.amount) }))} className="grid gap-4">
-      <Field label="Title" htmlFor="edit-title" required error={errors.title?.message}>
-        <Input id="edit-title" aria-invalid={!!errors.title} {...form.register("title", { required: "Required" })} />
+      <Field label={t("Title")} htmlFor="edit-title" required error={errors.title?.message}>
+        <Input id="edit-title" aria-invalid={!!errors.title} {...form.register("title", { required: t("Required") })} />
       </Field>
-      <Field label="Description" htmlFor="edit-desc">
+      <Field label={t("Description")} htmlFor="edit-desc">
         <Textarea id="edit-desc" rows={3} {...form.register("description")} />
       </Field>
-      <Field label="Total amount" htmlFor="edit-amount" required error={errors.amount?.message}>
-        <Input id="edit-amount" type="number" step="0.01" min={0} aria-invalid={!!errors.amount} {...form.register("amount", { validate: (v) => (Number(v) > 0 ? true : "Enter an amount") })} />
+      <Field label={t("Total amount")} htmlFor="edit-amount" required error={errors.amount?.message}>
+        <Input id="edit-amount" type="number" step="0.01" min={0} aria-invalid={!!errors.amount} {...form.register("amount", { validate: (v) => (Number(v) > 0 ? true : t("Enter an amount")) })} />
       </Field>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" loading={loading}>Save</Button>
+        <Button type="button" variant="outline" onClick={onCancel}>{t("Cancel")}</Button>
+        <Button type="submit" loading={loading}>{t("Save")}</Button>
       </DialogFooter>
     </form>
   );
@@ -346,7 +345,7 @@ function InvoiceDocument({ invoice, school, currency }: { invoice: InvoiceWithPa
           </div>
         </div>
         <div className="space-y-1 text-right">
-          <div className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">Invoice</div>
+          <div className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">{t("Invoice")}</div>
           <div className="text-lg font-semibold">#{invoice.invoice_id}</div>
           <div className="text-muted-foreground">{fromUnix(invoice.creation_timestamp)}</div>
           <StatusBadge invoice={invoice} />
@@ -357,13 +356,13 @@ function InvoiceDocument({ invoice, school, currency }: { invoice: InvoiceWithPa
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">Bill to</div>
+          <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">{t("Bill to")}</div>
           <div className="font-medium">{invoice.student_name ?? "—"}</div>
-          {invoice.year && <div className="text-muted-foreground">Session {invoice.year}</div>}
+          {invoice.year && <div className="text-muted-foreground">{tn("Session {year}", { year: invoice.year })}</div>}
         </div>
         {invoice.status === "paid" && invoice.payment_timestamp && (
           <div className="sm:text-right">
-            <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">Paid on</div>
+            <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">{t("Paid on")}</div>
             <div>{fromUnix(invoice.payment_timestamp)}</div>
           </div>
         )}
@@ -373,8 +372,8 @@ function InvoiceDocument({ invoice, school, currency }: { invoice: InvoiceWithPa
         <table className="w-full">
           <thead className="bg-muted/50 text-left text-xs">
             <tr>
-              <th className="px-3 py-2 font-medium">Description</th>
-              <th className="px-3 py-2 text-right font-medium">Amount</th>
+              <th className="px-3 py-2 font-medium">{t("Description")}</th>
+              <th className="px-3 py-2 text-right font-medium">{t("Amount")}</th>
             </tr>
           </thead>
           <tbody>
@@ -388,15 +387,15 @@ function InvoiceDocument({ invoice, school, currency }: { invoice: InvoiceWithPa
           </tbody>
           <tfoot className="border-t">
             <tr>
-              <td className="px-3 pt-2 text-right text-muted-foreground">Total</td>
+              <td className="px-3 pt-2 text-right text-muted-foreground">{t("Total")}</td>
               <td className="px-3 pt-2 text-right tabular-nums">{money(invoice.amount, currency)}</td>
             </tr>
             <tr>
-              <td className="px-3 text-right text-muted-foreground">Paid</td>
+              <td className="px-3 text-right text-muted-foreground">{t("Paid")}</td>
               <td className="px-3 text-right tabular-nums">{money(invoice.amount_paid, currency)}</td>
             </tr>
             <tr>
-              <td className="px-3 pb-2 text-right font-semibold">Due</td>
+              <td className="px-3 pb-2 text-right font-semibold">{t("Due")}</td>
               <td className="px-3 pb-2 text-right font-semibold tabular-nums">{money(invoice.due, currency)}</td>
             </tr>
           </tfoot>
@@ -404,17 +403,17 @@ function InvoiceDocument({ invoice, school, currency }: { invoice: InvoiceWithPa
       </div>
 
       <div>
-        <div className="mb-2 font-semibold">Payment history</div>
+        <div className="mb-2 font-semibold">{t("Payment history")}</div>
         {invoice.payments.length === 0 ? (
-          <p className="text-muted-foreground">No payments yet.</p>
+          <p className="text-muted-foreground">{t("No payments yet.")}</p>
         ) : (
           <div className="overflow-hidden rounded-lg border">
             <table className="w-full">
               <thead className="bg-muted/50 text-left text-xs">
                 <tr>
-                  <th className="px-3 py-2 font-medium">Date</th>
-                  <th className="px-3 py-2 font-medium">Method</th>
-                  <th className="px-3 py-2 text-right font-medium">Amount</th>
+                  <th className="px-3 py-2 font-medium">{t("Date")}</th>
+                  <th className="px-3 py-2 font-medium">{t("Method")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("Amount")}</th>
                   <th className="no-print w-20 px-3 py-2" />
                 </tr>
               </thead>
@@ -426,8 +425,7 @@ function InvoiceDocument({ invoice, school, currency }: { invoice: InvoiceWithPa
                     <td className="px-3 py-2 text-right tabular-nums">{money(p.amount, currency)}</td>
                     <td className="no-print px-3 py-2 text-right">
                       <Link to={`/app/receipts/${p.payment_id}`} className="text-primary text-xs font-medium underline-offset-4 hover:underline">
-                        Receipt
-                      </Link>
+                        {t("Receipt")}</Link>
                     </td>
                   </tr>
                 ))}
@@ -456,8 +454,7 @@ function InvoiceDetail({ id, currency }: { id: number; currency: string }) {
       <div className="flex justify-end">
         <Button variant="outline" size="sm" onClick={() => window.print()}>
           <PrinterIcon />
-          Print
-        </Button>
+          {t("Print")}</Button>
       </div>
       <InvoiceDocument invoice={data} school={settings.data} currency={currency} />
       <style>{PRINT_CSS}</style>
@@ -476,8 +473,8 @@ function InvoiceSheet({ id, currency, onClose }: { id: number | null; currency: 
     <Sheet open={id !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>Invoice</SheetTitle>
-          <SheetDescription>Details, payments and a printable copy.</SheetDescription>
+          <SheetTitle>{t("Invoice")}</SheetTitle>
+          <SheetDescription>{t("Details, payments and a printable copy.")}</SheetDescription>
         </SheetHeader>
         {id !== null && <InvoiceDetail id={id} currency={currency} />}
       </SheetContent>
@@ -502,7 +499,7 @@ function StudentHistory({ currency, onView }: { currency: string; onView: (id: n
   return (
     <div className="space-y-6">
       <div className="no-print flex flex-wrap items-end gap-3">
-        <Field label="Class" className="w-44">
+        <Field label={t("Class")} className="w-44">
           <Combobox
             data={toOptions(classes.data?.items, "class_id", "name")}
             value={classId}
@@ -510,38 +507,36 @@ function StudentHistory({ currency, onView }: { currency: string; onView: (id: n
               setClassId(v);
               setStudentId(null);
             }}
-            placeholder="Choose class"
+            placeholder={t("Choose class")}
           />
         </Field>
-        <Field label="Student" className="w-full sm:w-72">
+        <Field label={t("Student")} className="w-full sm:w-72">
           <Combobox
-            data={(students.data?.items ?? []).map((s) => ({ value: String(s.student_id), label: s.roll ? `${s.name} (roll ${s.roll})` : s.name }))}
+            data={(students.data?.items ?? []).map((s) => ({ value: String(s.student_id), label: s.roll ? t("{name} (roll {roll})", { name: s.name, roll: s.roll }) : s.name }))}
             value={studentId}
             onChange={setStudentId}
             disabled={!classId}
-            placeholder={classId ? "Choose student" : "Choose a class first"}
-            emptyText="No students in this class"
+            placeholder={classId ? t("Choose student") : t("Choose a class first")}
+            emptyText={t("No students in this class")}
           />
         </Field>
         {studentId && (
           <Button variant="outline" onClick={() => window.print()} className="sm:ml-auto">
             <PrinterIcon />
-            Print
-          </Button>
+            {t("Print")}</Button>
         )}
       </div>
 
       {!studentId ? (
-        <EmptyState icon={ReceiptTextIcon} title="Pick a student">
-          Choose a class and a student to see their invoices and payments.
-        </EmptyState>
+        <EmptyState icon={ReceiptTextIcon} title={t("Pick a student")}>
+          {t("Choose a class and a student to see their invoices and payments.")}</EmptyState>
       ) : (
         <>
           {student && (
             <div>
               <h2 className="text-lg font-semibold">{student.name}</h2>
               <p className="text-muted-foreground text-sm">
-                {[student.class_name && `Class ${student.class_name}`, student.section_name && `Section ${student.section_name}`, student.roll && `Roll ${student.roll}`].filter(Boolean).join(" · ")}
+                {[student.class_name && t("Class {class_name}", { class_name: student.class_name }), student.section_name && t("Section {section_name}", { section_name: student.section_name }), student.roll && t("Roll {roll}", { roll: student.roll })].filter(Boolean).join(" · ")}
               </p>
             </div>
           )}
@@ -549,30 +544,30 @@ function StudentHistory({ currency, onView }: { currency: string; onView: (id: n
             <StatSkeleton count={3} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-3">
-              <StatCard label="Billed" value={money(billed, currency)} hint={`${invoices.data?.items.length ?? 0} invoices`} icon={ReceiptTextIcon} />
-              <StatCard label="Paid" value={money(paid, currency)} icon={WalletIcon} tone="success" />
-              <StatCard label="Due" value={money(due, currency)} icon={CircleAlertIcon} tone={due > 0 ? "destructive" : "success"} />
+              <StatCard label={t("Billed")} value={money(billed, currency)} hint={t("{value} invoices", { value: invoices.data?.items.length ?? 0 })} icon={ReceiptTextIcon} />
+              <StatCard label={t("Paid")} value={money(paid, currency)} icon={WalletIcon} tone="success" />
+              <StatCard label={t("Due")} value={money(due, currency)} icon={CircleAlertIcon} tone={due > 0 ? "destructive" : "success"} />
             </div>
           )}
           <Card className="gap-0 overflow-hidden py-0">
             <CardHeader className="border-b py-4">
-              <CardTitle>Invoices</CardTitle>
+              <CardTitle>{t("Invoices")}</CardTitle>
             </CardHeader>
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
                   <TableHead>#</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead className="text-right">Paid</TableHead>
-                  <TableHead className="text-right">Due</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t("Title")}</TableHead>
+                  <TableHead>{t("Date")}</TableHead>
+                  <TableHead className="text-right">{t("Total")}</TableHead>
+                  <TableHead className="text-right">{t("Paid")}</TableHead>
+                  <TableHead className="text-right">{t("Due")}</TableHead>
+                  <TableHead>{t("Status")}</TableHead>
                   <TableHead className="no-print w-12" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableState loading={invoices.isLoading} empty={invoices.data?.items.length === 0} colSpan={8} emptyText="No invoices for this student" />
+                <TableState loading={invoices.isLoading} empty={invoices.data?.items.length === 0} colSpan={8} emptyText={t("No invoices for this student")} />
                 {invoices.data?.items.map((inv) => (
                   <TableRow key={inv.invoice_id}>
                     <TableCell className="text-muted-foreground">{inv.invoice_id}</TableCell>
@@ -583,7 +578,7 @@ function StudentHistory({ currency, onView }: { currency: string; onView: (id: n
                     <TableCell className="text-right tabular-nums">{money(inv.due, currency)}</TableCell>
                     <TableCell><StatusBadge invoice={inv} /></TableCell>
                     <TableCell className="no-print">
-                      <IconAction label="View invoice" onClick={() => onView(inv.invoice_id)}><EyeIcon /></IconAction>
+                      <IconAction label={t("View invoice")} onClick={() => onView(inv.invoice_id)}><EyeIcon /></IconAction>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -591,7 +586,7 @@ function StudentHistory({ currency, onView }: { currency: string; onView: (id: n
               {!!invoices.data?.items.length && (
                 <TableFooter>
                   <TableRow>
-                    <TableCell colSpan={3}>Total</TableCell>
+                    <TableCell colSpan={3}>{t("Total")}</TableCell>
                     <TableCell className="text-right tabular-nums">{money(billed, currency)}</TableCell>
                     <TableCell className="text-right tabular-nums">{money(paid, currency)}</TableCell>
                     <TableCell className="text-right tabular-nums">{money(due, currency)}</TableCell>
@@ -603,26 +598,26 @@ function StudentHistory({ currency, onView }: { currency: string; onView: (id: n
           </Card>
           <Card className="gap-0 overflow-hidden py-0">
             <CardHeader className="border-b py-4">
-              <CardTitle>Payments</CardTitle>
+              <CardTitle>{t("Payments")}</CardTitle>
             </CardHeader>
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Method</TableHead>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead>{t("Date")}</TableHead>
+                  <TableHead>{t("Title")}</TableHead>
+                  <TableHead>{t("Method")}</TableHead>
+                  <TableHead>{t("Invoice")}</TableHead>
+                  <TableHead className="text-right">{t("Amount")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableState loading={payments.isLoading} empty={payments.data?.items.length === 0} colSpan={5} emptyText="No payments recorded" />
+                <TableState loading={payments.isLoading} empty={payments.data?.items.length === 0} colSpan={5} emptyText={t("No payments recorded")} />
                 {payments.data?.items.map((p) => (
                   <TableRow key={p.payment_id}>
                     <TableCell>{fromUnix(p.timestamp)}</TableCell>
                     <TableCell>{p.title ?? <Dash />}</TableCell>
                     <TableCell>{methodLabel(p.method)}</TableCell>
-                    <TableCell className="text-muted-foreground">{p.invoice_id ? `#${p.invoice_id}` : <Dash />}</TableCell>
+                    <TableCell className="text-muted-foreground">{p.invoice_id ? t("#{invoice_id}", { invoice_id: p.invoice_id }) : <Dash />}</TableCell>
                     <TableCell className="text-right tabular-nums">{money(p.amount, currency)}</TableCell>
                   </TableRow>
                 ))}
@@ -630,7 +625,7 @@ function StudentHistory({ currency, onView }: { currency: string; onView: (id: n
               {!!payments.data?.items.length && (
                 <TableFooter>
                   <TableRow>
-                    <TableCell colSpan={4}>Total received</TableCell>
+                    <TableCell colSpan={4}>{t("Total received")}</TableCell>
                     <TableCell className="text-right tabular-nums">{money(sum(payments.data.items, (p) => p.amount), currency)}</TableCell>
                   </TableRow>
                 </TableFooter>
@@ -654,10 +649,10 @@ export function InvoicesPage() {
   const [paying, setPaying] = useState<Invoice | null>(null);
   const [viewing, setViewing] = useState<number | null>(null);
   const [editing, setEditing] = useState<Invoice | null>(null);
-  const remove = useAction((id: number) => api.delete(`/invoices/${id}`), { success: "Invoice deleted", invalidate: [["/invoices"], ["/finance/summary"]] });
+  const remove = useAction((id: number) => api.delete(`/invoices/${id}`), { success: t("Invoice deleted"), invalidate: [["/invoices"], ["/finance/summary"]] });
   const edit = useAction(
     (v: { title: string; description: string; amount: number }) => api.put(`/invoices/${editing!.invoice_id}`, v),
-    { success: "Invoice updated", invalidate: [["/invoices"]], onSuccess: () => setEditing(null) },
+    { success: t("Invoice updated"), invalidate: [["/invoices"]], onSuccess: () => setEditing(null) },
   );
 
   const rows = data?.items ?? [];
@@ -666,62 +661,61 @@ export function InvoicesPage() {
   return (
     <>
       <PageHeader
-        title="Invoices"
-        subtitle="Bill students, take payments and review payment history."
+        title={t("Invoices")}
+        subtitle={t("Bill students, take payments and review payment history.")}
         actions={
           <>
             <ExportButton size="default" path="/export/invoices.xlsx" params={{ status: status === "all" ? undefined : status, q: q || undefined }} />
             <Button onClick={() => setCreateOpen(true)}>
               <PlusIcon />
-              New invoice
-            </Button>
+              {t("New invoice")}</Button>
           </>
         }
       />
       <Tabs defaultValue="invoices" className="gap-6">
         <TabsList>
-          <TabsTrigger value="invoices">Invoices</TabsTrigger>
-          <TabsTrigger value="history">Student history</TabsTrigger>
+          <TabsTrigger value="invoices">{t("Invoices")}</TabsTrigger>
+          <TabsTrigger value="history">{t("Student history")}</TabsTrigger>
         </TabsList>
         <TabsContent value="invoices" className="space-y-6">
           {isLoading ? (
             <StatSkeleton count={4} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <StatCard label="Billed" value={money(summary?.billed ?? 0, currency)} hint={`${data?.total ?? 0} invoices`} icon={ReceiptTextIcon} />
-              <StatCard label="Collected" value={money(summary?.collected ?? 0, currency)} icon={WalletIcon} tone="success" />
-              <StatCard label="Outstanding" value={money(summary?.outstanding ?? 0, currency)} icon={CircleAlertIcon} tone="destructive" />
-              <StatCard label="Open invoices" value={summary?.open ?? 0} hint={`${summary?.partial ?? 0} partially paid`} icon={BanknoteIcon} tone="warning" />
+              <StatCard label={t("Billed")} value={money(summary?.billed ?? 0, currency)} hint={t("{value} invoices", { value: data?.total ?? 0 })} icon={ReceiptTextIcon} />
+              <StatCard label={t("Collected")} value={money(summary?.collected ?? 0, currency)} icon={WalletIcon} tone="success" />
+              <StatCard label={t("Outstanding")} value={money(summary?.outstanding ?? 0, currency)} icon={CircleAlertIcon} tone="destructive" />
+              <StatCard label={t("Open invoices")} value={summary?.open ?? 0} hint={t("{value} partially paid", { value: summary?.partial ?? 0 })} icon={BanknoteIcon} tone="warning" />
             </div>
           )}
           <Card className="gap-0 overflow-hidden py-0">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
               <ToggleGroup type="single" variant="outline" size="sm" value={status} onValueChange={(v) => v && setStatus(v)}>
-                <ToggleGroupItem value="all">All</ToggleGroupItem>
-                <ToggleGroupItem value="unpaid">Unpaid</ToggleGroupItem>
-                <ToggleGroupItem value="paid">Paid</ToggleGroupItem>
+                <ToggleGroupItem value="all">{t("All")}</ToggleGroupItem>
+                <ToggleGroupItem value="unpaid">{t("Unpaid")}</ToggleGroupItem>
+                <ToggleGroupItem value="paid">{t("Paid")}</ToggleGroupItem>
               </ToggleGroup>
               <div className="relative w-full sm:max-w-xs">
                 <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-                <Input placeholder="Search student, title or number" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
+                <Input placeholder={t("Search student, title or number")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
               </div>
             </div>
             <Table className="min-w-[800px]">
               <TableHeader className="bg-muted/50">
                 <TableRow>
                   <TableHead>#</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead className="text-right">Paid</TableHead>
-                  <TableHead className="text-right">Due</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead>{t("Student")}</TableHead>
+                  <TableHead>{t("Title")}</TableHead>
+                  <TableHead className="text-right">{t("Total")}</TableHead>
+                  <TableHead className="text-right">{t("Paid")}</TableHead>
+                  <TableHead className="text-right">{t("Due")}</TableHead>
+                  <TableHead>{t("Status")}</TableHead>
+                  <TableHead>{t("Date")}</TableHead>
                   <TableHead className="w-36" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={9} emptyText="No invoices" />
+                <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={9} emptyText={t("No invoices")} />
                 {rows.map((inv) => (
                   <TableRow key={inv.invoice_id}>
                     <TableCell className="text-muted-foreground">{inv.invoice_id}</TableCell>
@@ -735,16 +729,16 @@ export function InvoicesPage() {
                     <TableCell>
                       <div className="flex items-center justify-end gap-1">
                         {inv.status !== "paid" && (
-                          <IconAction label="Take payment" onClick={() => setPaying(inv)}>
+                          <IconAction label={t("Take payment")} onClick={() => setPaying(inv)}>
                             <BanknoteIcon className="text-success" />
                           </IconAction>
                         )}
-                        <IconAction label="View" onClick={() => setViewing(inv.invoice_id)}><EyeIcon /></IconAction>
-                        <IconAction label="Edit" onClick={() => setEditing(inv)}><PencilIcon /></IconAction>
+                        <IconAction label={t("View")} onClick={() => setViewing(inv.invoice_id)}><EyeIcon /></IconAction>
+                        <IconAction label={t("Edit")} onClick={() => setEditing(inv)}><PencilIcon /></IconAction>
                         <IconAction
-                          label="Delete"
+                          label={t("Delete")}
                           destructive
-                          onClick={() => confirmAction({ title: "Delete invoice?", description: "Its payments are deleted too.", onConfirm: () => remove.mutate(inv.invoice_id) })}
+                          onClick={() => confirmAction({ title: t("Delete invoice?"), description: t("Its payments are deleted too."), onConfirm: () => remove.mutate(inv.invoice_id) })}
                         >
                           <Trash2Icon />
                         </IconAction>
@@ -765,8 +759,8 @@ export function InvoicesPage() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>New invoice</DialogTitle>
-            <DialogDescription>Bill one student or a whole group at once.</DialogDescription>
+            <DialogTitle>{t("New invoice")}</DialogTitle>
+            <DialogDescription>{t("Bill one student or a whole group at once.")}</DialogDescription>
           </DialogHeader>
           {createOpen && <InvoiceForm onDone={() => setCreateOpen(false)} />}
         </DialogContent>
@@ -774,7 +768,7 @@ export function InvoicesPage() {
       <Dialog open={!!paying} onOpenChange={(open) => !open && setPaying(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Take payment</DialogTitle>
+            <DialogTitle>{t("Take payment")}</DialogTitle>
           </DialogHeader>
           {paying && <PaymentForm invoice={paying} currency={currency} onDone={() => setPaying(null)} />}
         </DialogContent>
@@ -782,7 +776,7 @@ export function InvoicesPage() {
       <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit invoice</DialogTitle>
+            <DialogTitle>{t("Edit invoice")}</DialogTitle>
           </DialogHeader>
           {editing && <EditInvoice key={editing.invoice_id} invoice={editing} loading={edit.isPending} onCancel={() => setEditing(null)} onSave={(v) => edit.mutate(v)} />}
         </DialogContent>
@@ -819,7 +813,7 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
   const { data, isLoading, page, setPage, pageSize } = usePagedList<Payment, PaymentPage>("/payments", { payment_type: type });
   const cats = useList<{ expense_category_id: number; name: string }>(type === "expense" ? "/expense-categories" : null);
   const [editing, setEditing] = useState<Payment | null | "new">(null);
-  const remove = useAction((id: number) => api.delete(`/expenses/${id}`), { success: "Deleted", invalidate: [["/payments"], ["/finance/summary"]] });
+  const remove = useAction((id: number) => api.delete(`/expenses/${id}`), { success: t("Deleted"), invalidate: [["/payments"], ["/finance/summary"]] });
   const form = useForm<ExpenseValues>({ defaultValues: EMPTY_EXPENSE });
   const { errors } = form.formState;
   const save = useAction(
@@ -827,7 +821,7 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
       const body = { ...v, expense_category_id: v.expense_category_id ? Number(v.expense_category_id) : null, amount: Number(v.amount), date: v.date || null, description: v.description || null };
       return editing && editing !== "new" ? api.put(`/expenses/${editing.payment_id}`, body) : api.post("/expenses", body);
     },
-    { success: "Saved", invalidate: [["/payments"], ["/finance/summary"]], onSuccess: () => setEditing(null) },
+    { success: t("Saved"), invalidate: [["/payments"], ["/finance/summary"]], onSuccess: () => setEditing(null) },
   );
   const openForm = (p: Payment | "new") => {
     setEditing(p);
@@ -852,7 +846,7 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
     <Card className="gap-0 overflow-hidden py-0">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
         <div className="text-sm">
-          <span className="text-muted-foreground">{type === "income" ? "Total income" : "Total expenses"}: </span>
+          <span className="text-muted-foreground">{type === "income" ? t("Total income") : t("Total expenses")}: </span>
           <span className="font-semibold tabular-nums">{money(total, currency)}</span>
         </div>
         <div className="flex gap-2">
@@ -860,24 +854,23 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
           {type === "expense" && (
             <Button size="sm" onClick={() => openForm("new")}>
               <PlusIcon />
-              Add expense
-            </Button>
+              {t("Add expense")}</Button>
           )}
         </div>
       </div>
       <Table className="min-w-[700px]">
         <TableHeader className="bg-muted/50">
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>{type === "income" ? "Student" : "Category"}</TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            <TableHead>{t("Date")}</TableHead>
+            <TableHead>{t("Title")}</TableHead>
+            <TableHead>{type === "income" ? t("Student") : t("Category")}</TableHead>
+            <TableHead>{t("Method")}</TableHead>
+            <TableHead className="text-right">{t("Amount")}</TableHead>
             <TableHead className="w-24" />
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableState loading={isLoading} empty={data?.items.length === 0} colSpan={colSpan} emptyText="Nothing recorded" />
+          <TableState loading={isLoading} empty={data?.items.length === 0} colSpan={colSpan} emptyText={t("Nothing recorded")} />
           {data?.items.map((p) => (
             <TableRow key={p.payment_id}>
               <TableCell>{fromUnix(p.timestamp)}</TableCell>
@@ -888,11 +881,11 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
               <TableCell>
                 <div className="flex items-center justify-end gap-1">
                   {type === "income" ? (
-                    <IconAction label="Receipt" onClick={() => navigate(`/app/receipts/${p.payment_id}`)}><ReceiptTextIcon /></IconAction>
+                    <IconAction label={t("Receipt")} onClick={() => navigate(`/app/receipts/${p.payment_id}`)}><ReceiptTextIcon /></IconAction>
                   ) : (
                     <>
-                      <IconAction label="Edit" onClick={() => openForm(p)}><PencilIcon /></IconAction>
-                      <IconAction label="Delete" destructive onClick={() => confirmAction({ title: "Delete expense?", onConfirm: () => remove.mutate(p.payment_id) })}>
+                      <IconAction label={t("Edit")} onClick={() => openForm(p)}><PencilIcon /></IconAction>
+                      <IconAction label={t("Delete")} destructive onClick={() => confirmAction({ title: t("Delete expense?"), onConfirm: () => remove.mutate(p.payment_id) })}>
                         <Trash2Icon />
                       </IconAction>
                     </>
@@ -907,30 +900,30 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
       <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing === "new" ? "Add expense" : "Edit expense"}</DialogTitle>
+            <DialogTitle>{editing === "new" ? t("Add expense") : t("Edit expense")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
-            <Field label="Title" htmlFor="exp-title" required error={errors.title?.message}>
-              <Input id="exp-title" aria-invalid={!!errors.title} {...form.register("title", { required: "Required" })} />
+            <Field label={t("Title")} htmlFor="exp-title" required error={errors.title?.message}>
+              <Input id="exp-title" aria-invalid={!!errors.title} {...form.register("title", { required: t("Required") })} />
             </Field>
             <Controller
               control={form.control}
               name="expense_category_id"
               render={({ field }) => (
-                <Field label="Category">
-                  <Combobox data={toOptions(cats.data?.items, "expense_category_id", "name")} value={field.value} onChange={field.onChange} clearable placeholder="Choose category" />
+                <Field label={t("Category")}>
+                  <Combobox data={toOptions(cats.data?.items, "expense_category_id", "name")} value={field.value} onChange={field.onChange} clearable placeholder={t("Choose category")} />
                 </Field>
               )}
             />
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Amount" htmlFor="exp-amount" required error={errors.amount?.message}>
-                <Input id="exp-amount" type="number" step="0.01" min={0.01} aria-invalid={!!errors.amount} {...form.register("amount", { validate: (v) => (Number(v) > 0 ? true : "Enter an amount") })} />
+              <Field label={t("Amount")} htmlFor="exp-amount" required error={errors.amount?.message}>
+                <Input id="exp-amount" type="number" step="0.01" min={0.01} aria-invalid={!!errors.amount} {...form.register("amount", { validate: (v) => (Number(v) > 0 ? true : t("Enter an amount")) })} />
               </Field>
               <Controller
                 control={form.control}
                 name="method"
                 render={({ field }) => (
-                  <Field label="Method">
+                  <Field label={t("Method")}>
                     <Combobox data={METHODS} value={field.value} onChange={(v) => field.onChange(v ?? "cash")} />
                   </Field>
                 )}
@@ -940,17 +933,17 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
               control={form.control}
               name="date"
               render={({ field }) => (
-                <Field label="Date">
+                <Field label={t("Date")}>
                   <DatePicker value={field.value} onChange={field.onChange} />
                 </Field>
               )}
             />
-            <Field label="Description" htmlFor="exp-desc">
+            <Field label={t("Description")} htmlFor="exp-desc">
               <Textarea id="exp-desc" rows={3} {...form.register("description")} />
             </Field>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-              <Button type="submit" loading={save.isPending}>Save</Button>
+              <Button type="button" variant="outline" onClick={() => setEditing(null)}>{t("Cancel")}</Button>
+              <Button type="submit" loading={save.isPending}>{t("Save")}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -965,13 +958,13 @@ export function AccountingPage() {
   const peak = Math.max(1, ...(data?.monthly ?? []).flatMap((m) => [m.income, m.expense]));
   return (
     <>
-      <PageHeader title="Income & expenses" subtitle="Running-year totals, monthly breakdown and the expense ledger." />
+      <PageHeader title={t("Income & expenses")} subtitle={t("Running-year totals, monthly breakdown and the expense ledger.")} />
       <Tabs defaultValue="summary" className="gap-6">
         <TabsList className="w-full overflow-x-auto sm:w-fit">
-          <TabsTrigger value="summary">Summary</TabsTrigger>
-          <TabsTrigger value="income">Income</TabsTrigger>
-          <TabsTrigger value="expense">Expenses</TabsTrigger>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="summary">{t("Summary")}</TabsTrigger>
+          <TabsTrigger value="income">{t("Income")}</TabsTrigger>
+          <TabsTrigger value="expense">{t("Expenses")}</TabsTrigger>
+          <TabsTrigger value="categories">{t("Categories")}</TabsTrigger>
         </TabsList>
         <TabsContent value="summary" className="space-y-6">
           {isLoading || !data ? (
@@ -979,26 +972,26 @@ export function AccountingPage() {
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <StatCard label="Income" value={money(data.income, currency)} icon={TrendingUpIcon} tone="success" />
-                <StatCard label="Expenses" value={money(data.expense, currency)} icon={TrendingDownIcon} tone="destructive" />
-                <StatCard label="Balance" value={money(data.balance, currency)} icon={ScaleIcon} />
-                <StatCard label="Outstanding dues" value={money(data.outstanding_due, currency)} hint={`${data.unpaid_invoices} unpaid invoices`} icon={CircleAlertIcon} tone="warning" />
+                <StatCard label={t("Income")} value={money(data.income, currency)} icon={TrendingUpIcon} tone="success" />
+                <StatCard label={t("Expenses")} value={money(data.expense, currency)} icon={TrendingDownIcon} tone="destructive" />
+                <StatCard label={t("Balance")} value={money(data.balance, currency)} icon={ScaleIcon} />
+                <StatCard label={t("Outstanding dues")} value={money(data.outstanding_due, currency)} hint={t("{unpaid_invoices} unpaid invoices", { unpaid_invoices: data.unpaid_invoices })} icon={CircleAlertIcon} tone="warning" />
               </div>
               <Card className="gap-0 overflow-hidden py-0">
                 <CardHeader className="border-b py-4">
-                  <CardTitle>Monthly breakdown</CardTitle>
+                  <CardTitle>{t("Monthly breakdown")}</CardTitle>
                 </CardHeader>
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
-                      <TableHead>Month</TableHead>
-                      <TableHead className="text-right">Income</TableHead>
-                      <TableHead className="text-right">Expenses</TableHead>
-                      <TableHead className="text-right">Net</TableHead>
+                      <TableHead>{t("Month")}</TableHead>
+                      <TableHead className="text-right">{t("Income")}</TableHead>
+                      <TableHead className="text-right">{t("Expenses")}</TableHead>
+                      <TableHead className="text-right">{t("Net")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableState empty={data.monthly.length === 0} colSpan={4} emptyText="No transactions this year" />
+                    <TableState empty={data.monthly.length === 0} colSpan={4} emptyText={t("No transactions this year")} />
                     {data.monthly.map((m) => (
                       <TableRow key={m.month}>
                         <TableCell>
@@ -1022,7 +1015,7 @@ export function AccountingPage() {
         <TabsContent value="income"><PaymentsTable type="income" currency={currency} /></TabsContent>
         <TabsContent value="expense"><PaymentsTable type="expense" currency={currency} /></TabsContent>
         <TabsContent value="categories">
-          <CrudPage title="Expense categories" path="/expense-categories" idField="expense_category_id" fields={[{ name: "name", label: "Name", required: true }]} />
+          <CrudPage title={t("Expense categories")} path="/expense-categories" idField="expense_category_id" fields={[{ name: "name", label: t("Name"), required: true }]} />
         </TabsContent>
       </Tabs>
     </>
@@ -1066,15 +1059,15 @@ export function MyInvoicesPage() {
       navigate({ pathname: location.pathname, search: search ? `?${search}` : "" }, { replace: true });
     };
     if (flag !== "return" || !token) {
-      if (flag === "cancel") toast.info("PayPal payment cancelled. Your invoice has not been charged.");
+      if (flag === "cancel") toast.info(t("PayPal payment cancelled. Your invoice has not been charged."));
       strip();
       return;
     }
     api
       .post<{ status: "paid" | "pending"; invoice_id: number }>("/payments/paypal/capture", { order_id: token })
       .then(({ data: r }) => {
-        if (r.status === "paid") toast.success("Payment received. Thank you!");
-        else toast.info("PayPal is still processing your payment. The invoice will update once it is confirmed.");
+        if (r.status === "paid") toast.success(t("Payment received. Thank you!"));
+        else toast.info(t("PayPal is still processing your payment. The invoice will update once it is confirmed."));
       })
       .catch((e) => toast.error(errorMessage(e)))
       .finally(() => {
@@ -1091,39 +1084,39 @@ export function MyInvoicesPage() {
 
   return (
     <>
-      <PageHeader title="Payments" subtitle={parent ? "Invoices of your children" : "Your invoices and payments"} />
+      <PageHeader title={t("Payments")} subtitle={parent ? t("Invoices of your children") : t("Your invoices and payments")} />
       <div className="space-y-6">
         {params.get("paid") && (
           <Alert className="border-success/40 text-success">
             <WalletIcon />
-            <AlertTitle>Thank you</AlertTitle>
-            <AlertDescription>Your payment is being confirmed and the invoice will update in a moment.</AlertDescription>
+            <AlertTitle>{t("Thank you")}</AlertTitle>
+            <AlertDescription>{t("Your payment is being confirmed and the invoice will update in a moment.")}</AlertDescription>
           </Alert>
         )}
         {isLoading ? (
           <StatSkeleton count={3} />
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="Billed" value={money(sum(data, (i) => i.amount), currency)} hint={`${data?.length ?? 0} invoices`} icon={ReceiptTextIcon} />
-            <StatCard label="Paid" value={money(sum(data, (i) => i.amount_paid), currency)} icon={WalletIcon} tone="success" />
-            <StatCard label="Due" value={money(due, currency)} icon={CircleAlertIcon} tone={due > 0 ? "destructive" : "success"} />
+            <StatCard label={t("Billed")} value={money(sum(data, (i) => i.amount), currency)} hint={t("{value} invoices", { value: data?.length ?? 0 })} icon={ReceiptTextIcon} />
+            <StatCard label={t("Paid")} value={money(sum(data, (i) => i.amount_paid), currency)} icon={WalletIcon} tone="success" />
+            <StatCard label={t("Due")} value={money(due, currency)} icon={CircleAlertIcon} tone={due > 0 ? "destructive" : "success"} />
           </div>
         )}
         <Card className="gap-0 overflow-hidden py-0">
           <Table className="min-w-[700px]">
             <TableHeader className="bg-muted/50">
               <TableRow>
-                {parent && <TableHead>Student</TableHead>}
-                <TableHead>Title</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="text-right">Due</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+                {parent && <TableHead>{t("Student")}</TableHead>}
+                <TableHead>{t("Title")}</TableHead>
+                <TableHead className="text-right">{t("Total")}</TableHead>
+                <TableHead className="text-right">{t("Due")}</TableHead>
+                <TableHead>{t("Status")}</TableHead>
+                <TableHead>{t("Date")}</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableState loading={isLoading} empty={data?.length === 0} colSpan={colSpan} emptyText="No invoices" />
+              <TableState loading={isLoading} empty={data?.length === 0} colSpan={colSpan} emptyText={t("No invoices")} />
               {data?.map((inv) => (
                 <TableRow key={inv.invoice_id}>
                   {parent && <TableCell>{inv.student_name}</TableCell>}
@@ -1134,18 +1127,16 @@ export function MyInvoicesPage() {
                   <TableCell>{fromUnix(inv.creation_timestamp)}</TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-2">
-                      <IconAction label="View invoice" onClick={() => setViewing(inv.invoice_id)}><EyeIcon /></IconAction>
+                      <IconAction label={t("View invoice")} onClick={() => setViewing(inv.invoice_id)}><EyeIcon /></IconAction>
                       {inv.status !== "paid" && settings.data?.stripe_enabled && (
                         <Button size="sm" loading={pay.isPending && pay.variables === inv.invoice_id} disabled={paypal.isPending} onClick={() => pay.mutate(inv.invoice_id)}>
                           <CreditCardIcon />
-                          Pay online
-                        </Button>
+                          {t("Pay online")}</Button>
                       )}
                       {inv.status !== "paid" && settings.data?.paypal_enabled && (
                         <Button size="sm" variant="outline" loading={paypal.isPending && paypal.variables === inv.invoice_id} disabled={pay.isPending} onClick={() => paypal.mutate(inv.invoice_id)}>
                           <WalletIcon />
-                          Pay with PayPal
-                        </Button>
+                          {t("Pay with PayPal")}</Button>
                       )}
                       {inv.status !== "paid" && (
                         <LocalPayButtons invoiceId={inv.invoice_id} gateways={settings.data?.local_gateways} disabled={pay.isPending || paypal.isPending} />

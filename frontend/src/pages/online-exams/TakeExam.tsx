@@ -18,6 +18,7 @@ import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { Skeleton } from "../../components/ui/skeleton";
 import { cn } from "../../lib/utils";
 import { ResultBadge, blankify } from "./shared";
+import { t as tr, tn } from "../../i18n";
 
 interface ExamPaper {
   exam: OnlineExam;
@@ -62,13 +63,12 @@ export function TakeExamPage() {
     return (
       <Alert variant="destructive" className="max-w-xl">
         <CircleAlertIcon />
-        <AlertTitle>Cannot open exam</AlertTitle>
+        <AlertTitle>{tr("Cannot open exam")}</AlertTitle>
         <AlertDescription>
           <p>{error}</p>
           <Button variant="outline" size="sm" className="mt-2" onClick={() => navigate("/app/my-online-exams")}>
             <ArrowLeftIcon />
-            Back
-          </Button>
+            {tr("Back")}</Button>
         </AlertDescription>
       </Alert>
     );
@@ -79,17 +79,17 @@ export function TakeExamPage() {
           <div className="bg-success/15 text-success mx-auto mb-2 flex size-12 items-center justify-center rounded-full">
             <CheckIcon className="size-6" />
           </div>
-          <CardTitle className="text-xl">Exam submitted</CardTitle>
-          <CardDescription>Your answers have been recorded.</CardDescription>
+          <CardTitle className="text-xl">{tr("Exam submitted")}</CardTitle>
+          <CardDescription>{tr("Your answers have been recorded.")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-4xl font-bold tabular-nums">
             {result.obtained_mark} <span className="text-muted-foreground text-2xl font-medium">/ {result.total_mark}</span>
           </p>
           <ResultBadge result={result.result} className="px-3 py-1 text-sm" />
-          <p className="text-muted-foreground text-sm">The full answer script becomes available once the exam closes.</p>
+          <p className="text-muted-foreground text-sm">{tr("The full answer script becomes available once the exam closes.")}</p>
           <Button asChild className="w-full">
-            <Link to="/app/my-online-exams">Back to exams</Link>
+            <Link to="/app/my-online-exams">{tr("Back to exams")}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -111,13 +111,13 @@ export function TakeExamPage() {
   const urgent = left < 120;
   const confirmSubmit = () =>
     confirmAction({
-      title: "Submit exam?",
+      title: tr("Submit exam?"),
       description:
         answered < total
-          ? `You have answered ${answered} of ${total} questions. You cannot change answers after submitting.`
-          : "You cannot change answers after submitting.",
-      confirmLabel: "Submit",
-      cancelLabel: "Keep working",
+          ? tr("You have answered {answered} of {total} questions. You cannot change answers after submitting.", { answered, total })
+          : tr("You cannot change answers after submitting."),
+      confirmLabel: tr("Submit"),
+      cancelLabel: tr("Keep working"),
       destructive: false,
       onConfirm: () => submit.mutate(undefined),
     });
@@ -129,15 +129,14 @@ export function TakeExamPage() {
           <div className="min-w-0">
             <h1 className="truncate text-lg font-semibold">{paper.exam.title}</h1>
             <p className="text-muted-foreground truncate text-xs">
-              {paper.exam.subject_name} · {total} questions · {paper.exam.total_mark} marks
-            </p>
+              {tn("{subject_name} · {total} questions · {total_mark} marks", { subject_name: paper.exam.subject_name, total, total_mark: paper.exam.total_mark })}</p>
           </div>
           <div
             className={cn(
               "flex shrink-0 items-center gap-1.5 rounded-md border px-3 py-1.5 font-mono text-lg font-semibold tabular-nums",
               urgent ? "border-destructive/40 bg-destructive/10 text-destructive animate-pulse" : "bg-muted",
             )}
-            aria-label="Time left"
+            aria-label={tr("Time left")}
           >
             <ClockIcon className="size-4" />
             {Math.floor(secs / 60)}:{String(secs % 60).padStart(2, "0")}
@@ -146,8 +145,7 @@ export function TakeExamPage() {
         <div className="mt-3 flex items-center gap-3">
           <Progress value={total ? (answered / total) * 100 : 0} className="flex-1" />
           <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
-            {answered}/{total} answered
-          </span>
+            {tn("{answered}/{total} answered", { answered, total })}</span>
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {paper.questions.map((q, i) => (
@@ -159,7 +157,7 @@ export function TakeExamPage() {
                 "size-7 rounded-md border text-xs font-medium transition-colors",
                 isAnswered(q.question_bank_id) ? "border-primary bg-primary text-primary-foreground" : "hover:bg-accent",
               )}
-              aria-label={`Question ${i + 1}${isAnswered(q.question_bank_id) ? " (answered)" : ""}`}
+              aria-label={(isAnswered(q.question_bank_id) ? tr("Question {number} (answered)", { number: i + 1 }) : tr("Question {number}", { number: i + 1 }))}
             >
               {i + 1}
             </button>
@@ -170,7 +168,7 @@ export function TakeExamPage() {
       {paper.exam.instruction && (
         <Alert className="mb-4">
           <CircleAlertIcon />
-          <AlertTitle>Instructions</AlertTitle>
+          <AlertTitle>{tr("Instructions")}</AlertTitle>
           <AlertDescription className="whitespace-pre-wrap">{paper.exam.instruction}</AlertDescription>
         </Alert>
       )}
@@ -180,8 +178,8 @@ export function TakeExamPage() {
           <Card key={q.question_bank_id} id={`q-${q.question_bank_id}`} className="scroll-mt-48 gap-4">
             <CardHeader>
               <CardDescription className="flex items-center justify-between">
-                <span>Question {i + 1}</span>
-                <Badge variant="outline">{q.mark} marks</Badge>
+                <span>{tn("Question {value}", { value: i + 1 })}</span>
+                <Badge variant="outline">{tn("{mark} marks", { mark: q.mark })}</Badge>
               </CardDescription>
               <CardTitle className="leading-snug">{blankify(q.question_title)}</CardTitle>
             </CardHeader>
@@ -239,8 +237,8 @@ export function TakeExamPage() {
                   {Array.from({ length: q.blanks }, (_, j) => (
                     <Input
                       key={j}
-                      placeholder={`Blank ${j + 1}`}
-                      aria-label={`Blank ${j + 1}`}
+                      placeholder={tr("Blank {value}", { value: j + 1 })}
+                      aria-label={tr("Blank {value}", { value: j + 1 })}
                       value={answers[q.question_bank_id]?.[j] ?? ""}
                       onChange={(e) => {
                         const next = [...(answers[q.question_bank_id] ?? Array(q.blanks).fill(""))];
@@ -257,12 +255,10 @@ export function TakeExamPage() {
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
         <p className="text-muted-foreground text-sm">
-          {answered} of {total} questions answered
-        </p>
+          {tn("{answered} of {total} questions answered", { answered, total })}</p>
         <Button size="lg" loading={submit.isPending} onClick={confirmSubmit}>
           <SendIcon />
-          Submit exam
-        </Button>
+          {tr("Submit exam")}</Button>
       </div>
     </div>
   );

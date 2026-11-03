@@ -30,32 +30,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Textarea } from "../components/ui/textarea";
 import { cn } from "../lib/utils";
 import { toOptions } from "../utils";
+import { t, tn, tp } from "../i18n";
 
 const STATUS: Record<AdmissionStatus, [string, string]> = {
-  new: ["New", "bg-primary/10 text-primary"],
-  reviewing: ["Reviewing", "bg-warning/20 text-amber-700 dark:text-amber-300"],
-  accepted: ["Accepted", "bg-success/15 text-success"],
-  rejected: ["Rejected", "bg-destructive/10 text-destructive"],
-  enrolled: ["Enrolled", "bg-chart-2/15 text-chart-2"],
-  withdrawn: ["Withdrawn", "bg-muted text-muted-foreground"],
+  new: [t("New"), "bg-primary/10 text-primary"],
+  reviewing: [t("Reviewing"), "bg-warning/20 text-amber-700 dark:text-amber-300"],
+  accepted: [t("Accepted"), "bg-success/15 text-success"],
+  rejected: [t("Rejected"), "bg-destructive/10 text-destructive"],
+  enrolled: [t("Enrolled"), "bg-chart-2/15 text-chart-2"],
+  withdrawn: [t("Withdrawn"), "bg-muted text-muted-foreground"],
 };
 const STATUS_OPTIONS = Object.entries(STATUS).map(([value, [label]]) => ({ value, label }));
-const SOURCE_LABEL: Record<AdmissionApplication["source"], string> = { online: "Online", office: "Office", enquiry: "Enquiry" };
+const SOURCE_LABEL: Record<AdmissionApplication["source"], string> = { online: t("Online"), office: t("Office"), enquiry: t("Enquiry") };
 const ENQUIRY_SOURCES = [
-  { value: "walk-in", label: "Walk-in" },
-  { value: "phone", label: "Phone" },
-  { value: "website", label: "Website" },
-  { value: "other", label: "Other" },
+  { value: "walk-in", label: t("Walk-in") },
+  { value: "phone", label: t("Phone") },
+  { value: "website", label: t("Website") },
+  { value: "other", label: t("Other") },
 ];
 const ENQUIRY_STATUS = [
-  { value: "open", label: "Open" },
-  { value: "converted", label: "Converted" },
-  { value: "closed", label: "Closed" },
+  { value: "open", label: t("Open") },
+  { value: "converted", label: t("Converted") },
+  { value: "closed", label: t("Closed") },
 ];
 const GENDERS = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
+  { value: "male", label: t("Male") },
+  { value: "female", label: t("Female") },
+  { value: "other", label: t("Other") },
 ];
 const INVALIDATE = [["/admissions"], ["/admissions/summary"], ["/enquiries"]];
 
@@ -70,7 +71,7 @@ function AdmissionSettingsBar({ isAdmin }: { isAdmin: boolean }) {
   const years = useGet<{ years: string[] }>("/academic-years");
   const summary = useGet<{ year: string; counts: Record<AdmissionStatus, number> }>("/admissions/summary");
   const save = useAction((v: { open: boolean; year: string }) => api.put("/admissions/settings", v), {
-    success: "Admission settings saved",
+    success: t("Admission settings saved"),
     invalidate: [["/admissions/settings"], ["/admissions/summary"]],
   });
   const s = settings.data;
@@ -80,9 +81,9 @@ function AdmissionSettingsBar({ isAdmin }: { isAdmin: boolean }) {
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex items-center gap-2 pb-2">
             <Switch id="adm-open" disabled={!isAdmin || !s} checked={!!s?.open} onCheckedChange={(open) => s && save.mutate({ ...s, open })} />
-            <Label htmlFor="adm-open">Online applications open</Label>
+            <Label htmlFor="adm-open">{t("Online applications open")}</Label>
           </div>
-          <Field label="Admission year" className="w-40">
+          <Field label={t("Admission year")} className="w-40">
             <Combobox
               disabled={!isAdmin || !s}
               data={[...new Set([...(years.data?.years ?? []), ...(s ? [s.year] : [])])].sort().map((y) => ({ value: y, label: y }))}
@@ -136,38 +137,38 @@ function ApplicationForm({ application, onDone }: { application: AdmissionApplic
       const r = application ? await api.put(`/admissions/${application.application_id}`, body) : await api.post("/admissions", body);
       return r.data as AdmissionApplication;
     },
-    { success: "Saved", invalidate: INVALIDATE, onSuccess: onDone },
+    { success: t("Saved"), invalidate: INVALIDATE, onSuccess: onDone },
   );
   const text = (name: keyof ApplicationValues, label: string, opts: { required?: boolean; className?: string; type?: string } = {}) => (
     <Field label={label} htmlFor={`app-${name}`} required={opts.required} error={errors[name]?.message} className={opts.className}>
-      <Input id={`app-${name}`} type={opts.type} aria-invalid={!!errors[name]} {...form.register(name, opts.required ? { required: "Required" } : {})} />
+      <Input id={`app-${name}`} type={opts.type} aria-invalid={!!errors[name]} {...form.register(name, opts.required ? { required: t("Required") } : {})} />
     </Field>
   );
   return (
     <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        {text("student_name", "Student name", { required: true })}
-        <Controller control={form.control} name="class_id" rules={{ required: "Required" }} render={({ field }) => (
-          <Field label="Class applied for" required error={errors.class_id?.message}>
+        {text("student_name", t("Student name"), { required: true })}
+        <Controller control={form.control} name="class_id" rules={{ required: t("Required") }} render={({ field }) => (
+          <Field label={t("Class applied for")} required error={errors.class_id?.message}>
             <Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={field.value} onChange={field.onChange} />
           </Field>
         )} />
         <Controller control={form.control} name="date_of_birth" render={({ field }) => (
-          <Field label="Date of birth"><DatePicker value={field.value} onChange={field.onChange} /></Field>
+          <Field label={t("Date of birth")}><DatePicker value={field.value} onChange={field.onChange} /></Field>
         )} />
         <Controller control={form.control} name="gender" render={({ field }) => (
-          <Field label="Gender"><Combobox data={GENDERS} value={field.value} onChange={field.onChange} clearable /></Field>
+          <Field label={t("Gender")}><Combobox data={GENDERS} value={field.value} onChange={field.onChange} clearable /></Field>
         )} />
-        {text("previous_school", "Previous school", { className: "sm:col-span-2" })}
-        {text("guardian_name", "Guardian name", { required: true })}
-        {text("guardian_relation", "Relation")}
-        {text("guardian_phone", "Guardian phone", { required: true, type: "tel" })}
-        {text("guardian_email", "Guardian email", { type: "email" })}
+        {text("previous_school", t("Previous school"), { className: "sm:col-span-2" })}
+        {text("guardian_name", t("Guardian name"), { required: true })}
+        {text("guardian_relation", t("Relation"))}
+        {text("guardian_phone", t("Guardian phone"), { required: true, type: "tel" })}
+        {text("guardian_email", t("Guardian email"), { type: "email" })}
       </div>
-      <Field label="Address" htmlFor="app-address"><Textarea id="app-address" rows={2} {...form.register("address")} /></Field>
-      <Field label="Notes" htmlFor="app-notes"><Textarea id="app-notes" rows={2} {...form.register("notes")} /></Field>
+      <Field label={t("Address")} htmlFor="app-address"><Textarea id="app-address" rows={2} {...form.register("address")} /></Field>
+      <Field label={t("Notes")} htmlFor="app-notes"><Textarea id="app-notes" rows={2} {...form.register("notes")} /></Field>
       <DialogFooter>
-        <Button type="submit" loading={save.isPending}>Save</Button>
+        <Button type="submit" loading={save.isPending}>{t("Save")}</Button>
       </DialogFooter>
     </form>
   );  // prettier-ignore
@@ -200,44 +201,42 @@ function EnrollForm({ application, onDone }: { application: AdmissionApplication
         parent_email: v.parent_email.trim() || null,
         parent_password: v.parent_password || null,
       }),
-    { success: `${application.student_name} enrolled`, invalidate: [...INVALIDATE, ["/students"]], onSuccess: onDone },
+    { success: t("{student_name} enrolled", { student_name: application.student_name }), invalidate: [...INVALIDATE, ["/students"]], onSuccess: onDone },
   );
-  const password = { minLength: { value: 8, message: "At least 8 characters" } };
+  const password = { minLength: { value: 8, message: t("At least 8 characters") } };
   return (
     <form onSubmit={form.handleSubmit((v) => enroll.mutate(v))} className="grid gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Controller control={form.control} name="section_id" rules={{ required: "Required" }} render={({ field }) => (
-          <Field label={`Section of class ${application.class_name ?? ""}`} required error={errors.section_id?.message}>
+        <Controller control={form.control} name="section_id" rules={{ required: t("Required") }} render={({ field }) => (
+          <Field label={t("Section of class {value}", { value: application.class_name ?? "" })} required error={errors.section_id?.message}>
             <Combobox data={toOptions(sections.data?.items, "section_id", "name")} value={field.value} onChange={field.onChange} />
           </Field>
         )} />
-        <Field label="Roll" htmlFor="enr-roll" description="Empty: next free roll number">
+        <Field label={t("Roll")} htmlFor="enr-roll" description={t("Empty: next free roll number")}>
           <Input id="enr-roll" type="number" min={1} {...form.register("roll")} />
         </Field>
-        <Field label="Student login email" htmlFor="enr-semail" required error={errors.student_email?.message}>
-          <Input id="enr-semail" type="email" aria-invalid={!!errors.student_email} {...form.register("student_email", { required: "Required" })} />
+        <Field label={t("Student login email")} htmlFor="enr-semail" required error={errors.student_email?.message}>
+          <Input id="enr-semail" type="email" aria-invalid={!!errors.student_email} {...form.register("student_email", { required: t("Required") })} />
         </Field>
-        <Field label="Student password" htmlFor="enr-spass" required error={errors.student_password?.message}>
-          <Input id="enr-spass" type="password" autoComplete="new-password" aria-invalid={!!errors.student_password} {...form.register("student_password", { required: "Required", ...password })} />
+        <Field label={t("Student password")} htmlFor="enr-spass" required error={errors.student_password?.message}>
+          <Input id="enr-spass" type="password" autoComplete="new-password" aria-invalid={!!errors.student_password} {...form.register("student_password", { required: t("Required"), ...password })} />
         </Field>
       </div>
       <Separator />
       <p className="text-muted-foreground text-sm">
-        Parent account: an existing parent with this email is linked to the student. Otherwise a new parent account is created with the password below. Leave the email empty for none.
-      </p>
+        {t("Parent account: an existing parent with this email is linked to the student. Otherwise a new parent account is created with the password below. Leave the email empty for none.")}</p>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Parent email" htmlFor="enr-pemail">
+        <Field label={t("Parent email")} htmlFor="enr-pemail">
           <Input id="enr-pemail" type="email" {...form.register("parent_email")} />
         </Field>
-        <Field label="New parent password" htmlFor="enr-ppass" error={errors.parent_password?.message}>
+        <Field label={t("New parent password")} htmlFor="enr-ppass" error={errors.parent_password?.message}>
           <Input id="enr-ppass" type="password" autoComplete="new-password" {...form.register("parent_password", password)} />
         </Field>
       </div>
       <DialogFooter>
         <Button type="submit" loading={enroll.isPending}>
           <GraduationCapIcon />
-          Enrol
-        </Button>
+          {t("Enrol")}</Button>
       </DialogFooter>
     </form>
   );  // prettier-ignore
@@ -254,7 +253,7 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
   const invalidate = [...INVALIDATE, [`/admissions/${id}`]];
   const saveStatus = useAction(
     () => api.post(`/admissions/${id}/status`, { status, note: note.trim() || null, notify }),
-    { success: "Status updated", invalidate, onSuccess: () => setStatus(null) },
+    { success: t("Status updated"), invalidate, onSuccess: () => setStatus(null) },
   );
   const upload = useAction(
     (file: File) => {
@@ -263,23 +262,23 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
       body.append("label", label.trim() || "Document");
       return api.post(`/admissions/${id}/documents`, body);
     },
-    { success: "Document added", invalidate, onSuccess: () => setLabel("") },
+    { success: t("Document added"), invalidate, onSuccess: () => setLabel("") },
   );
-  const removeDoc = useAction((docId: number) => api.delete(`/admissions/${id}/documents/${docId}`), { success: "Document removed", invalidate });
+  const removeDoc = useAction((docId: number) => api.delete(`/admissions/${id}/documents/${docId}`), { success: t("Document removed"), invalidate });
 
   if (!a) return null;
   const enrolled = a.status === "enrolled";
   const rows: [string, React.ReactNode][] = [
-    ["Class", `${a.class_name ?? a.class_id} · ${a.year}`],
-    ["Date of birth", a.date_of_birth ? dayjs(a.date_of_birth).format("DD MMM YYYY") : null],
-    ["Gender", a.gender],
-    ["Previous school", a.previous_school],
-    ["Guardian", [a.guardian_name, a.guardian_relation && `(${a.guardian_relation})`].filter(Boolean).join(" ")],
-    ["Phone", a.guardian_phone],
-    ["Email", a.guardian_email],
-    ["Address", a.address],
-    ["Notes", a.notes],
-    ["Received", `${dayjs(a.created_at).format("DD MMM YYYY HH:mm")} · ${SOURCE_LABEL[a.source] ?? a.source}`],
+    [t("Class"), `${a.class_name ?? a.class_id} · ${a.year}`],
+    [t("Date of birth"), a.date_of_birth ? dayjs(a.date_of_birth).format("DD MMM YYYY") : null],
+    [t("Gender"), a.gender],
+    [t("Previous school"), a.previous_school],
+    [t("Guardian"), [a.guardian_name, a.guardian_relation && `(${a.guardian_relation})`].filter(Boolean).join(" ")],
+    [t("Phone"), a.guardian_phone],
+    [t("Email"), a.guardian_email],
+    [t("Address"), a.address],
+    [t("Notes"), a.notes],
+    [t("Received"), `${dayjs(a.created_at).format("DD MMM YYYY HH:mm")} · ${SOURCE_LABEL[a.source] ?? a.source}`],
   ];
 
   return (
@@ -290,8 +289,7 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
         {isAdmin && !enrolled && (
           <Button size="sm" variant="outline" className="ml-auto" onClick={() => onEdit(a)}>
             <PencilIcon />
-            Edit
-          </Button>
+            {t("Edit")}</Button>
         )}
       </div>
       <dl className="grid grid-cols-[8rem_1fr] gap-x-4 gap-y-2 text-sm">
@@ -304,21 +302,21 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
       </dl>
       {a.status_note && (
         <p className="bg-muted rounded-md p-3 text-sm">
-          <span className="font-medium">Note: </span>
+          <span className="font-medium">{t("Note:")}{" "}</span>
           {a.status_note}
         </p>
       )}
 
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold">Documents</h3>
-        {(a.documents ?? []).length === 0 && <p className="text-muted-foreground text-sm">No documents</p>}
+        <h3 className="text-sm font-semibold">{t("Documents")}</h3>
+        {(a.documents ?? []).length === 0 && <p className="text-muted-foreground text-sm">{t("No documents")}</p>}
         {(a.documents ?? []).map((d) => (
           <div key={d.document_id} className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
             <FileTextIcon className="text-muted-foreground size-4" />
             <a href={d.url ?? undefined} target="_blank" rel="noreferrer" className="hover:underline">{d.label}</a>
             <span className="text-muted-foreground truncate text-xs">{d.file_name.replace(/^[0-9a-f]{12}_/, "")}</span>
             {isAdmin && !enrolled && (
-              <IconAction label="Remove document" destructive onClick={() => confirmAction({ title: `Remove "${d.label}"?`, onConfirm: () => removeDoc.mutate(d.document_id) })}>
+              <IconAction label={t("Remove document")} destructive onClick={() => confirmAction({ title: t("Remove \"{label}\"?", { label: d.label }), onConfirm: () => removeDoc.mutate(d.document_id) })}>
                 <Trash2Icon />
               </IconAction>
             )}
@@ -326,13 +324,12 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
         ))}
         {isAdmin && !enrolled && (
           <div className="flex flex-wrap gap-2">
-            <Input className="w-56" placeholder="Label, e.g. Birth certificate" value={label} onChange={(e) => setLabel(e.target.value)} />
+            <Input className="w-56" placeholder={t("Label, e.g. Birth certificate")} value={label} onChange={(e) => setLabel(e.target.value)} />
             <FileButton accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" onChange={(f) => f && upload.mutate(f)}>
               {(props) => (
                 <Button {...props} variant="outline" loading={upload.isPending}>
                   <UploadIcon />
-                  Upload
-                </Button>
+                  {t("Upload")}</Button>
               )}
             </FileButton>
           </div>
@@ -341,29 +338,27 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
 
       {isAdmin && !enrolled && (
         <div className="space-y-3 rounded-lg border p-4">
-          <h3 className="text-sm font-semibold">Decision</h3>
+          <h3 className="text-sm font-semibold">{t("Decision")}</h3>
           <Combobox data={STATUS_OPTIONS.filter((o) => o.value !== "enrolled")} value={status ?? a.status} onChange={setStatus} />
-          <Textarea rows={2} placeholder="Note (sent to the guardian with an acceptance or rejection)" value={note} onChange={(e) => setNote(e.target.value)} />
+          <Textarea rows={2} placeholder={t("Note (sent to the guardian with an acceptance or rejection)")} value={note} onChange={(e) => setNote(e.target.value)} />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Switch id="adm-notify" checked={notify} onCheckedChange={setNotify} />
-              <Label htmlFor="adm-notify">Email the guardian</Label>
+              <Label htmlFor="adm-notify">{t("Email the guardian")}</Label>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" disabled={!status || status === a.status} loading={saveStatus.isPending} onClick={() => saveStatus.mutate(undefined)}>
-                Save status
-              </Button>
+                {t("Save status")}</Button>
               {a.status === "accepted" && (
                 <Button onClick={() => onEnroll(a)}>
                   <GraduationCapIcon />
-                  Enrol student
-                </Button>
+                  {t("Enrol student")}</Button>
               )}
             </div>
           </div>
         </div>
       )}
-      {enrolled && <p className="text-muted-foreground text-sm">Enrolled as student #{a.student_id}{a.parent_id ? `, parent #${a.parent_id}` : ""}.</p>}
+      {enrolled && <p className="text-muted-foreground text-sm">{tn("Enrolled as student #{student_id}{value}.", { student_id: a.student_id, value: a.parent_id ? t(", parent #{parent_id}", { parent_id: a.parent_id }) : "" })}</p>}
     </div>
   );
 }
@@ -388,38 +383,37 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
     <>
       <Card className="gap-0 overflow-hidden py-0">
         <div className="grid gap-3 border-b p-3 sm:grid-cols-[1fr_1fr_2fr_auto]">
-          <Combobox data={STATUS_OPTIONS} value={status} onChange={setStatus} clearable placeholder="All statuses" />
-          <Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} clearable placeholder="All classes" />
+          <Combobox data={STATUS_OPTIONS} value={status} onChange={setStatus} clearable placeholder={t("All statuses")} />
+          <Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} clearable placeholder={t("All classes")} />
           <div className="relative">
             <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-            <Input placeholder="Reference, student, guardian or phone" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
+            <Input placeholder={t("Reference, student, guardian or phone")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
           </div>
           {isAdmin && (
             <Button onClick={() => setEditing("new")}>
               <PlusIcon />
-              New application
-            </Button>
+              {t("New application")}</Button>
           )}
         </div>
         <Table className="min-w-[800px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Reference</TableHead>
-              <TableHead>Student</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Guardian</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Received</TableHead>
+              <TableHead>{t("Reference")}</TableHead>
+              <TableHead>{t("Student")}</TableHead>
+              <TableHead>{t("Class")}</TableHead>
+              <TableHead>{t("Guardian")}</TableHead>
+              <TableHead>{t("Status")}</TableHead>
+              <TableHead>{t("Received")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={6} emptyText="No applications" />
+            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={6} emptyText={t("No applications")} />
             {rows.map((a) => (
               <TableRow key={a.application_id} className="cursor-pointer" onClick={() => setViewing(a.application_id)}>
                 <TableCell className="font-mono text-xs">{a.reference}</TableCell>
                 <TableCell className="font-medium">
                   {a.student_name}
-                  {a.document_count > 0 && <span className="text-muted-foreground ml-2 text-xs">{a.document_count} doc{a.document_count > 1 ? "s" : ""}</span>}
+                  {a.document_count > 0 && <span className="text-muted-foreground ml-2 text-xs">{tp(a.document_count, "{count} doc", "{count} docs")}</span>}
                 </TableCell>
                 <TableCell>{a.class_name ?? <Dash />}</TableCell>
                 <TableCell>
@@ -441,8 +435,8 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
       <Sheet open={viewing !== null} onOpenChange={(open) => !open && setViewing(null)}>
         <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
           <SheetHeader>
-            <SheetTitle>Application</SheetTitle>
-            <SheetDescription>Details, documents and decision.</SheetDescription>
+            <SheetTitle>{t("Application")}</SheetTitle>
+            <SheetDescription>{t("Details, documents and decision.")}</SheetDescription>
           </SheetHeader>
           {viewing !== null && <ApplicationDetail id={viewing} isAdmin={isAdmin} onEdit={setEditing} onEnroll={setEnrolling} />}
         </SheetContent>
@@ -450,8 +444,8 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
       <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editing === "new" ? "New application" : "Edit application"}</DialogTitle>
-            {editing === "new" && <DialogDescription>For paper forms and walk-in applicants.</DialogDescription>}
+            <DialogTitle>{editing === "new" ? t("New application") : t("Edit application")}</DialogTitle>
+            {editing === "new" && <DialogDescription>{t("For paper forms and walk-in applicants.")}</DialogDescription>}
           </DialogHeader>
           {editing !== null && (
             <ApplicationForm
@@ -468,8 +462,8 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
       <Dialog open={enrolling !== null} onOpenChange={(open) => !open && setEnrolling(null)}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Enrol {enrolling?.student_name}</DialogTitle>
-            <DialogDescription>Creates the student account and enrols the student for {enrolling?.year}.</DialogDescription>
+            <DialogTitle>{tn("Enrol {student_name}", { student_name: enrolling?.student_name })}</DialogTitle>
+            <DialogDescription>{tn("Creates the student account and enrols the student for {year}.", { year: enrolling?.year })}</DialogDescription>
           </DialogHeader>
           {enrolling && <EnrollForm application={enrolling} onDone={() => setEnrolling(null)} />}
         </DialogContent>
@@ -500,35 +494,35 @@ function EnquiryForm({ enquiry, onDone }: { enquiry: Enquiry | null; onDone: () 
       };  // prettier-ignore
       return enquiry ? api.put(`/enquiries/${enquiry.enquiry_id}`, body) : api.post("/enquiries", body);
     },
-    { success: "Saved", invalidate: [["/enquiries"]], onSuccess: onDone },
+    { success: t("Saved"), invalidate: [["/enquiries"]], onSuccess: onDone },
   );
   return (
     <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Name" htmlFor="enq-name" required error={errors.name?.message}>
-          <Input id="enq-name" aria-invalid={!!errors.name} {...form.register("name", { required: "Required" })} />
+        <Field label={t("Name")} htmlFor="enq-name" required error={errors.name?.message}>
+          <Input id="enq-name" aria-invalid={!!errors.name} {...form.register("name", { required: t("Required") })} />
         </Field>
-        <Field label="Phone" htmlFor="enq-phone"><Input id="enq-phone" type="tel" {...form.register("phone")} /></Field>
-        <Field label="Email" htmlFor="enq-email"><Input id="enq-email" type="email" {...form.register("email")} /></Field>
+        <Field label={t("Phone")} htmlFor="enq-phone"><Input id="enq-phone" type="tel" {...form.register("phone")} /></Field>
+        <Field label={t("Email")} htmlFor="enq-email"><Input id="enq-email" type="email" {...form.register("email")} /></Field>
         <Controller control={form.control} name="class_id" render={({ field }) => (
-          <Field label="Class of interest"><Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={field.value} onChange={field.onChange} clearable /></Field>
+          <Field label={t("Class of interest")}><Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={field.value} onChange={field.onChange} clearable /></Field>
         )} />
         <Controller control={form.control} name="source" render={({ field }) => (
-          <Field label="Source"><Combobox data={ENQUIRY_SOURCES} value={field.value} onChange={(v) => field.onChange(v ?? "walk-in")} /></Field>
+          <Field label={t("Source")}><Combobox data={ENQUIRY_SOURCES} value={field.value} onChange={(v) => field.onChange(v ?? "walk-in")} /></Field>
         )} />
         <Controller control={form.control} name="follow_up_on" render={({ field }) => (
-          <Field label="Follow up on"><DatePicker value={field.value} onChange={field.onChange} /></Field>
+          <Field label={t("Follow up on")}><DatePicker value={field.value} onChange={field.onChange} /></Field>
         )} />
         {enquiry && (
           <Controller control={form.control} name="status" render={({ field }) => (
-            <Field label="Status"><Combobox data={ENQUIRY_STATUS} value={field.value} onChange={(v) => field.onChange(v ?? "open")} /></Field>
+            <Field label={t("Status")}><Combobox data={ENQUIRY_STATUS} value={field.value} onChange={(v) => field.onChange(v ?? "open")} /></Field>
           )} />
         )}
       </div>
-      <Field label="Notes" htmlFor="enq-notes"><Textarea id="enq-notes" rows={3} {...form.register("notes")} /></Field>
+      <Field label={t("Notes")} htmlFor="enq-notes"><Textarea id="enq-notes" rows={3} {...form.register("notes")} /></Field>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={save.isPending}>Save</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("Cancel")}</Button>
+        <Button type="submit" loading={save.isPending}>{t("Save")}</Button>
       </DialogFooter>
     </form>
   );  // prettier-ignore
@@ -540,21 +534,20 @@ function ConvertForm({ enquiry, onDone }: { enquiry: Enquiry; onDone: () => void
   const [classId, setClassId] = useState<string | null>(enquiry.class_id ? String(enquiry.class_id) : null);
   const convert = useAction(
     () => api.post(`/enquiries/${enquiry.enquiry_id}/convert`, { student_name: studentName.trim(), class_id: classId ? Number(classId) : null }),
-    { success: "Application created", invalidate: INVALIDATE, onSuccess: onDone },
+    { success: t("Application created"), invalidate: INVALIDATE, onSuccess: onDone },
   );
   return (
     <div className="grid gap-4">
-      <Field label="Student name" htmlFor="conv-name" required>
+      <Field label={t("Student name")} htmlFor="conv-name" required>
         <Input id="conv-name" value={studentName} onChange={(e) => setStudentName(e.target.value)} />
       </Field>
-      <Field label="Class applied for" required>
+      <Field label={t("Class applied for")} required>
         <Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} />
       </Field>
       <DialogFooter>
         <Button disabled={!studentName.trim() || !classId} loading={convert.isPending} onClick={() => convert.mutate(undefined)}>
           <ArrowRightLeftIcon />
-          Create application
-        </Button>
+          {t("Create application")}</Button>
       </DialogFooter>
     </div>
   );
@@ -570,7 +563,7 @@ function Enquiries({ isAdmin }: { isAdmin: boolean }) {
   });  // prettier-ignore
   const [editing, setEditing] = useState<Enquiry | "new" | null>(null);
   const [converting, setConverting] = useState<Enquiry | null>(null);
-  const remove = useAction((id: number) => api.delete(`/enquiries/${id}`), { success: "Deleted", invalidate: [["/enquiries"]] });
+  const remove = useAction((id: number) => api.delete(`/enquiries/${id}`), { success: t("Deleted"), invalidate: [["/enquiries"]] });
   const today = dayjs().format("YYYY-MM-DD");
   const rows = data?.items ?? [];
 
@@ -580,34 +573,33 @@ function Enquiries({ isAdmin }: { isAdmin: boolean }) {
         <div className="flex flex-wrap items-center gap-3 border-b p-3">
           <div className="flex items-center gap-2">
             <Switch id="enq-due" checked={due} onCheckedChange={setDue} />
-            <Label htmlFor="enq-due">Follow-ups due</Label>
+            <Label htmlFor="enq-due">{t("Follow-ups due")}</Label>
           </div>
-          <Combobox className="w-40" disabled={due} data={ENQUIRY_STATUS} value={status} onChange={setStatus} clearable placeholder="All" />
+          <Combobox className="w-40" disabled={due} data={ENQUIRY_STATUS} value={status} onChange={setStatus} clearable placeholder={t("All")} />
           <div className="relative min-w-56 flex-1">
             <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-            <Input placeholder="Name, phone or email" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
+            <Input placeholder={t("Name, phone or email")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
           </div>
           {isAdmin && (
             <Button onClick={() => setEditing("new")}>
               <PlusIcon />
-              New enquiry
-            </Button>
+              {t("New enquiry")}</Button>
           )}
         </div>
         <Table className="min-w-[760px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Follow up</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>{t("Name")}</TableHead>
+              <TableHead>{t("Contact")}</TableHead>
+              <TableHead>{t("Class")}</TableHead>
+              <TableHead>{t("Source")}</TableHead>
+              <TableHead>{t("Follow up")}</TableHead>
+              <TableHead>{t("Status")}</TableHead>
               {isAdmin && <TableHead className="w-28" />}
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={isAdmin ? 7 : 6} emptyText={due ? "No follow-ups due" : "No enquiries"} />
+            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={isAdmin ? 7 : 6} emptyText={due ? t("No follow-ups due") : t("No enquiries")} />
             {rows.map((e) => (
               <TableRow key={e.enquiry_id} className="align-top">
                 <TableCell>
@@ -628,10 +620,10 @@ function Enquiries({ isAdmin }: { isAdmin: boolean }) {
                   <TableCell>
                     <div className="flex justify-end gap-1">
                       {!e.application_id && (
-                        <IconAction label="Convert to application" onClick={() => setConverting(e)}><ArrowRightLeftIcon /></IconAction>
+                        <IconAction label={t("Convert to application")} onClick={() => setConverting(e)}><ArrowRightLeftIcon /></IconAction>
                       )}
-                      <IconAction label="Edit" onClick={() => setEditing(e)}><PencilIcon /></IconAction>
-                      <IconAction label="Delete" destructive onClick={() => confirmAction({ title: `Delete enquiry from ${e.name}?`, onConfirm: () => remove.mutate(e.enquiry_id) })}>
+                      <IconAction label={t("Edit")} onClick={() => setEditing(e)}><PencilIcon /></IconAction>
+                      <IconAction label={t("Delete")} destructive onClick={() => confirmAction({ title: t("Delete enquiry from {name}?", { name: e.name }), onConfirm: () => remove.mutate(e.enquiry_id) })}>
                         <Trash2Icon />
                       </IconAction>
                     </div>
@@ -647,7 +639,7 @@ function Enquiries({ isAdmin }: { isAdmin: boolean }) {
       <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editing === "new" ? "New enquiry" : "Edit enquiry"}</DialogTitle>
+            <DialogTitle>{editing === "new" ? t("New enquiry") : t("Edit enquiry")}</DialogTitle>
           </DialogHeader>
           {editing !== null && <EnquiryForm key={editing === "new" ? "new" : editing.enquiry_id} enquiry={editing === "new" ? null : editing} onDone={() => setEditing(null)} />}
         </DialogContent>
@@ -655,8 +647,8 @@ function Enquiries({ isAdmin }: { isAdmin: boolean }) {
       <Dialog open={converting !== null} onOpenChange={(open) => !open && setConverting(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Start an application</DialogTitle>
-            <DialogDescription>{converting?.name} becomes the guardian on the application.</DialogDescription>
+            <DialogTitle>{t("Start an application")}</DialogTitle>
+            <DialogDescription>{tn("{name} becomes the guardian on the application.", { name: converting?.name })}</DialogDescription>
           </DialogHeader>
           {converting && <ConvertForm enquiry={converting} onDone={() => setConverting(null)} />}
         </DialogContent>
@@ -670,12 +662,12 @@ export function AdmissionsPage() {
   const isAdmin = user.role === "admin";
   return (
     <div className="space-y-6">
-      <PageHeader title="Admissions" subtitle="Online and office applications, decisions and enrolment, and enquiries to follow up." />
+      <PageHeader title={t("Admissions")} subtitle={t("Online and office applications, decisions and enrolment, and enquiries to follow up.")} />
       <AdmissionSettingsBar isAdmin={isAdmin} />
       <Tabs defaultValue="applications" className="gap-6">
         <TabsList>
-          <TabsTrigger value="applications">Applications</TabsTrigger>
-          <TabsTrigger value="enquiries">Enquiries</TabsTrigger>
+          <TabsTrigger value="applications">{t("Applications")}</TabsTrigger>
+          <TabsTrigger value="enquiries">{t("Enquiries")}</TabsTrigger>
         </TabsList>
         <TabsContent value="applications">
           <Applications isAdmin={isAdmin} />

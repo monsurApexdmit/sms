@@ -33,6 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Textarea } from "../components/ui/textarea";
 import { cn } from "../lib/utils";
 import { fromUnix } from "../utils";
+import { t as tr } from "../i18n";
 
 type Dict = Record<string, string | null>;
 const MASK = "********";
@@ -43,7 +44,7 @@ function useSettingsForm(source: Dict | undefined, path: string, invalidate: str
     if (source) setValues(source);
   }, [source]);
   const save = useAction((keys: string[]) => api.put(path, Object.fromEntries(keys.map((k) => [k, values[k] ?? null]))), {
-    success: "Settings saved",
+    success: tr("Settings saved"),
     invalidate,
   });
   const set = (key: string, value: string | null) => setValues((v) => ({ ...v, [key]: value }));
@@ -77,7 +78,7 @@ function SettingsCard({ title, description, children, footer }: { title: string;
   );
 }
 
-function SaveButton({ loading, onClick, label = "Save" }: { loading: boolean; onClick: () => void; label?: string }) {
+function SaveButton({ loading, onClick, label = tr("Save") }: { loading: boolean; onClick: () => void; label?: string }) {
   return (
     <Button loading={loading} onClick={onClick}>
       <SaveIcon />
@@ -94,7 +95,7 @@ function SecretInput({ id, value, onChange }: { id: string; value: string | null
       type="password"
       autoComplete="new-password"
       value={value ?? ""}
-      placeholder="Not set"
+      placeholder={tr("Not set")}
       onFocus={(e) => value === MASK && e.target.select()}
       onChange={(e) => onChange(e.target.value)}
     />
@@ -102,10 +103,10 @@ function SecretInput({ id, value, onChange }: { id: string; value: string | null
 }
 
 // API weekday numbers: Monday = 0
-const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((label, i) => ({ value: String(i), label }));
+const WEEKDAYS = [tr("Monday"), tr("Tuesday"), tr("Wednesday"), tr("Thursday"), tr("Friday"), tr("Saturday"), tr("Sunday")].map((label, i) => ({ value: String(i), label }));
 const MFA_ROLES = ["admin", "accountant", "librarian", "teacher", "parent", "student"].map((r) => ({ value: r, label: r[0].toUpperCase() + r.slice(1) }));
 
-const secretHint = (value: string | null | undefined) => (value === MASK ? "Saved; type to replace" : undefined);
+const secretHint = (value: string | null | undefined) => (value === MASK ? tr("Saved; type to replace") : undefined);
 
 export function SystemSettingsPage() {
   const { data } = useGet<Dict>("/settings");
@@ -119,7 +120,7 @@ export function SystemSettingsPage() {
     setPaypal(parseConfig((data as Record<string, unknown> | undefined)?.paypal));
   }, [data]);
   const saveStripe = useAction(() => api.put("/settings", { stripe_keys: JSON.stringify([stripe]) }), {
-    success: "Stripe settings saved",
+    success: tr("Stripe settings saved"),
     invalidate: [["/settings"], ["/settings/public"]],
   });
   const savePaypal = useAction(
@@ -134,7 +135,7 @@ export function SystemSettingsPage() {
           production_secret_key: paypal.production_secret_key ?? "",
         },
       }),
-    { success: "PayPal settings saved", invalidate: [["/settings"], ["/settings/public"]] },
+    { success: tr("PayPal settings saved"), invalidate: [["/settings"], ["/settings/public"]] },
   );
   const logo = useAction(
     (file: File) => {
@@ -142,7 +143,7 @@ export function SystemSettingsPage() {
       body.append("file", file);
       return api.post("/settings/logo", body);
     },
-    { success: "Logo updated", invalidate: [["/settings/public"]] },
+    { success: tr("Logo updated"), invalidate: [["/settings/public"]] },
   );
 
   const field = (key: string, label: string, secret = false) => {
@@ -162,23 +163,23 @@ export function SystemSettingsPage() {
   const providerTitle = (name: string, key: string) => (
     <div className="flex items-center gap-2">
       <h3 className="font-medium">{name}</h3>
-      {sms === key && <Badge className="bg-success/15 text-success border-transparent">Active</Badge>}
+      {sms === key && <Badge className="bg-success/15 text-success border-transparent">{tr("Active")}</Badge>}
     </div>
   );
 
   return (
     <>
-      <PageHeader title="System settings" subtitle="School details, messaging, email and online payments" />
+      <PageHeader title={tr("System settings")} subtitle={tr("School details, messaging, email and online payments")} />
       <Tabs defaultValue="general" className="gap-4">
         <div className="-mx-1 overflow-x-auto px-1">
           <TabsList>
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="sms">SMS</TabsTrigger>
-            <TabsTrigger value="email">Email (SMTP)</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
-            <TabsTrigger value="logo">Logo</TabsTrigger>
-            <TabsTrigger value="ai">AI assistant</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="general">{tr("General")}</TabsTrigger>
+            <TabsTrigger value="sms">{tr("SMS")}</TabsTrigger>
+            <TabsTrigger value="email">{tr("Email (SMTP)")}</TabsTrigger>
+            <TabsTrigger value="payments">{tr("Payments")}</TabsTrigger>
+            <TabsTrigger value="logo">{tr("Logo")}</TabsTrigger>
+            <TabsTrigger value="ai">{tr("AI assistant")}</TabsTrigger>
+            <TabsTrigger value="security">{tr("Security")}</TabsTrigger>
           </TabsList>
         </div>
 
@@ -188,57 +189,57 @@ export function SystemSettingsPage() {
 
         <TabsContent value="security" className="space-y-4">
           <SettingsCard
-            title="Two-factor authentication"
-            description="Roles that must use an authenticator app at sign-in. Their users set it up the next time they sign in."
+            title={tr("Two-factor authentication")}
+            description={tr("Roles that must use an authenticator app at sign-in. Their users set it up the next time they sign in.")}
             footer={saveBtn(["mfa_required_roles"])}
           >
-            <Field label="Required for" className="max-w-md">
+            <Field label={tr("Required for")} className="max-w-md">
               <MultiCombobox
                 data={MFA_ROLES}
                 value={(values.mfa_required_roles ?? "").split(",").filter(Boolean)}
                 onChange={(v) => set("mfa_required_roles", [...v].sort().join(","))}
-                placeholder="Nobody (optional for everyone)"
+                placeholder={tr("Nobody (optional for everyone)")}
               />
             </Field>
           </SettingsCard>
-          <SettingsCard title="Accounts using two-factor authentication" description="Reset someone who lost their phone so they can sign in again.">
+          <SettingsCard title={tr("Accounts using two-factor authentication")} description={tr("Reset someone who lost their phone so they can sign in again.")}>
             <TwoFactorUsers />
           </SettingsCard>
         </TabsContent>
 
         <TabsContent value="general">
           <SettingsCard
-            title="General"
-            description="Basic information shown across the system"
+            title={tr("General")}
+            description={tr("Basic information shown across the system")}
             footer={saveBtn(["system_name", "system_title", "address", "phone", "system_email", "currency", "running_year", "disable_frontend", "weekly_off_days"])}
           >
             <div className="grid gap-4 sm:grid-cols-2">
-              {field("system_name", "School name")}
-              {field("system_title", "System title")}
-              {field("address", "Address")}
-              {field("phone", "Phone")}
-              {field("system_email", "System email")}
-              {field("currency", "Currency code (e.g. usd, bdt)")}
-              <Field label="Running academic year" description="Changing this switches every screen to the new year">
+              {field("system_name", tr("School name"))}
+              {field("system_title", tr("System title"))}
+              {field("address", tr("Address"))}
+              {field("phone", tr("Phone"))}
+              {field("system_email", tr("System email"))}
+              {field("currency", tr("Currency code (e.g. usd, bdt)"))}
+              <Field label={tr("Running academic year")} description={tr("Changing this switches every screen to the new year")}>
                 <Combobox
                   data={(years.data?.years ?? []).map((y) => ({ value: y, label: y }))}
                   value={values.running_year ?? null}
                   onChange={(v) => set("running_year", v)}
                 />
               </Field>
-              <Field label="Weekly days off" description="Not counted as school days in attendance">
+              <Field label={tr("Weekly days off")} description={tr("Not counted as school days in attendance")}>
                 <MultiCombobox
                   data={WEEKDAYS}
                   value={(values.weekly_off_days ?? "").split(",").filter(Boolean)}
                   onChange={(v) => set("weekly_off_days", [...v].sort().join(","))}
-                  placeholder="None"
+                  placeholder={tr("None")}
                 />
               </Field>
-              <Field label="Public website">
+              <Field label={tr("Public website")}>
                 <Combobox
                   data={[
-                    { value: "0", label: "Enabled" },
-                    { value: "1", label: "Disabled" },
+                    { value: "0", label: tr("Enabled") },
+                    { value: "1", label: tr("Disabled") },
                   ]}
                   value={values.disable_frontend ?? "0"}
                   onChange={(v) => set("disable_frontend", v)}
@@ -250,8 +251,8 @@ export function SystemSettingsPage() {
 
         <TabsContent value="sms">
           <SettingsCard
-            title="SMS"
-            description="Gateway used for notices, attendance and exam result messages"
+            title={tr("SMS")}
+            description={tr("Gateway used for notices, attendance and exam result messages")}
             footer={saveBtn([
               "active_sms_service",
               "clickatell_user",
@@ -266,101 +267,101 @@ export function SystemSettingsPage() {
               "msg91_country_code",
             ])}
           >
-            <Field label="Active SMS service" className="sm:max-w-xs">
+            <Field label={tr("Active SMS service")} className="sm:max-w-xs">
               <Combobox
                 data={[
-                  { value: "disabled", label: "Disabled" },
-                  { value: "clickatell", label: "Clickatell" },
-                  { value: "twilio", label: "Twilio" },
-                  { value: "msg91", label: "MSG91" },
+                  { value: "disabled", label: tr("Disabled") },
+                  { value: "clickatell", label: tr("Clickatell") },
+                  { value: "twilio", label: tr("Twilio") },
+                  { value: "msg91", label: tr("MSG91") },
                 ]}
                 value={sms}
                 onChange={(v) => set("active_sms_service", v ?? "disabled")}
               />
             </Field>
             <Separator />
-            {providerTitle("Clickatell", "clickatell")}
+            {providerTitle(tr("Clickatell"), "clickatell")}
             <div className="grid gap-4 sm:grid-cols-3">
-              {field("clickatell_user", "Username")}
-              {field("clickatell_password", "Password", true)}
-              {field("clickatell_api_id", "API ID")}
+              {field("clickatell_user", tr("Username"))}
+              {field("clickatell_password", tr("Password"), true)}
+              {field("clickatell_api_id", tr("API ID"))}
             </div>
             <Separator />
-            {providerTitle("Twilio", "twilio")}
+            {providerTitle(tr("Twilio"), "twilio")}
             <div className="grid gap-4 sm:grid-cols-3">
-              {field("twilio_account_sid", "Account SID")}
-              {field("twilio_auth_token", "Auth token", true)}
-              {field("twilio_sender_phone_number", "Sender number")}
+              {field("twilio_account_sid", tr("Account SID"))}
+              {field("twilio_auth_token", tr("Auth token"), true)}
+              {field("twilio_sender_phone_number", tr("Sender number"))}
             </div>
             <Separator />
-            {providerTitle("MSG91", "msg91")}
+            {providerTitle(tr("MSG91"), "msg91")}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {field("msg91_authentication_key", "Auth key", true)}
-              {field("msg91_sender_ID", "Sender ID")}
-              {field("msg91_route", "Route")}
-              {field("msg91_country_code", "Country code")}
+              {field("msg91_authentication_key", tr("Auth key"), true)}
+              {field("msg91_sender_ID", tr("Sender ID"))}
+              {field("msg91_route", tr("Route"))}
+              {field("msg91_country_code", tr("Country code"))}
             </div>
           </SettingsCard>
         </TabsContent>
 
         <TabsContent value="email">
-          <SettingsCard title="Email (SMTP)" description="Outgoing mail server for password resets and notifications" footer={saveBtn(["smtp_host", "smtp_port", "smtp_user", "smtp_pass"])}>
+          <SettingsCard title={tr("Email (SMTP)")} description={tr("Outgoing mail server for password resets and notifications")} footer={saveBtn(["smtp_host", "smtp_port", "smtp_user", "smtp_pass"])}>
             <div className="grid gap-4 sm:grid-cols-2">
               {field("smtp_host", "SMTP host (prefix ssl:// for SSL)")}
-              {field("smtp_port", "SMTP port")}
-              {field("smtp_user", "SMTP user")}
-              {field("smtp_pass", "SMTP password", true)}
+              {field("smtp_port", tr("SMTP port"))}
+              {field("smtp_user", tr("SMTP user"))}
+              {field("smtp_pass", tr("SMTP password"), true)}
             </div>
           </SettingsCard>
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-6">
           <SettingsCard
-            title="Stripe"
-            description="Card payments through Stripe Checkout"
+            title={tr("Stripe")}
+            description={tr("Card payments through Stripe Checkout")}
             footer={<SaveButton loading={saveStripe.isPending} onClick={() => saveStripe.mutate(undefined)} />}
           >
             <Alert>
-              <AlertTitle>Webhook required</AlertTitle>
+              <AlertTitle>{tr("Webhook required")}</AlertTitle>
               <AlertDescription>
                 <p>
-                  Invoices are marked paid only by Stripe's signed webhook; set STRIPE_WEBHOOK_SECRET on the server and point the webhook at{" "}
+                  {tr("Invoices are marked paid only by Stripe's signed webhook; set STRIPE_WEBHOOK_SECRET on the server and point the webhook at")}{" "}
                   <code className="bg-muted rounded px-1">/api/payments/stripe/webhook</code>.
                 </p>
               </AlertDescription>
             </Alert>
             <div className="flex flex-wrap gap-6">
-              <SwitchRow id="stripe-active" label="Enable Stripe" checked={stripe.active === "1"} onChange={(c) => setStripe({ ...stripe, active: c ? "1" : "0" })} />
-              <SwitchRow id="stripe-test" label="Test mode" checked={stripe.testmode === "on"} onChange={(c) => setStripe({ ...stripe, testmode: c ? "on" : "off" })} />
+              <SwitchRow id="stripe-active" label={tr("Enable Stripe")} checked={stripe.active === "1"} onChange={(c) => setStripe({ ...stripe, active: c ? "1" : "0" })} />
+              <SwitchRow id="stripe-test" label={tr("Test mode")} checked={stripe.testmode === "on"} onChange={(c) => setStripe({ ...stripe, testmode: c ? "on" : "off" })} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Test publishable key" htmlFor="stripe-pk">
+              <Field label={tr("Test publishable key")} htmlFor="stripe-pk">
                 <Input id="stripe-pk" value={stripe.public_key ?? ""} onChange={(e) => setStripe({ ...stripe, public_key: e.target.value })} />
               </Field>
-              <Field label="Test secret key" htmlFor="stripe-sk" description={secretHint(stripe.secret_key)}>
+              <Field label={tr("Test secret key")} htmlFor="stripe-sk" description={secretHint(stripe.secret_key)}>
                 <SecretInput id="stripe-sk" value={stripe.secret_key} onChange={(v) => setStripe({ ...stripe, secret_key: v })} />
               </Field>
-              <Field label="Live publishable key" htmlFor="stripe-lpk">
+              <Field label={tr("Live publishable key")} htmlFor="stripe-lpk">
                 <Input id="stripe-lpk" value={stripe.public_live_key ?? ""} onChange={(e) => setStripe({ ...stripe, public_live_key: e.target.value })} />
               </Field>
-              <Field label="Live secret key" htmlFor="stripe-lsk" description={secretHint(stripe.secret_live_key)}>
+              <Field label={tr("Live secret key")} htmlFor="stripe-lsk" description={secretHint(stripe.secret_live_key)}>
                 <SecretInput id="stripe-lsk" value={stripe.secret_live_key} onChange={(v) => setStripe({ ...stripe, secret_live_key: v })} />
               </Field>
             </div>
           </SettingsCard>
 
           <SettingsCard
-            title="PayPal"
-            description="Parents and students pay invoices through PayPal; the server captures and verifies each order"
+            title={tr("PayPal")}
+            description={tr("Parents and students pay invoices through PayPal; the server captures and verifies each order")}
             footer={<SaveButton loading={savePaypal.isPending} onClick={() => savePaypal.mutate(undefined)} />}
           >
             <div className="flex flex-wrap items-end gap-6">
-              <SwitchRow id="paypal-active" label="Enable PayPal" checked={paypal.active === "1"} onChange={(c) => setPaypal({ ...paypal, active: c ? "1" : "0" })} />
-              <Field label="Mode" className="w-48">
+              <SwitchRow id="paypal-active" label={tr("Enable PayPal")} checked={paypal.active === "1"} onChange={(c) => setPaypal({ ...paypal, active: c ? "1" : "0" })} />
+              <Field label={tr("Mode")} className="w-48">
                 <Combobox
                   data={[
-                    { value: "sandbox", label: "Sandbox (testing)" },
-                    { value: "production", label: "Production (live)" },
+                    { value: "sandbox", label: tr("Sandbox (testing)") },
+                    { value: "production", label: tr("Production (live)") },
                   ]}
                   value={paypal.mode === "production" ? "production" : "sandbox"}
                   onChange={(v) => setPaypal({ ...paypal, mode: v ?? "sandbox" })}
@@ -368,16 +369,16 @@ export function SystemSettingsPage() {
               </Field>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Sandbox client ID" htmlFor="pp-sci">
+              <Field label={tr("Sandbox client ID")} htmlFor="pp-sci">
                 <Input id="pp-sci" value={paypal.sandbox_client_id ?? ""} onChange={(e) => setPaypal({ ...paypal, sandbox_client_id: e.target.value })} />
               </Field>
-              <Field label="Sandbox secret key" htmlFor="pp-ssk" description={secretHint(paypal.sandbox_secret_key)}>
+              <Field label={tr("Sandbox secret key")} htmlFor="pp-ssk" description={secretHint(paypal.sandbox_secret_key)}>
                 <SecretInput id="pp-ssk" value={paypal.sandbox_secret_key} onChange={(v) => setPaypal({ ...paypal, sandbox_secret_key: v })} />
               </Field>
-              <Field label="Production client ID" htmlFor="pp-pci">
+              <Field label={tr("Production client ID")} htmlFor="pp-pci">
                 <Input id="pp-pci" value={paypal.production_client_id ?? ""} onChange={(e) => setPaypal({ ...paypal, production_client_id: e.target.value })} />
               </Field>
-              <Field label="Production secret key" htmlFor="pp-psk" description={secretHint(paypal.production_secret_key)}>
+              <Field label={tr("Production secret key")} htmlFor="pp-psk" description={secretHint(paypal.production_secret_key)}>
                 <SecretInput id="pp-psk" value={paypal.production_secret_key} onChange={(v) => setPaypal({ ...paypal, production_secret_key: v })} />
               </Field>
             </div>
@@ -387,11 +388,11 @@ export function SystemSettingsPage() {
         </TabsContent>
 
         <TabsContent value="logo">
-          <SettingsCard title="Logo" description="Shown on the login page, sidebar and printed documents. PNG or JPG, ideally square.">
+          <SettingsCard title={tr("Logo")} description={tr("Shown on the login page, sidebar and printed documents. PNG or JPG, ideally square.")}>
             <div className="flex flex-wrap items-center gap-6">
               <div className="bg-muted/40 flex size-28 items-center justify-center overflow-hidden rounded-lg border">
                 {pub.data?.logo_url ? (
-                  <img src={pub.data.logo_url} alt="School logo" className="max-h-full max-w-full object-contain p-2" />
+                  <img src={pub.data.logo_url} alt={tr("School logo")} className="max-h-full max-w-full object-contain p-2" />
                 ) : (
                   <ImageIcon className="text-muted-foreground size-8" />
                 )}
@@ -400,8 +401,7 @@ export function SystemSettingsPage() {
                 {(props) => (
                   <Button variant="secondary" loading={logo.isPending} {...props}>
                     <UploadIcon />
-                    Upload logo
-                  </Button>
+                    {tr("Upload logo")}</Button>
                 )}
               </FileButton>
             </div>
@@ -426,21 +426,21 @@ function SwitchRow({ id, label, checked, onChange }: { id: string; label: string
 const LOCAL_GATEWAYS: { key: LocalGateway; description: string; fields: [string, string, "text" | "secret" | "key"][] }[] = [
   {
     key: "bkash",
-    description: "bKash tokenized checkout. The server executes each payment and checks the amount with bKash before recording it.",
-    fields: [["app_key", "App key", "text"], ["app_secret", "App secret", "secret"], ["username", "Username", "text"], ["password", "Password", "secret"]],
+    description: tr("bKash tokenized checkout. The server executes each payment and checks the amount with bKash before recording it."),
+    fields: [["app_key", tr("App key"), "text"], ["app_secret", tr("App secret"), "secret"], ["username", tr("Username"), "text"], ["password", tr("Password"), "secret"]],
   },
   {
     key: "nagad",
-    description: "Nagad merchant checkout. Requests are signed with your merchant private key; each payment is verified with Nagad before recording.",
+    description: tr("Nagad merchant checkout. Requests are signed with your merchant private key; each payment is verified with Nagad before recording."),
     fields: [
-      ["merchant_id", "Merchant ID", "text"], ["merchant_number", "Merchant mobile number", "text"],
-      ["merchant_private_key", "Merchant private key", "secret"], ["nagad_public_key", "Nagad public key", "key"],
+      ["merchant_id", tr("Merchant ID"), "text"], ["merchant_number", tr("Merchant mobile number"), "text"],
+      ["merchant_private_key", tr("Merchant private key"), "secret"], ["nagad_public_key", tr("Nagad public key"), "key"],
     ],
   },
   {
     key: "sslcommerz",
-    description: "SSLCommerz hosted checkout (cards, mobile banking, net banking). Payments are confirmed with the SSLCommerz validation API.",
-    fields: [["store_id", "Store ID", "text"], ["store_password", "Store password", "secret"]],
+    description: tr("SSLCommerz hosted checkout (cards, mobile banking, net banking). Payments are confirmed with the SSLCommerz validation API."),
+    fields: [["store_id", tr("Store ID"), "text"], ["store_password", tr("Store password"), "secret"]],
   },
 ];  // prettier-ignore
 
@@ -451,7 +451,7 @@ function LocalGatewayCards() {
     if (data) setValues({ bkash: data.bkash, nagad: data.nagad, sslcommerz: data.sslcommerz });
   }, [data]);
   const save = useAction((gateway: LocalGateway) => api.put("/payment-gateways/settings", { [gateway]: values[gateway] }), {
-    success: "Payment gateway saved",
+    success: tr("Payment gateway saved"),
     invalidate: [["/payment-gateways/settings"], ["/settings/public"]],
   });
   const set = (gateway: LocalGateway, key: string, value: string) => setValues((v) => ({ ...v, [gateway]: { ...v[gateway], [key]: value } }));
@@ -460,8 +460,8 @@ function LocalGatewayCards() {
     <>
       {data && !data.currency_is_bdt && (
         <Alert>
-          <AlertTitle>BDT only</AlertTitle>
-          <AlertDescription>bKash, Nagad and SSLCommerz are offered to parents only when the currency in General settings is bdt.</AlertDescription>
+          <AlertTitle>{tr("BDT only")}</AlertTitle>
+          <AlertDescription>{tr("bKash, Nagad and SSLCommerz are offered to parents only when the currency in General settings is bdt.")}</AlertDescription>
         </Alert>
       )}
       {LOCAL_GATEWAYS.map(({ key, description, fields }) => {
@@ -474,12 +474,12 @@ function LocalGatewayCards() {
             footer={<SaveButton loading={save.isPending && save.variables === key} onClick={() => save.mutate(key)} />}
           >
             <div className="flex flex-wrap items-end gap-6">
-              <SwitchRow id={`${key}-active`} label={`Enable ${GATEWAY_LABELS[key]}`} checked={cfg.active === "1"} onChange={(c) => set(key, "active", c ? "1" : "0")} />
-              <Field label="Mode" className="w-48">
+              <SwitchRow id={`${key}-active`} label={tr("Enable {value}", { value: GATEWAY_LABELS[key] })} checked={cfg.active === "1"} onChange={(c) => set(key, "active", c ? "1" : "0")} />
+              <Field label={tr("Mode")} className="w-48">
                 <Combobox
                   data={[
-                    { value: "sandbox", label: "Sandbox (testing)" },
-                    { value: "live", label: "Live" },
+                    { value: "sandbox", label: tr("Sandbox (testing)") },
+                    { value: "live", label: tr("Live") },
                   ]}
                   value={cfg.mode === "live" ? "live" : "sandbox"}
                   onChange={(v) => set(key, "mode", v ?? "sandbox")}
@@ -517,8 +517,8 @@ interface Slide {
 
 const SOCIAL = ["facebook", "twitter", "google", "instagram", "linkedin", "youtube"] as const;
 const THEMES = [
-  { value: "default", label: "Default", description: "Full-width photo hero with a dark overlay" },
-  { value: "ultimate", label: "Ultimate", description: "Split hero with a coloured panel beside the photo" },
+  { value: "default", label: tr("Default"), description: tr("Full-width photo hero with a dark overlay") },
+  { value: "ultimate", label: tr("Ultimate"), description: tr("Split hero with a coloured panel beside the photo") },
 ];
 
 function ImageUpload({ label, url, path, invalidate }: { label: string; url?: string | null; path: string; invalidate: string[][] }) {
@@ -528,7 +528,7 @@ function ImageUpload({ label, url, path, invalidate }: { label: string; url?: st
       body.append("file", file);
       return api.post(path, body);
     },
-    { success: `${label} updated`, invalidate },
+    { success: tr("{label} updated", { label }), invalidate },
   );
   return (
     <Card className="gap-3 py-4">
@@ -537,14 +537,13 @@ function ImageUpload({ label, url, path, invalidate }: { label: string; url?: st
       </CardHeader>
       <CardContent className="space-y-3 px-4">
         <div className="bg-muted/40 flex h-24 items-center justify-center overflow-hidden rounded-md border">
-          {url ? <img src={url} alt={label} className="max-h-full max-w-full object-contain p-2" /> : <span className="text-muted-foreground text-sm">Not set</span>}
+          {url ? <img src={url} alt={label} className="max-h-full max-w-full object-contain p-2" /> : <span className="text-muted-foreground text-sm">{tr("Not set")}</span>}
         </div>
         <FileButton onChange={(f) => f && up.mutate(f)} accept="image/*">
           {(props) => (
             <Button size="sm" variant="secondary" loading={up.isPending} {...props}>
               <UploadIcon />
-              Upload
-            </Button>
+              {tr("Upload")}</Button>
           )}
         </FileButton>
       </CardContent>
@@ -557,15 +556,14 @@ function SimpleList<T extends Record<string, unknown>>({
 }: { path: string; idField: string; title: string; columns: [string, (r: T) => ReactNode][]; form: (p: { item: T | null; onDone: () => void }) => ReactNode }) {  // prettier-ignore
   const { data, isLoading } = useGet<T[]>(path);
   const [editing, setEditing] = useState<T | null | "new">(null);
-  const del = useAction((id: unknown) => api.delete(`${path}/${id}`), { success: "Deleted", invalidate: [[path]] });
+  const del = useAction((id: unknown) => api.delete(`${path}/${id}`), { success: tr("Deleted"), invalidate: [[path]] });
   return (
     <Card className="gap-0 overflow-hidden py-0">
       <div className="flex items-center justify-between gap-2 border-b p-3">
-        <span className="text-muted-foreground text-sm">{data ? `${data.length} items` : ""}</span>
+        <span className="text-muted-foreground text-sm">{data ? tr("{length} items", { length: data.length }) : ""}</span>
         <Button size="sm" onClick={() => setEditing("new")}>
           <PlusIcon />
-          Add
-        </Button>
+          {tr("Add")}</Button>
       </div>
       <Table>
         <TableHeader className="bg-muted/50">
@@ -585,10 +583,10 @@ function SimpleList<T extends Record<string, unknown>>({
               ))}
               <TableCell>
                 <div className="flex justify-end gap-1">
-                  <IconAction label="Edit" onClick={() => setEditing(r)}>
+                  <IconAction label={tr("Edit")} onClick={() => setEditing(r)}>
                     <PencilIcon />
                   </IconAction>
-                  <IconAction label="Delete" destructive onClick={() => confirmAction({ title: "Delete?", onConfirm: () => del.mutate(r[idField]) })}>
+                  <IconAction label={tr("Delete")} destructive onClick={() => confirmAction({ title: tr("Delete?"), onConfirm: () => del.mutate(r[idField]) })}>
                     <Trash2Icon />
                   </IconAction>
                 </div>
@@ -601,7 +599,7 @@ function SimpleList<T extends Record<string, unknown>>({
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>
-              {editing === "new" ? "Add" : "Edit"} {title}
+              {editing === "new" ? tr("Add") : tr("Edit")} {title}
             </DialogTitle>
           </DialogHeader>
           {editing !== null && <FormComp item={editing === "new" ? null : editing} onDone={() => setEditing(null)} />}
@@ -628,11 +626,9 @@ function FormFooter({ onCancel, loading }: { onCancel: () => void; loading: bool
   return (
     <DialogFooter>
       <Button type="button" variant="outline" onClick={onCancel}>
-        Cancel
-      </Button>
+        {tr("Cancel")}</Button>
       <Button type="submit" loading={loading}>
-        Save
-      </Button>
+        {tr("Save")}</Button>
     </DialogFooter>
   );
 }
@@ -643,7 +639,7 @@ type NewsRow = { frontend_news_id: number; title: string; description: string; d
 function NewsForm({ item, onDone }: { item: NewsRow | null; onDone: () => void }) {
   const [v, setV] = useState({ title: item?.title ?? "", description: item?.description ?? "", image: null as File | null });
   const save = useAction((v: Record<string, unknown>) => (item ? api.put(`/cms/news/${item.frontend_news_id}`, multipart(v)) : api.post("/cms/news", multipart(v))), {
-    success: "Saved",
+    success: tr("Saved"),
     invalidate: [["/cms/news"]],
     onSuccess: onDone,
   });
@@ -655,13 +651,13 @@ function NewsForm({ item, onDone }: { item: NewsRow | null; onDone: () => void }
       }}
       className="grid gap-4"
     >
-      <Field label="Title" htmlFor="news-title" required>
+      <Field label={tr("Title")} htmlFor="news-title" required>
         <Input id="news-title" required value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} />
       </Field>
-      <Field label="Text" htmlFor="news-text">
+      <Field label={tr("Text")} htmlFor="news-text">
         <Textarea id="news-text" rows={8} value={v.description} onChange={(e) => setV({ ...v, description: e.target.value })} />
       </Field>
-      <Field label="Image" htmlFor="news-image" description={item?.image_url ? "Leave empty to keep the current image" : undefined}>
+      <Field label={tr("Image")} htmlFor="news-image" description={item?.image_url ? tr("Leave empty to keep the current image") : undefined}>
         <ImageInput id="news-image" onChange={(image) => setV({ ...v, image })} />
       </Field>
       <FormFooter onCancel={onDone} loading={save.isPending} />
@@ -681,7 +677,7 @@ function EventForm({ item, onDone }: { item: EventRow | null; onDone: () => void
       const body = { title: v.title, date: v.date || dayjs().format("YYYY-MM-DD"), status: v.status ? 1 : 0 };
       return item ? api.put(`/cms/events/${item.frontend_events_id}`, body) : api.post("/cms/events", body);
     },
-    { success: "Saved", invalidate: [["/cms/events"]], onSuccess: onDone },
+    { success: tr("Saved"), invalidate: [["/cms/events"]], onSuccess: onDone },
   );
   return (
     <form
@@ -691,13 +687,13 @@ function EventForm({ item, onDone }: { item: EventRow | null; onDone: () => void
       }}
       className="grid gap-4"
     >
-      <Field label="Title" htmlFor="event-title" required>
+      <Field label={tr("Title")} htmlFor="event-title" required>
         <Input id="event-title" required value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} />
       </Field>
-      <Field label="Date">
+      <Field label={tr("Date")}>
         <DatePicker value={v.date} onChange={(date) => setV({ ...v, date })} clearable={false} />
       </Field>
-      <SwitchRow id="event-status" label="Show on website" checked={v.status} onChange={(status) => setV({ ...v, status })} />
+      <SwitchRow id="event-status" label={tr("Show on website")} checked={v.status} onChange={(status) => setV({ ...v, status })} />
       <FormFooter onCancel={onDone} loading={save.isPending} />
     </form>
   );
@@ -713,7 +709,7 @@ function GalleryForm({ item, onDone }: { item: GalleryRow | null; onDone: () => 
   });
   const save = useAction(
     (v: Record<string, unknown>) => (item ? api.put(`/cms/gallery/${item.frontend_gallery_id}`, multipart(v)) : api.post("/cms/gallery", multipart(v))),
-    { success: "Saved", invalidate: [["/cms/gallery"]], onSuccess: onDone },
+    { success: tr("Saved"), invalidate: [["/cms/gallery"]], onSuccess: onDone },
   );
   const detail = useGet<{ images: { frontend_gallery_image_id: number; image_url: string }[] }>(item ? `/cms/gallery/${item.frontend_gallery_id}` : null);
   const addImages = useAction(
@@ -722,7 +718,7 @@ function GalleryForm({ item, onDone }: { item: GalleryRow | null; onDone: () => 
       files.forEach((f) => body.append("files", f));
       return api.post(`/cms/gallery/${item!.frontend_gallery_id}/images`, body);
     },
-    { success: "Images added", invalidate: [[`/cms/gallery/${item?.frontend_gallery_id}`]] },
+    { success: tr("Images added"), invalidate: [[`/cms/gallery/${item?.frontend_gallery_id}`]] },
   );
   const delImage = useAction((id: number) => api.delete(`/cms/gallery-images/${id}`), { invalidate: [[`/cms/gallery/${item?.frontend_gallery_id}`]] });
   const photos = useRef<HTMLInputElement>(null);
@@ -736,22 +732,22 @@ function GalleryForm({ item, onDone }: { item: GalleryRow | null; onDone: () => 
         }}
         className="grid gap-4"
       >
-        <Field label="Title" htmlFor="gallery-title" required>
+        <Field label={tr("Title")} htmlFor="gallery-title" required>
           <Input id="gallery-title" required value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} />
         </Field>
-        <Field label="Description" htmlFor="gallery-desc">
+        <Field label={tr("Description")} htmlFor="gallery-desc">
           <Textarea id="gallery-desc" rows={3} value={v.description} onChange={(e) => setV({ ...v, description: e.target.value })} />
         </Field>
-        <Field label="Cover image" htmlFor="gallery-cover" description={item?.image_url ? "Leave empty to keep the current cover" : undefined}>
+        <Field label={tr("Cover image")} htmlFor="gallery-cover" description={item?.image_url ? tr("Leave empty to keep the current cover") : undefined}>
           <ImageInput id="gallery-cover" onChange={(image) => setV({ ...v, image })} />
         </Field>
-        <SwitchRow id="gallery-show" label="Show on website" checked={v.show_on_website} onChange={(show_on_website) => setV({ ...v, show_on_website })} />
+        <SwitchRow id="gallery-show" label={tr("Show on website")} checked={v.show_on_website} onChange={(show_on_website) => setV({ ...v, show_on_website })} />
         <FormFooter onCancel={onDone} loading={save.isPending} />
       </form>
       {item && (
         <div className="grid gap-3 border-t pt-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-medium">Photos</h3>
+            <h3 className="font-medium">{tr("Photos")}</h3>
             <input
               ref={photos}
               type="file"
@@ -766,8 +762,7 @@ function GalleryForm({ item, onDone }: { item: GalleryRow | null; onDone: () => 
             />
             <Button size="sm" variant="secondary" loading={addImages.isPending} onClick={() => photos.current?.click()}>
               <UploadIcon />
-              Add photos
-            </Button>
+              {tr("Add photos")}</Button>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {detail.data?.images.map((img) => (
@@ -776,7 +771,7 @@ function GalleryForm({ item, onDone }: { item: GalleryRow | null; onDone: () => 
                 <Button
                   size="icon-xs"
                   variant="destructive"
-                  aria-label="Remove photo"
+                  aria-label={tr("Remove photo")}
                   className="absolute top-1 right-1 opacity-90"
                   onClick={() => delImage.mutate(img.frontend_gallery_image_id)}
                 >
@@ -785,7 +780,7 @@ function GalleryForm({ item, onDone }: { item: GalleryRow | null; onDone: () => 
               </div>
             ))}
           </div>
-          {detail.data?.images.length === 0 && <p className="text-muted-foreground text-sm">No photos in this album yet.</p>}
+          {detail.data?.images.length === 0 && <p className="text-muted-foreground text-sm">{tr("No photos in this album yet.")}</p>}
         </div>
       )}
     </div>
@@ -808,11 +803,11 @@ export function WebsitePage() {
     setSocial(parseConfig(data?.social_links));
   }, [data]);
   const saveSlides = useAction(() => api.put("/cms/slider", slides.map(({ title, description, image }) => ({ title, description, image }))), {
-    success: "Slider saved",
+    success: tr("Slider saved"),
     invalidate: [["/cms/settings"]],
   });
   const saveSocial = useAction(() => api.put("/cms/settings", { social_links: JSON.stringify([social]) }), {
-    success: "Social links saved",
+    success: tr("Social links saved"),
     invalidate: [["/cms/settings"]],
   });
   const uploadSlide = useAction(
@@ -844,40 +839,40 @@ export function WebsitePage() {
 
   return (
     <>
-      <PageHeader title="Website" subtitle="Content of the public school website" />
+      <PageHeader title={tr("Website")} subtitle={tr("Content of the public school website")} />
       <Tabs defaultValue="general" className="gap-4">
         <div className="-mx-1 overflow-x-auto px-1">
           <TabsList>
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="social">Social links</TabsTrigger>
-            <TabsTrigger value="pages">Pages</TabsTrigger>
-            <TabsTrigger value="images">Images & slider</TabsTrigger>
-            <TabsTrigger value="news">News</TabsTrigger>
-            <TabsTrigger value="events">Events</TabsTrigger>
-            <TabsTrigger value="gallery">Gallery</TabsTrigger>
+            <TabsTrigger value="general">{tr("General")}</TabsTrigger>
+            <TabsTrigger value="social">{tr("Social links")}</TabsTrigger>
+            <TabsTrigger value="pages">{tr("Pages")}</TabsTrigger>
+            <TabsTrigger value="images">{tr("Images & slider")}</TabsTrigger>
+            <TabsTrigger value="news">{tr("News")}</TabsTrigger>
+            <TabsTrigger value="events">{tr("Events")}</TabsTrigger>
+            <TabsTrigger value="gallery">{tr("Gallery")}</TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="general" className="space-y-6">
           <SettingsCard
-            title="School information"
-            description="Contact details and the homepage note"
+            title={tr("School information")}
+            description={tr("Contact details and the homepage note")}
             footer={saveBtn(TEXT_KEYS.slice(0, 9))}
           >
             <div className="grid gap-4 sm:grid-cols-2">
-              {text("school_title", "School title")}
-              {text("email", "Email")}
-              {text("phone", "Phone")}
-              {text("fax", "Fax")}
-              {text("address", "Address")}
-              {text("school_location", "Map location (lat,lng)", { placeholder: "23.8103,90.4125" })}
-              {text("copyright_text", "Copyright text")}
-              {text("homepage_note_title", "Homepage note title")}
+              {text("school_title", tr("School title"))}
+              {text("email", tr("Email"))}
+              {text("phone", tr("Phone"))}
+              {text("fax", tr("Fax"))}
+              {text("address", tr("Address"))}
+              {text("school_location", tr("Map location (lat,lng)"), { placeholder: "23.8103,90.4125" })}
+              {text("copyright_text", tr("Copyright text"))}
+              {text("homepage_note_title", tr("Homepage note title"))}
             </div>
-            {text("homepage_note_description", "Homepage note", { area: true, rows: 3 })}
+            {text("homepage_note_description", tr("Homepage note"), { area: true, rows: 3 })}
           </SettingsCard>
 
-          <SettingsCard title="Theme" description="Look of the public website's homepage" footer={saveBtn(["theme"])}>
+          <SettingsCard title={tr("Theme")} description={tr("Look of the public website's homepage")} footer={saveBtn(["theme"])}>
             <RadioGroup value={theme} onValueChange={(v) => set("theme", v)} className="grid gap-3 sm:grid-cols-2">
               {THEMES.map((t) => (
                 <Label
@@ -899,22 +894,21 @@ export function WebsitePage() {
           </SettingsCard>
 
           <SettingsCard
-            title="Spam protection (reCAPTCHA)"
+            title={tr("Spam protection (reCAPTCHA)")}
             description={
               <>
-                Protects the contact form. Create v2 checkbox keys in the{" "}
+                {tr("Protects the contact form. Create v2 checkbox keys in the")}{" "}
                 <a href="https://www.google.com/recaptcha/admin" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                  reCAPTCHA admin console
-                </a>
+                  {tr("reCAPTCHA admin console")}</a>
                 .
               </>
             }
             footer={saveBtn(hasSecret ? ["recaptcha_site_key", "recaptcha_secret_key"] : ["recaptcha_site_key"])}
           >
             <div className="grid gap-4 sm:grid-cols-2">
-              {text("recaptcha_site_key", "Site key")}
+              {text("recaptcha_site_key", tr("Site key"))}
               {hasSecret && (
-                <Field label="Secret key" htmlFor="site-recaptcha_secret_key" description={secretHint(values.recaptcha_secret_key)}>
+                <Field label={tr("Secret key")} htmlFor="site-recaptcha_secret_key" description={secretHint(values.recaptcha_secret_key)}>
                   <SecretInput id="site-recaptcha_secret_key" value={values.recaptcha_secret_key} onChange={(v) => set("recaptcha_secret_key", v)} />
                 </Field>
               )}
@@ -924,17 +918,17 @@ export function WebsitePage() {
 
         <TabsContent value="social">
           <SettingsCard
-            title="Social links"
-            description="Shown in the website footer. Use full addresses starting with https://"
+            title={tr("Social links")}
+            description={tr("Shown in the website footer. Use full addresses starting with https://")}
             footer={<SaveButton loading={saveSocial.isPending} onClick={() => saveSocial.mutate(undefined)} />}
           >
             <div className="grid gap-4 sm:grid-cols-2">
               {SOCIAL.map((k) => (
-                <Field key={k} label={k === "twitter" ? "Twitter / X" : k[0]!.toUpperCase() + k.slice(1)} htmlFor={`social-${k}`}>
+                <Field key={k} label={k === "twitter" ? tr("Twitter / X") : k[0]!.toUpperCase() + k.slice(1)} htmlFor={`social-${k}`}>
                   <Input
                     id={`social-${k}`}
                     type="url"
-                    placeholder={`https://${k === "google" ? "g.page" : `${k}.com`}/…`}
+                    placeholder={tr("https://{value}/…", { value: k === "google" ? "g.page" : `${k}.com` })}
                     value={social[k] ?? ""}
                     onChange={(e) => setSocial({ ...social, [k]: e.target.value })}
                   />
@@ -945,43 +939,42 @@ export function WebsitePage() {
         </TabsContent>
 
         <TabsContent value="pages">
-          <SettingsCard title="Pages" description="Plain text; line breaks are kept" footer={saveBtn(["about_us", "terms_conditions", "privacy_policy"])}>
-            {text("about_us", "About us", { area: true, rows: 8 })}
-            {text("terms_conditions", "Terms & conditions", { area: true, rows: 8 })}
-            {text("privacy_policy", "Privacy policy", { area: true, rows: 8 })}
+          <SettingsCard title={tr("Pages")} description={tr("Plain text; line breaks are kept")} footer={saveBtn(["about_us", "terms_conditions", "privacy_policy"])}>
+            {text("about_us", tr("About us"), { area: true, rows: 8 })}
+            {text("terms_conditions", tr("Terms & conditions"), { area: true, rows: 8 })}
+            {text("privacy_policy", tr("Privacy policy"), { area: true, rows: 8 })}
           </SettingsCard>
         </TabsContent>
 
         <TabsContent value="images" className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-3">
-            <ImageUpload label="Header logo" url={data?.header_logo_url} path="/cms/images/header_logo" invalidate={inv} />
-            <ImageUpload label="Footer logo" url={data?.footer_logo_url} path="/cms/images/footer_logo" invalidate={inv} />
-            <ImageUpload label="About us image" url={data?.about_us_image_url} path="/cms/images/about_us_image" invalidate={inv} />
+            <ImageUpload label={tr("Header logo")} url={data?.header_logo_url} path="/cms/images/header_logo" invalidate={inv} />
+            <ImageUpload label={tr("Footer logo")} url={data?.footer_logo_url} path="/cms/images/footer_logo" invalidate={inv} />
+            <ImageUpload label={tr("About us image")} url={data?.about_us_image_url} path="/cms/images/about_us_image" invalidate={inv} />
           </div>
           <SettingsCard
-            title="Homepage slider"
-            description="Large images at the top of the homepage. Wide photos (16:9) work best."
+            title={tr("Homepage slider")}
+            description={tr("Large images at the top of the homepage. Wide photos (16:9) work best.")}
             footer={
               <div className="flex flex-wrap gap-2">
                 <FileButton onChange={(f) => f && uploadSlide.mutate(f)} accept="image/*">
                   {(props) => (
                     <Button variant="secondary" loading={uploadSlide.isPending} {...props}>
                       <PlusIcon />
-                      Add slide
-                    </Button>
+                      {tr("Add slide")}</Button>
                   )}
                 </FileButton>
-                <SaveButton label="Save slider" loading={saveSlides.isPending} onClick={() => saveSlides.mutate(undefined)} />
+                <SaveButton label={tr("Save slider")} loading={saveSlides.isPending} onClick={() => saveSlides.mutate(undefined)} />
               </div>
             }
           >
-            {slides.length === 0 && <p className="text-muted-foreground text-sm">No slides yet.</p>}
+            {slides.length === 0 && <p className="text-muted-foreground text-sm">{tr("No slides yet.")}</p>}
             {slides.map((s, i) => (
               <div key={i} className="grid grid-cols-[5rem_1fr_auto] items-start gap-3 sm:grid-cols-[6rem_1fr_1fr_auto] sm:items-center">
                 <div className="bg-muted aspect-video overflow-hidden rounded-md">{s.image_url && <img src={s.image_url} alt="" className="size-full object-cover" />}</div>
                 <Input
-                  placeholder="Title"
-                  aria-label="Slide title"
+                  placeholder={tr("Title")}
+                  aria-label={tr("Slide title")}
                   value={s.title}
                   onChange={(e) => {
                     const v = e.target.value;
@@ -989,8 +982,8 @@ export function WebsitePage() {
                   }}
                 />
                 <Input
-                  placeholder="Description"
-                  aria-label="Slide description"
+                  placeholder={tr("Description")}
+                  aria-label={tr("Slide description")}
                   className="col-start-2 sm:col-start-auto"
                   value={s.description}
                   onChange={(e) => {
@@ -999,7 +992,7 @@ export function WebsitePage() {
                   }}
                 />
                 <div className="col-start-3 row-start-1 sm:col-start-auto sm:row-start-auto">
-                  <IconAction label="Remove slide" destructive onClick={() => setSlides((all) => all.filter((_, j) => j !== i))}>
+                  <IconAction label={tr("Remove slide")} destructive onClick={() => setSlides((all) => all.filter((_, j) => j !== i))}>
                     <Trash2Icon />
                   </IconAction>
                 </div>
@@ -1012,12 +1005,12 @@ export function WebsitePage() {
           <SimpleList<NewsRow>
             path="/cms/news"
             idField="frontend_news_id"
-            title="news"
+            title={tr("news")}
             form={NewsForm}
             columns={[
-              ["Title", (r) => <span className="font-medium">{r.title}</span>],
-              ["Date", (r) => fromUnix(r.date_added)],
-              ["Image", (r) => <Thumb url={r.image_url} />],
+              [tr("Title"), (r) => <span className="font-medium">{r.title}</span>],
+              [tr("Date"), (r) => fromUnix(r.date_added)],
+              [tr("Image"), (r) => <Thumb url={r.image_url} />],
             ]}
           />
         </TabsContent>
@@ -1025,12 +1018,12 @@ export function WebsitePage() {
           <SimpleList<EventRow>
             path="/cms/events"
             idField="frontend_events_id"
-            title="event"
+            title={tr("event")}
             form={EventForm}
             columns={[
-              ["Title", (r) => <span className="font-medium">{r.title}</span>],
-              ["Date", (r) => fromUnix(r.timestamp)],
-              ["Visible", (r) => <VisibleBadge on={r.status === 1} />],
+              [tr("Title"), (r) => <span className="font-medium">{r.title}</span>],
+              [tr("Date"), (r) => fromUnix(r.timestamp)],
+              [tr("Visible"), (r) => <VisibleBadge on={r.status === 1} />],
             ]}
           />
         </TabsContent>
@@ -1038,12 +1031,12 @@ export function WebsitePage() {
           <SimpleList<GalleryRow>
             path="/cms/gallery"
             idField="frontend_gallery_id"
-            title="album"
+            title={tr("album")}
             form={GalleryForm}
             columns={[
-              ["Title", (r) => <span className="font-medium">{r.title}</span>],
-              ["Cover", (r) => <Thumb url={r.image_url} />],
-              ["Visible", (r) => <VisibleBadge on={r.show_on_website === 1} />],
+              [tr("Title"), (r) => <span className="font-medium">{r.title}</span>],
+              [tr("Cover"), (r) => <Thumb url={r.image_url} />],
+              [tr("Visible"), (r) => <VisibleBadge on={r.show_on_website === 1} />],
             ]}
           />
         </TabsContent>
@@ -1053,7 +1046,7 @@ export function WebsitePage() {
 }
 
 function VisibleBadge({ on }: { on: boolean }) {
-  return on ? <Badge className="bg-success/15 text-success border-transparent">Yes</Badge> : <Badge variant="secondary">No</Badge>;
+  return on ? <Badge className="bg-success/15 text-success border-transparent">{tr("Yes")}</Badge> : <Badge variant="secondary">{tr("No")}</Badge>;
 }
 
 /** Tiny wireframe of the two homepage hero styles. */
@@ -1079,9 +1072,9 @@ function ThemePreview({ variant }: { variant: string }) {
 // --- audit log ----------------------------------------------------------------
 
 const AUDIT_ACTIONS: Record<AuditEntry["action"], [string, string]> = {
-  insert: ["Added", "border-transparent bg-success/15 text-success"],
-  update: ["Changed", "border-transparent bg-warning/20 text-amber-700 dark:text-amber-300"],
-  delete: ["Deleted", "border-transparent bg-destructive/15 text-destructive"],
+  insert: [tr("Added"), "border-transparent bg-success/15 text-success"],
+  update: [tr("Changed"), "border-transparent bg-warning/20 text-amber-700 dark:text-amber-300"],
+  delete: [tr("Deleted"), "border-transparent bg-destructive/15 text-destructive"],
 };
 
 const auditValue = (v: unknown) => (v === null || v === undefined || v === "" ? "—" : typeof v === "object" ? JSON.stringify(v) : String(v));
@@ -1124,29 +1117,29 @@ export function AuditLogPage() {
   return (
     <>
       <PageHeader
-        title="Audit log"
-        subtitle="Who changed marks, attendance, invoices, payments, enrolments, accounts and settings in this system, and what changed."
+        title={tr("Audit log")}
+        subtitle={tr("Who changed marks, attendance, invoices, payments, enrolments, accounts and settings in this system, and what changed.")}
         actions={<ExportButton size="default" path="/export/audit-log.xlsx" params={filters} />}
       />
       <Card className="gap-0 overflow-hidden py-0">
         <div className="grid gap-3 border-b p-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Combobox data={(tables.data ?? []).map((t) => ({ value: t, label: t }))} value={table} onChange={setTable} clearable placeholder="All tables" />
-          <Combobox data={Object.entries(AUDIT_ACTIONS).map(([value, [label]]) => ({ value, label }))} value={action} onChange={setAction} clearable placeholder="All actions" />
-          <DatePicker value={dateFrom} onChange={setDateFrom} placeholder="From date" />
-          <DatePicker value={dateTo} onChange={setDateTo} placeholder="To date" />
+          <Combobox data={(tables.data ?? []).map((t) => ({ value: t, label: t }))} value={table} onChange={setTable} clearable placeholder={tr("All tables")} />
+          <Combobox data={Object.entries(AUDIT_ACTIONS).map(([value, [label]]) => ({ value, label }))} value={action} onChange={setAction} clearable placeholder={tr("All actions")} />
+          <DatePicker value={dateFrom} onChange={setDateFrom} placeholder={tr("From date")} />
+          <DatePicker value={dateTo} onChange={setDateTo} placeholder={tr("To date")} />
         </div>
         <Table className="min-w-[800px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="w-40">When</TableHead>
-              <TableHead className="w-44">By</TableHead>
-              <TableHead className="w-28">Action</TableHead>
-              <TableHead className="w-40">Record</TableHead>
-              <TableHead>Changes</TableHead>
+              <TableHead className="w-40">{tr("When")}</TableHead>
+              <TableHead className="w-44">{tr("By")}</TableHead>
+              <TableHead className="w-28">{tr("Action")}</TableHead>
+              <TableHead className="w-40">{tr("Record")}</TableHead>
+              <TableHead>{tr("Changes")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={5} emptyText="No changes recorded" />
+            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={5} emptyText={tr("No changes recorded")} />
             {rows.map((entry) => {
               const [label, style] = AUDIT_ACTIONS[entry.action] ?? [entry.action, ""];
               return (
@@ -1159,7 +1152,7 @@ export function AuditLogPage() {
                         <div className="text-muted-foreground text-xs">{entry.actor}</div>
                       </>
                     ) : (
-                      <span className="text-muted-foreground">System</span>
+                      <span className="text-muted-foreground">{tr("System")}</span>
                     )}
                   </TableCell>
                   <TableCell><Badge className={style}>{label}</Badge></TableCell>

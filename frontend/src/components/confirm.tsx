@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
+import { t } from "../i18n";
 
 interface ConfirmOptions {
   title: string;
@@ -51,10 +52,10 @@ export function ConfirmHost() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{options?.title}</AlertDialogTitle>
-          <AlertDialogDescription>{options?.description ?? "This cannot be undone."}</AlertDialogDescription>
+          <AlertDialogDescription>{options?.description ?? t("This cannot be undone.")}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{options?.cancelLabel ?? "Cancel"}</AlertDialogCancel>
+          <AlertDialogCancel>{options?.cancelLabel ?? t("Cancel")}</AlertDialogCancel>
           <AlertDialogAction
             className={destructive ? buttonVariants({ variant: "destructive" }) : undefined}
             onClick={() => {
@@ -62,7 +63,7 @@ export function ConfirmHost() {
               close();
             }}
           >
-            {options?.confirmLabel ?? "Delete"}
+            {options?.confirmLabel ?? t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

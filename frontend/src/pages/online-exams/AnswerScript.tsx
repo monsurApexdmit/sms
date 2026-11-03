@@ -18,6 +18,7 @@ import { Skeleton } from "../../components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table";
 import { cn } from "../../lib/utils";
 import { ResultBadge, TYPE_LABEL, blankify } from "./shared";
+import { t, tn } from "../../i18n";
 
 // --- answer script ------------------------------------------------------------
 
@@ -54,8 +55,7 @@ function OptionRow({ index, label, correct, chosen }: { index: string; label: Re
       <span className="flex-1">{label}</span>
       {chosen && (
         <Badge variant="outline" className={cn("bg-background", correct ? "text-success" : "text-destructive")}>
-          Answered
-        </Badge>
+          {t("Answered")}</Badge>
       )}
       {correct ? <CheckIcon className="text-success size-4 shrink-0" /> : chosen ? <XIcon className="text-destructive size-4 shrink-0" /> : null}
     </li>
@@ -70,9 +70,9 @@ function ScriptAnswer({ q }: { q: ScriptQuestion }) {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="w-20">Blank</TableHead>
-              <TableHead>Submitted</TableHead>
-              <TableHead>Correct</TableHead>
+              <TableHead className="w-20">{t("Blank")}</TableHead>
+              <TableHead>{t("Submitted")}</TableHead>
+              <TableHead>{t("Correct")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -85,7 +85,7 @@ function ScriptAnswer({ q }: { q: ScriptQuestion }) {
                   <TableCell className={cn("font-medium", given ? (ok ? "text-success" : "text-destructive") : "text-muted-foreground")}>
                     <span className="inline-flex items-center gap-1.5">
                       {given ? (ok ? <CheckIcon className="size-4" /> : <XIcon className="size-4" />) : null}
-                      {given || "Not answered"}
+                      {given || t("Not answered")}
                     </span>
                   </TableCell>
                   <TableCell className="text-success">{q.correct_answers[i] ?? "—"}</TableCell>
@@ -100,8 +100,8 @@ function ScriptAnswer({ q }: { q: ScriptQuestion }) {
   const options =
     q.type === "true_false"
       ? [
-          { value: "true", label: "True" },
-          { value: "false", label: "False" },
+          { value: "true", label: t("True") },
+          { value: "false", label: t("False") },
         ]
       : q.options.map((label, i) => ({ value: String(i + 1), label }));
   const correct = q.correct_answers.map(norm);
@@ -135,7 +135,7 @@ export function AnswerScriptPage() {
     <Button asChild variant="ghost" size="sm" className="no-print mb-3 -ml-2">
       <Link to={back}>
         <ArrowLeftIcon />
-        {staff ? "Back to exam" : "Online exams"}
+        {staff ? t("Back to exam") : t("Online exams")}
       </Link>
     </Button>
   );
@@ -154,10 +154,10 @@ export function AnswerScriptPage() {
         {backButton}
         <Alert variant={forbidden ? "default" : "destructive"} className="max-w-xl">
           {forbidden ? <ClockIcon /> : <CircleAlertIcon />}
-          <AlertTitle>{forbidden ? "Answer script not available yet" : "Could not load the answer script"}</AlertTitle>
+          <AlertTitle>{forbidden ? t("Answer script not available yet") : t("Could not load the answer script")}</AlertTitle>
           <AlertDescription>
             {forbidden
-              ? `${errorMessage(error)}. Check back once the exam has ended and your answers have been submitted.`
+              ? t("{errorMessage}. Check back once the exam has ended and your answers have been submitted.", { errorMessage: errorMessage(error) })
               : errorMessage(error)}
           </AlertDescription>
         </Alert>
@@ -173,13 +173,12 @@ export function AnswerScriptPage() {
       <div>
         {backButton}
         <PageHeader
-          title="Answer script"
-          subtitle={`${exam.title} · ${student.name}`}
+          title={t("Answer script")}
+          subtitle={t("{title} · {name}", { title: exam.title, name: student.name })}
           actions={
             <Button variant="outline" onClick={() => window.print()}>
               <PrinterIcon />
-              Print
-            </Button>
+              {t("Print")}</Button>
           }
         />
       </div>
@@ -192,11 +191,10 @@ export function AnswerScriptPage() {
               {[exam.class_name, exam.subject_name].filter(Boolean).join(" · ")}
             </p>
             <p className="text-sm">
-              Student: <span className="font-medium">{student.name}</span>
+              {t("Student:")}{" "}<span className="font-medium">{student.name}</span>
             </p>
             <p className="text-muted-foreground text-sm">
-              {correctCount} of {questions.length} questions correct · pass mark {exam.minimum_percentage}%
-            </p>
+              {tn("{correctCount} of {length} questions correct · pass mark {minimum_percentage}%", { correctCount, length: questions.length, minimum_percentage: exam.minimum_percentage })}</p>
           </div>
           <div className="flex items-center gap-4 md:flex-col md:items-end">
             <p className="text-3xl font-bold tabular-nums">
@@ -220,15 +218,15 @@ export function AnswerScriptPage() {
               <CardHeader>
                 <CardDescription className="flex flex-wrap items-center justify-between gap-2">
                   <span>
-                    Question {i + 1} · {TYPE_LABEL[q.type]}
+                    {tn("Question {value} · {value2}", { value: i + 1, value2: TYPE_LABEL[q.type] })}
                   </span>
                   <span className="flex items-center gap-2">
                     {unanswered ? (
-                      <Badge variant="secondary">Not answered</Badge>
+                      <Badge variant="secondary">{t("Not answered")}</Badge>
                     ) : q.is_correct ? (
-                      <Badge className="bg-success/15 text-success border-transparent">Correct</Badge>
+                      <Badge className="bg-success/15 text-success border-transparent">{t("Correct")}</Badge>
                     ) : (
-                      <Badge variant="destructive">Incorrect</Badge>
+                      <Badge variant="destructive">{t("Incorrect")}</Badge>
                     )}
                     <Badge variant="outline" className="tabular-nums">
                       {q.is_correct ? q.mark : 0} / {q.mark}
@@ -243,7 +241,7 @@ export function AnswerScriptPage() {
             </Card>
           );
         })}
-        {questions.length === 0 && <EmptyState title="This exam has no questions" />}
+        {questions.length === 0 && <EmptyState title={t("This exam has no questions")} />}
       </div>
     </div>
   );

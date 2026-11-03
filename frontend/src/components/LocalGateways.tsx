@@ -8,8 +8,9 @@ import { api, errorMessage } from "../api/client";
 import { useAction } from "../api/hooks";
 import type { LocalGateway } from "../api/types";
 import { Button } from "./ui/button";
+import { t } from "../i18n";
 
-export const GATEWAY_LABELS: Record<LocalGateway, string> = { bkash: "bKash", nagad: "Nagad", sslcommerz: "SSLCommerz" };
+export const GATEWAY_LABELS: Record<LocalGateway, string> = { bkash: "bKash", nagad: t("Nagad"), sslcommerz: t("SSLCommerz") };
 const ORDER: LocalGateway[] = ["bkash", "nagad", "sslcommerz"];
 
 /** "Pay with bKash / Nagad / SSLCommerz" buttons for one unpaid invoice. The server picks the amount. */
@@ -66,17 +67,17 @@ export function useLocalGatewayReturn() {
       navigate({ pathname: location.pathname, search: search ? `?${search}` : "" }, { replace: true });
     };
     if (result !== "success" || !ref) {
-      if (result === "cancel") toast.info(`${label} payment cancelled. Your invoice has not been charged.`);
-      else toast.error(`${label} payment did not go through. Your invoice has not been charged.`);
+      if (result === "cancel") toast.info(t("{label} payment cancelled. Your invoice has not been charged.", { label }));
+      else toast.error(t("{label} payment did not go through. Your invoice has not been charged.", { label }));
       strip();
       return;
     }
     api
       .post<{ status: "paid" | "pending" | "failed"; invoice_id: number }>(`/payments/${gateway}/confirm`, { ref })
       .then(({ data: r }) => {
-        if (r.status === "paid") toast.success("Payment received. Thank you!");
-        else if (r.status === "failed") toast.error(`${label} reports that the payment failed. Your invoice has not been charged.`);
-        else toast.info(`${label} is still processing your payment. The invoice will update once it is confirmed.`);
+        if (r.status === "paid") toast.success(t("Payment received. Thank you!"));
+        else if (r.status === "failed") toast.error(t("{label} reports that the payment failed. Your invoice has not been charged.", { label }));
+        else toast.info(t("{label} is still processing your payment. The invoice will update once it is confirmed.", { label }));
       })
       .catch((e) => toast.error(errorMessage(e)))
       .finally(() => {

@@ -50,6 +50,7 @@ import { Skeleton } from "../../components/ui/skeleton";
 import { Textarea } from "../../components/ui/textarea";
 import { cn } from "../../lib/utils";
 import { fromUnix, initials } from "../../utils";
+import { t as tr, tn } from "../../i18n";
 
 interface Site {
   system_name: string;
@@ -110,32 +111,32 @@ interface TeacherItem {
 }
 
 const useSite = () => useGet<Site>("/public/site");
-const schoolName = (site: Site | undefined) => site?.school_title || site?.system_name || "School";
+const schoolName = (site: Site | undefined) => site?.school_title || site?.system_name || tr("School");
 
 const MAIN_LINKS = [
-  { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/teachers", label: "Teachers" },
+  { to: "/", label: tr("Home") },
+  { to: "/about", label: tr("About") },
+  { to: "/teachers", label: tr("Teachers") },
 ];
 const LIFE_LINKS = [
-  { to: "/notices", label: "Notices", icon: MegaphoneIcon, description: "Announcements from the school office" },
-  { to: "/news", label: "News", icon: NewspaperIcon, description: "Stories and updates from campus" },
-  { to: "/events", label: "Events", icon: CalendarDaysIcon, description: "What is happening and when" },
-  { to: "/gallery", label: "Gallery", icon: ImageIcon, description: "Photos from school life" },
+  { to: "/notices", label: tr("Notices"), icon: MegaphoneIcon, description: tr("Announcements from the school office") },
+  { to: "/news", label: tr("News"), icon: NewspaperIcon, description: tr("Stories and updates from campus") },
+  { to: "/events", label: tr("Events"), icon: CalendarDaysIcon, description: tr("What is happening and when") },
+  { to: "/gallery", label: tr("Gallery"), icon: ImageIcon, description: tr("Photos from school life") },
 ];
 const END_LINKS = [
-  { to: "/admission", label: "Admission" },
-  { to: "/contact", label: "Contact" },
+  { to: "/admission", label: tr("Admission") },
+  { to: "/contact", label: tr("Contact") },
 ];
 const ALL_LINKS = [...MAIN_LINKS, ...LIFE_LINKS, ...END_LINKS];
 
 const SOCIAL_LABEL: Record<string, string> = {
-  facebook: "Facebook",
-  twitter: "X / Twitter",
-  google: "Google",
-  instagram: "Instagram",
-  linkedin: "LinkedIn",
-  youtube: "YouTube",
+  facebook: tr("Facebook"),
+  twitter: tr("X / Twitter"),
+  google: tr("Google"),
+  instagram: tr("Instagram"),
+  linkedin: tr("LinkedIn"),
+  youtube: tr("YouTube"),
 };
 const validSocial = (links: Record<string, string> | undefined) => Object.entries(links ?? {}).filter(([, url]) => /^https?:\/\//.test(url ?? ""));
 
@@ -232,7 +233,7 @@ export function PublicLayout() {
             <NavigationMenuList>
               {MAIN_LINKS.map((l) => navLink(l.to, l.label))}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={cn("bg-transparent", LIFE_LINKS.some((l) => isActive(l.to)) && "text-primary")}>School life</NavigationMenuTrigger>
+                <NavigationMenuTrigger className={cn("bg-transparent", LIFE_LINKS.some((l) => isActive(l.to)) && "text-primary")}>{tr("School life")}</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[30rem] grid-cols-2 gap-1 p-1">
                     {LIFE_LINKS.map((l) => (
@@ -259,12 +260,11 @@ export function PublicLayout() {
             <Button asChild size="sm" className="hidden sm:inline-flex">
               <Link to="/login">
                 <LogInIcon />
-                Portal login
-              </Link>
+                {tr("Portal login")}</Link>
             </Button>
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+                <Button variant="ghost" size="icon" className="lg:hidden" aria-label={tr("Open menu")}>
                   <MenuIcon />
                 </Button>
               </SheetTrigger>
@@ -290,8 +290,7 @@ export function PublicLayout() {
                   <Button asChild>
                     <Link to="/login">
                       <LogInIcon />
-                      Portal login
-                    </Link>
+                      {tr("Portal login")}</Link>
                   </Button>
                   {site?.phone && (
                     <Button asChild variant="outline">
@@ -340,10 +339,10 @@ export function PublicLayout() {
               </div>
             )}
           </div>
-          <FooterLinks title="School" links={[...MAIN_LINKS.slice(1), ...END_LINKS, { to: "/login", label: "Portal login" }]} />
-          <FooterLinks title="School life" links={LIFE_LINKS} />
+          <FooterLinks title={tr("School")} links={[...MAIN_LINKS.slice(1), ...END_LINKS, { to: "/login", label: tr("Portal login") }]} />
+          <FooterLinks title={tr("School life")} links={LIFE_LINKS} />
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">Get in touch</h3>
+            <h3 className="text-sm font-semibold text-white">{tr("Get in touch")}</h3>
             <ul className="space-y-2.5 text-sm">
               {site?.address && (
                 <li className="flex gap-2">
@@ -372,14 +371,12 @@ export function PublicLayout() {
         </Container>
         <div className="border-t border-zinc-800">
           <Container className="flex flex-col gap-2 py-5 text-xs sm:flex-row sm:items-center sm:justify-between">
-            <p>{site?.copyright_text || `© ${new Date().getFullYear()} ${name}. All rights reserved.`}</p>
+            <p>{site?.copyright_text || tr("© {getFullYear} {name}. All rights reserved.", { getFullYear: new Date().getFullYear(), name })}</p>
             <div className="flex gap-4">
               <Link to="/terms" className="hover:text-white">
-                Terms & conditions
-              </Link>
+                {tr("Terms & conditions")}</Link>
               <Link to="/privacy" className="hover:text-white">
-                Privacy policy
-              </Link>
+                {tr("Privacy policy")}</Link>
             </div>
           </Container>
         </div>
@@ -505,7 +502,7 @@ function HeroSlider({ site }: { site: Site | undefined }) {
   const slide = slides[index % Math.max(slides.length, 1)];
   const name = schoolName(site);
   const title = slide?.title || name;
-  const description = slide?.description || site?.homepage_note_title || `Welcome to ${name}`;
+  const description = slide?.description || site?.homepage_note_title || tr("Welcome to {name}", { name });
   const ultimate = site?.theme === "ultimate";
   const go = (step: number) => setIndex((i) => (i + step + slides.length) % slides.length);
 
@@ -514,8 +511,7 @@ function HeroSlider({ site }: { site: Site | undefined }) {
       <Button asChild size="lg" variant={ultimate ? "secondary" : "default"}>
         <Link to="/admission">
           <ClipboardListIcon />
-          Admission
-        </Link>
+          {tr("Admission")}</Link>
       </Button>
       <Button
         asChild
@@ -525,14 +521,12 @@ function HeroSlider({ site }: { site: Site | undefined }) {
       >
         <Link to="/contact">
           <MailIcon />
-          Contact us
-        </Link>
+          {tr("Contact us")}</Link>
       </Button>
       <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
         <Link to="/login">
           <LogInIcon />
-          Portal login
-        </Link>
+          {tr("Portal login")}</Link>
       </Button>
     </div>
   );
@@ -542,7 +536,7 @@ function HeroSlider({ site }: { site: Site | undefined }) {
         <button
           key={i}
           type="button"
-          aria-label={`Slide ${i + 1}`}
+          aria-label={tr("Slide {value}", { value: i + 1 })}
           onClick={() => setIndex(i)}
           className={cn("h-1.5 rounded-full bg-white/50 transition-all", i === index % slides.length ? "w-8 bg-white" : "w-3")}
         />
@@ -587,11 +581,11 @@ function HeroSlider({ site }: { site: Site | undefined }) {
         {ctas}
         {slides.length > 1 && (
           <div className="mt-10 flex items-center gap-4">
-            <button type="button" aria-label="Previous slide" onClick={() => go(-1)} className="rounded-full border border-white/30 p-2 hover:bg-white/10">
+            <button type="button" aria-label={tr("Previous slide")} onClick={() => go(-1)} className="rounded-full border border-white/30 p-2 hover:bg-white/10">
               <ChevronLeftIcon className="size-4" />
             </button>
             {dots}
-            <button type="button" aria-label="Next slide" onClick={() => go(1)} className="rounded-full border border-white/30 p-2 hover:bg-white/10">
+            <button type="button" aria-label={tr("Next slide")} onClick={() => go(1)} className="rounded-full border border-white/30 p-2 hover:bg-white/10">
               <ChevronRightIcon className="size-4" />
             </button>
           </div>
@@ -610,9 +604,9 @@ export function HomePage() {
   const gallery = useGet<GalleryItem[]>("/public/gallery");
   const today = dayjs().startOf("day").unix();
   const contacts = [
-    site?.address && { icon: MapPinIcon, label: "Visit us", value: site.address },
-    site?.phone && { icon: PhoneIcon, label: "Call us", value: site.phone, href: `tel:${site.phone}` },
-    site?.email && { icon: MailIcon, label: "Email us", value: site.email, href: `mailto:${site.email}` },
+    site?.address && { icon: MapPinIcon, label: tr("Visit us"), value: site.address },
+    site?.phone && { icon: PhoneIcon, label: tr("Call us"), value: site.phone, href: `tel:${site.phone}` },
+    site?.email && { icon: MailIcon, label: tr("Email us"), value: site.email, href: `mailto:${site.email}` },
   ].filter(Boolean) as { icon: typeof MailIcon; label: string; value: string; href?: string }[];
 
   return (
@@ -655,13 +649,12 @@ export function HomePage() {
             )}
           </div>
           <div>
-            <p className="text-primary mb-1 text-xs font-semibold tracking-widest uppercase">About us</p>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{site?.homepage_note_title || `Welcome to ${schoolName(site)}`}</h2>
+            <p className="text-primary mb-1 text-xs font-semibold tracking-widest uppercase">{tr("About us")}</p>
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{site?.homepage_note_title || tr("Welcome to {schoolName}", { schoolName: schoolName(site) })}</h2>
             <Prose text={site?.homepage_note_description || site?.about_us} className="text-muted-foreground mt-4 line-clamp-[10]" />
             <Button asChild variant="outline" className="mt-6">
               <Link to="/about">
-                Learn more
-                <ArrowRightIcon />
+                {tr("Learn more")}<ArrowRightIcon />
               </Link>
             </Button>
           </div>
@@ -674,20 +667,18 @@ export function HomePage() {
             <div className="space-y-1.5">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <MegaphoneIcon className="text-primary size-5" />
-                Latest notices
-              </CardTitle>
-              <CardDescription>Announcements from the school office</CardDescription>
+                {tr("Latest notices")}</CardTitle>
+              <CardDescription>{tr("Announcements from the school office")}</CardDescription>
             </div>
             <Button asChild variant="ghost" size="sm">
               <Link to="/notices">
-                View all
-                <ArrowRightIcon />
+                {tr("View all")}<ArrowRightIcon />
               </Link>
             </Button>
           </CardHeader>
           <CardContent>
             {notices.isLoading && <Skeleton className="h-40 w-full" />}
-            {notices.data?.length === 0 && <p className="text-muted-foreground text-sm">No notices at the moment.</p>}
+            {notices.data?.length === 0 && <p className="text-muted-foreground text-sm">{tr("No notices at the moment.")}</p>}
             <ul className="divide-y">
               {notices.data?.slice(0, 5).map((n) => (
                 <li key={n.notice_id}>
@@ -705,27 +696,25 @@ export function HomePage() {
             <div className="space-y-1.5">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <CalendarDaysIcon className="text-primary size-5" />
-                Events
-              </CardTitle>
-              <CardDescription>Dates for your calendar</CardDescription>
+                {tr("Events")}</CardTitle>
+              <CardDescription>{tr("Dates for your calendar")}</CardDescription>
             </div>
             <Button asChild variant="ghost" size="sm">
               <Link to="/events">
-                View all
-                <ArrowRightIcon />
+                {tr("View all")}<ArrowRightIcon />
               </Link>
             </Button>
           </CardHeader>
           <CardContent>
             {events.isLoading && <Skeleton className="h-40 w-full" />}
-            {events.data?.length === 0 && <p className="text-muted-foreground text-sm">No events scheduled.</p>}
+            {events.data?.length === 0 && <p className="text-muted-foreground text-sm">{tr("No events scheduled.")}</p>}
             <ul className="space-y-3">
               {events.data?.slice(0, 4).map((e) => (
                 <li key={e.frontend_events_id} className="flex items-center gap-4">
                   <DateTile ts={e.timestamp} />
                   <div className="min-w-0">
                     <p className="font-medium">{e.title}</p>
-                    <p className="text-muted-foreground text-xs">{e.timestamp >= today ? "Upcoming" : "Past"} · {fromUnix(e.timestamp, "dddd")}</p>
+                    <p className="text-muted-foreground text-xs">{e.timestamp >= today ? tr("Upcoming") : tr("Past")} · {fromUnix(e.timestamp, "dddd")}</p>
                   </div>
                 </li>
               ))}
@@ -735,9 +724,9 @@ export function HomePage() {
       </Container>
 
       <Container className="mt-20">
-        <SectionHeading eyebrow="Stay informed" title="Latest news" action={{ to: "/news", label: "All news" }} />
+        <SectionHeading eyebrow={tr("Stay informed")} title={tr("Latest news")} action={{ to: "/news", label: tr("All news") }} />
         {news.isLoading && <GridSkeleton />}
-        {news.data?.length === 0 && <EmptyState icon={NewspaperIcon} title="No news yet" />}
+        {news.data?.length === 0 && <EmptyState icon={NewspaperIcon} title={tr("No news yet")} />}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {news.data?.map((n) => (
             <NewsCard key={n.frontend_news_id} n={n} />
@@ -747,7 +736,7 @@ export function HomePage() {
 
       {!!teachers.data?.length && (
         <Container className="mt-20">
-          <SectionHeading eyebrow="Our people" title="Meet our teachers" action={{ to: "/teachers", label: "All teachers" }} />
+          <SectionHeading eyebrow={tr("Our people")} title={tr("Meet our teachers")} action={{ to: "/teachers", label: tr("All teachers") }} />
           <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
             {teachers.data.slice(0, 4).map((t) => (
               <TeacherCard key={t.teacher_id} t={t} />
@@ -758,7 +747,7 @@ export function HomePage() {
 
       {!!gallery.data?.length && (
         <Container className="mt-20">
-          <SectionHeading eyebrow="School life" title="Gallery" action={{ to: "/gallery", label: "All albums" }} />
+          <SectionHeading eyebrow={tr("School life")} title={tr("Gallery")} action={{ to: "/gallery", label: tr("All albums") }} />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {gallery.data.slice(0, 6).map((g) => (
               <GalleryCard key={g.frontend_gallery_id} g={g} />
@@ -773,22 +762,19 @@ export function HomePage() {
           <div className="absolute -bottom-24 left-1/3 size-48 rounded-full bg-white/5" />
           <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Admissions are open</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{tr("Admissions are open")}</h2>
               <p className="text-primary-foreground/80 mt-2 max-w-xl">
-                Download the admission form, fill it in and bring it to the school office, or get in touch with any questions.
-              </p>
+                {tr("Download the admission form, fill it in and bring it to the school office, or get in touch with any questions.")}</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg" variant="secondary">
                 <Link to="/admission">
                   <ClipboardListIcon />
-                  Admission form
-                </Link>
+                  {tr("Admission form")}</Link>
               </Button>
               <Button asChild size="lg" variant="ghost" className="hover:text-primary-foreground hover:bg-white/10">
                 <Link to="/contact">
-                  Contact us
-                  <ArrowRightIcon />
+                  {tr("Contact us")}<ArrowRightIcon />
                 </Link>
               </Button>
             </div>
@@ -805,10 +791,10 @@ export function PublicNoticesPage() {
   const { data, isLoading } = useGet<NoticeItem[]>("/public/notices");
   return (
     <>
-      <PageHero title="Noticeboard" subtitle="Official announcements from the school" />
+      <PageHero title={tr("Noticeboard")} subtitle={tr("Official announcements from the school")} />
       <Container className="mt-10 max-w-4xl space-y-4">
         {isLoading && <Skeleton className="h-28 w-full" />}
-        {data?.length === 0 && <EmptyState icon={MegaphoneIcon} title="No notices" />}
+        {data?.length === 0 && <EmptyState icon={MegaphoneIcon} title={tr("No notices")} />}
         {data?.map((n) => (
           <Link key={n.notice_id} to={`/notices/${n.notice_id}`} className="group block">
             <Card className="flex-row items-start gap-4 p-5 transition-shadow group-hover:shadow-md">
@@ -852,11 +838,10 @@ export function PublicNoticePage() {
   if (!data) return <ArticleSkeleton />;
   return (
     <Container className="mt-10 max-w-3xl">
-      <BackLink to="/notices" label="All notices" />
+      <BackLink to="/notices" label={tr("All notices")} />
       <Badge variant="secondary" className="mb-3">
         <MegaphoneIcon />
-        Notice
-      </Badge>
+        {tr("Notice")}</Badge>
       <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{data.notice_title}</h1>
       <p className="text-muted-foreground mt-2 mb-8">{fromUnix(data.create_timestamp, "dddd, DD MMMM YYYY")}</p>
       {data.image_url && <img src={data.image_url} alt="" className="mb-8 w-full rounded-xl" />}
@@ -869,10 +854,10 @@ export function PublicNewsPage() {
   const { data, isLoading } = useGet<NewsItem[]>("/public/news", { limit: 50 });
   return (
     <>
-      <PageHero title="News" subtitle="Stories and updates from our school community" />
+      <PageHero title={tr("News")} subtitle={tr("Stories and updates from our school community")} />
       <Container className="mt-10">
         {isLoading && <GridSkeleton count={6} />}
-        {data?.length === 0 && <EmptyState icon={NewspaperIcon} title="No news yet" />}
+        {data?.length === 0 && <EmptyState icon={NewspaperIcon} title={tr("No news yet")} />}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data?.map((n) => (
             <NewsCard key={n.frontend_news_id} n={n} />
@@ -889,7 +874,7 @@ export function PublicNewsItemPage() {
   if (!data) return <ArticleSkeleton />;
   return (
     <Container className="mt-10 max-w-3xl">
-      <BackLink to="/news" label="All news" />
+      <BackLink to="/news" label={tr("All news")} />
       <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{data.title}</h1>
       <p className="text-muted-foreground mt-2 mb-8">{fromUnix(data.date_added, "dddd, DD MMMM YYYY")}</p>
       {data.image_url && <img src={data.image_url} alt="" className="mb-8 w-full rounded-xl" />}
@@ -903,10 +888,10 @@ export function PublicEventsPage() {
   const today = dayjs().startOf("day").unix();
   return (
     <>
-      <PageHero title="Events" subtitle="Important dates in the school calendar" />
+      <PageHero title={tr("Events")} subtitle={tr("Important dates in the school calendar")} />
       <Container className="mt-10 max-w-4xl space-y-3">
         {isLoading && <Skeleton className="h-24 w-full" />}
-        {data?.length === 0 && <EmptyState icon={CalendarDaysIcon} title="No events" />}
+        {data?.length === 0 && <EmptyState icon={CalendarDaysIcon} title={tr("No events")} />}
         {data?.map((e) => (
           <Card key={e.frontend_events_id} className="flex-row items-center gap-4 p-4">
             <DateTile ts={e.timestamp} />
@@ -915,9 +900,9 @@ export function PublicEventsPage() {
               <p className="text-muted-foreground text-sm">{fromUnix(e.timestamp, "dddd, DD MMMM YYYY")}</p>
             </div>
             {e.timestamp >= today ? (
-              <Badge className="bg-success/15 text-success border-transparent">Upcoming</Badge>
+              <Badge className="bg-success/15 text-success border-transparent">{tr("Upcoming")}</Badge>
             ) : (
-              <Badge variant="secondary">Past</Badge>
+              <Badge variant="secondary">{tr("Past")}</Badge>
             )}
           </Card>
         ))}
@@ -930,10 +915,10 @@ export function PublicGalleryPage() {
   const { data, isLoading } = useGet<GalleryItem[]>("/public/gallery");
   return (
     <>
-      <PageHero title="Gallery" subtitle="Moments from school life" />
+      <PageHero title={tr("Gallery")} subtitle={tr("Moments from school life")} />
       <Container className="mt-10">
         {isLoading && <GridSkeleton count={6} />}
-        {data?.length === 0 && <EmptyState icon={ImageIcon} title="No albums yet" />}
+        {data?.length === 0 && <EmptyState icon={ImageIcon} title={tr("No albums yet")} />}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data?.map((g) => (
             <GalleryCard key={g.frontend_gallery_id} g={g} />
@@ -954,11 +939,11 @@ export function PublicGalleryItemPage() {
   return (
     <>
       <PageHero title={data.title} subtitle={data.description}>
-        <p className="mt-3 text-sm opacity-70">{data.images.length} photos</p>
+        <p className="mt-3 text-sm opacity-70">{tn("{length} photos", { length: data.images.length })}</p>
       </PageHero>
       <Container className="mt-10">
-        <BackLink to="/gallery" label="All albums" />
-        {data.images.length === 0 && <EmptyState icon={ImageIcon} title="No photos in this album yet" />}
+        <BackLink to="/gallery" label={tr("All albums")} />
+        {data.images.length === 0 && <EmptyState icon={ImageIcon} title={tr("No photos in this album yet")} />}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {data.images.map((img, i) => (
             <button key={img.frontend_gallery_image_id} type="button" onClick={() => setOpen(i)} className="group bg-muted aspect-square overflow-hidden rounded-lg">
@@ -972,21 +957,21 @@ export function PublicGalleryItemPage() {
           <DialogTitle className="sr-only">{current?.title || data.title}</DialogTitle>
           {current && <img src={current.image_url} alt={current.title ?? ""} className="max-h-[75vh] w-full rounded-md object-contain" />}
           <div className="flex items-center justify-between gap-2">
-            <Button variant="outline" size="icon-sm" aria-label="Previous photo" onClick={() => step(-1)}>
+            <Button variant="outline" size="icon-sm" aria-label={tr("Previous photo")} onClick={() => step(-1)}>
               <ChevronLeftIcon />
             </Button>
             <span className="text-muted-foreground truncate text-sm">
-              {current?.title || `${(open ?? 0) + 1} / ${data.images.length}`}
+              {current?.title || tr("{value} / {length}", { value: (open ?? 0) + 1, length: data.images.length })}
             </span>
             <div className="flex gap-2">
               {current && (
-                <Button asChild variant="outline" size="icon-sm" aria-label="Open original">
+                <Button asChild variant="outline" size="icon-sm" aria-label={tr("Open original")}>
                   <a href={current.image_url} target="_blank" rel="noopener noreferrer">
                     <ExternalLinkIcon />
                   </a>
                 </Button>
               )}
-              <Button variant="outline" size="icon-sm" aria-label="Next photo" onClick={() => step(1)}>
+              <Button variant="outline" size="icon-sm" aria-label={tr("Next photo")} onClick={() => step(1)}>
                 <ChevronRightIcon />
               </Button>
             </div>
@@ -1001,10 +986,10 @@ export function PublicTeachersPage() {
   const { data, isLoading } = useGet<TeacherItem[]>("/public/teachers");
   return (
     <>
-      <PageHero title="Our teachers" subtitle="The dedicated people who make learning happen" />
+      <PageHero title={tr("Our teachers")} subtitle={tr("The dedicated people who make learning happen")} />
       <Container className="mt-10">
         {isLoading && <GridSkeleton count={4} className="lg:grid-cols-4" />}
-        {data?.length === 0 && <EmptyState icon={UsersIcon} title="No teachers listed yet" />}
+        {data?.length === 0 && <EmptyState icon={UsersIcon} title={tr("No teachers listed yet")} />}
         <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
           {data?.map((t) => (
             <TeacherCard key={t.teacher_id} t={t} />
@@ -1024,7 +1009,7 @@ export function PublicTextPage({ field, title }: { field: "about_us" | "terms_co
         {field === "about_us" && site?.about_us_image_url && <img src={site.about_us_image_url} alt="" className="w-full rounded-2xl object-cover" />}
         <div>
           {isLoading && <Skeleton className="h-40 w-full" />}
-          {site && (site[field] ? <Prose text={site[field]} className="text-lg" /> : <p className="text-muted-foreground">Nothing here yet.</p>)}
+          {site && (site[field] ? <Prose text={site[field]} className="text-lg" /> : <p className="text-muted-foreground">{tr("Nothing here yet.")}</p>)}
         </div>
       </Container>
     </>
@@ -1057,7 +1042,7 @@ function loadRecaptcha(): Promise<void> {
     s.onerror = () => {
       recaptchaScript = null;
       s.remove();
-      reject(new Error("reCAPTCHA failed to load"));
+      reject(new Error(tr("reCAPTCHA failed to load")));
     };
     document.head.appendChild(s);
   });
@@ -1122,41 +1107,40 @@ function ContactForm({ siteKey, onSent }: { siteKey: string | null; onSent: () =
   return (
     <form onSubmit={submit} className="grid gap-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Your name" htmlFor="contact-name" required error={errors.name?.message}>
-          <Input id="contact-name" autoComplete="name" aria-invalid={!!errors.name} {...form.register("name", { required: "Please enter your name" })} />
+        <Field label={tr("Your name")} htmlFor="contact-name" required error={errors.name?.message}>
+          <Input id="contact-name" autoComplete="name" aria-invalid={!!errors.name} {...form.register("name", { required: tr("Please enter your name") })} />
         </Field>
-        <Field label="Email" htmlFor="contact-email" required error={errors.email?.message}>
+        <Field label={tr("Email")} htmlFor="contact-email" required error={errors.email?.message}>
           <Input
             id="contact-email"
             type="email"
             autoComplete="email"
             aria-invalid={!!errors.email}
-            {...form.register("email", { required: "Please enter your email", pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email address" } })}
+            {...form.register("email", { required: tr("Please enter your email"), pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: tr("Enter a valid email address") } })}
           />
         </Field>
       </div>
-      <Field label="Phone" htmlFor="contact-phone" description="Optional">
+      <Field label={tr("Phone")} htmlFor="contact-phone" description={tr("Optional")}>
         <Input id="contact-phone" type="tel" autoComplete="tel" {...form.register("phone")} />
       </Field>
-      <Field label="Message" htmlFor="contact-message" required error={errors.message?.message}>
+      <Field label={tr("Message")} htmlFor="contact-message" required error={errors.message?.message}>
         <Textarea
           id="contact-message"
           rows={6}
           aria-invalid={!!errors.message}
-          {...form.register("message", { required: "Please write a message", minLength: { value: 10, message: "Message is too short" } })}
+          {...form.register("message", { required: tr("Please write a message"), minLength: { value: 10, message: tr("Message is too short") } })}
         />
       </Field>
       {siteKey && (
         <div className="grid gap-1.5">
           <div ref={captcha.ref} onClick={() => setCaptchaError(false)} />
-          {captcha.failed && <p className="text-destructive text-xs">The spam check could not be loaded. Check your connection and reload the page.</p>}
-          {captchaError && !captcha.token && <p className="text-destructive text-xs">Please confirm you are not a robot.</p>}
+          {captcha.failed && <p className="text-destructive text-xs">{tr("The spam check could not be loaded. Check your connection and reload the page.")}</p>}
+          {captchaError && !captcha.token && <p className="text-destructive text-xs">{tr("Please confirm you are not a robot.")}</p>}
         </div>
       )}
       <Button type="submit" size="lg" className="w-full sm:w-fit" loading={send.isPending}>
         <SendIcon />
-        Send message
-      </Button>
+        {tr("Send message")}</Button>
     </form>
   );
 }
@@ -1167,21 +1151,21 @@ export function PublicContactPage() {
   const coords = mapCoords(site?.school_location);
   const enabled = site?.contact_enabled !== false;
   const items = [
-    site?.address && { icon: MapPinIcon, label: "Address", value: site.address, href: coords ? `https://www.google.com/maps?q=${coords}` : undefined },
-    site?.phone && { icon: PhoneIcon, label: "Phone", value: site.phone, href: `tel:${site.phone}` },
-    site?.email && { icon: MailIcon, label: "Email", value: site.email, href: `mailto:${site.email}` },
-    site?.fax && { icon: PrinterIcon, label: "Fax", value: site.fax },
+    site?.address && { icon: MapPinIcon, label: tr("Address"), value: site.address, href: coords ? `https://www.google.com/maps?q=${coords}` : undefined },
+    site?.phone && { icon: PhoneIcon, label: tr("Phone"), value: site.phone, href: `tel:${site.phone}` },
+    site?.email && { icon: MailIcon, label: tr("Email"), value: site.email, href: `mailto:${site.email}` },
+    site?.fax && { icon: PrinterIcon, label: tr("Fax"), value: site.fax },
   ].filter(Boolean) as { icon: typeof MailIcon; label: string; value: string; href?: string }[];
 
   return (
     <>
-      <PageHero title="Contact us" subtitle="Questions about admission, fees or anything else? We are happy to help." />
+      <PageHero title={tr("Contact us")} subtitle={tr("Questions about admission, fees or anything else? We are happy to help.")} />
       <Container className={cn("mt-10 grid gap-8", enabled && "lg:grid-cols-[2fr_3fr]")}>
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>{schoolName(site)}</CardTitle>
-              <CardDescription>Reach the school office</CardDescription>
+              <CardDescription>{tr("Reach the school office")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoading && <Skeleton className="h-24 w-full" />}
@@ -1202,13 +1186,13 @@ export function PublicContactPage() {
                   </div>
                 </div>
               ))}
-              {site && items.length === 0 && <p className="text-muted-foreground text-sm">Contact details have not been published yet.</p>}
+              {site && items.length === 0 && <p className="text-muted-foreground text-sm">{tr("Contact details have not been published yet.")}</p>}
             </CardContent>
           </Card>
           {coords && (
             <Card className="gap-0 overflow-hidden py-0">
               <iframe
-                title="School location"
+                title={tr("School location")}
                 src={`https://maps.google.com/maps?q=${coords}&z=15&output=embed`}
                 className="aspect-[4/3] w-full border-0"
                 loading="lazy"
@@ -1218,8 +1202,7 @@ export function PublicContactPage() {
                 <Button asChild variant="ghost" size="sm">
                   <a href={`https://www.google.com/maps?q=${coords}`} target="_blank" rel="noopener noreferrer">
                     <MapPinIcon />
-                    Open in Google Maps
-                  </a>
+                    {tr("Open in Google Maps")}</a>
                 </Button>
               </div>
             </Card>
@@ -1233,17 +1216,16 @@ export function PublicContactPage() {
                 <span className="bg-success/15 text-success flex size-14 items-center justify-center rounded-full">
                   <CheckIcon className="size-7" />
                 </span>
-                <h2 className="text-xl font-semibold">Message sent</h2>
-                <p className="text-muted-foreground max-w-sm">Thank you for getting in touch. The school office will reply to you by email as soon as possible.</p>
+                <h2 className="text-xl font-semibold">{tr("Message sent")}</h2>
+                <p className="text-muted-foreground max-w-sm">{tr("Thank you for getting in touch. The school office will reply to you by email as soon as possible.")}</p>
                 <Button variant="outline" className="mt-2" onClick={() => setSent(false)}>
-                  Send another message
-                </Button>
+                  {tr("Send another message")}</Button>
               </CardContent>
             ) : (
               <>
                 <CardHeader>
-                  <CardTitle className="text-xl">Send us a message</CardTitle>
-                  <CardDescription>We usually reply within one working day.</CardDescription>
+                  <CardTitle className="text-xl">{tr("Send us a message")}</CardTitle>
+                  <CardDescription>{tr("We usually reply within one working day.")}</CardDescription>
                 </CardHeader>
                 <CardContent>{site ? <ContactForm siteKey={site.recaptcha_site_key || null} onSent={() => setSent(true)} /> : <Skeleton className="h-72 w-full" />}</CardContent>
               </>
@@ -1293,12 +1275,12 @@ function FormSection({ n, title, children }: { n: number; title: string; childre
 }
 
 const DOCUMENTS = [
-  "Birth certificate (copy)",
-  "Two recent passport-size photographs",
-  "Previous school report card / transcript",
-  "Transfer / leaving certificate",
-  "Parent or guardian ID (copy)",
-  "Immunisation / medical record",
+  tr("Birth certificate (copy)"),
+  tr("Two recent passport-size photographs"),
+  tr("Previous school report card / transcript"),
+  tr("Transfer / leaving certificate"),
+  tr("Parent or guardian ID (copy)"),
+  tr("Immunisation / medical record"),
 ];
 
 interface AdmissionOptions {
@@ -1360,102 +1342,99 @@ function OnlineApplicationForm({ options, siteKey }: { options: AdmissionOptions
         <div className="bg-primary/10 text-primary flex size-12 items-center justify-center rounded-full">
           <CheckIcon className="size-6" />
         </div>
-        <p className="text-lg font-semibold">Application received</p>
+        <p className="text-lg font-semibold">{tr("Application received")}</p>
         <p className="text-muted-foreground max-w-md text-sm">
-          Your reference is <span className="text-foreground font-mono font-semibold">{sent}</span>. Keep it: with your phone number it lets you check the status below.
-        </p>
+          {tr("Your reference is")}{" "}<span className="text-foreground font-mono font-semibold">{sent}</span>{tr(". Keep it: with your phone number it lets you check the status below.")}</p>
       </div>
     );
 
   return (
     <form onSubmit={submit} className="grid gap-6" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Student's full name" htmlFor="adm-name" required error={errors.student_name?.message}>
-          <Input id="adm-name" aria-invalid={!!errors.student_name} {...form.register("student_name", { required: "Please enter the student's name" })} />
+        <Field label={tr("Student's full name")} htmlFor="adm-name" required error={errors.student_name?.message}>
+          <Input id="adm-name" aria-invalid={!!errors.student_name} {...form.register("student_name", { required: tr("Please enter the student's name") })} />
         </Field>
-        <Field label={`Class applying for (${options.year})`} htmlFor="adm-class" required error={errors.class_id?.message}>
+        <Field label={tr("Class applying for ({year})", { year: options.year })} htmlFor="adm-class" required error={errors.class_id?.message}>
           <select
             id="adm-class"
             className="border-input bg-background h-9 rounded-md border px-3 text-sm"
             aria-invalid={!!errors.class_id}
-            {...form.register("class_id", { required: "Please choose a class" })}
+            {...form.register("class_id", { required: tr("Please choose a class") })}
           >
-            <option value="">Choose…</option>
+            <option value="">{tr("Choose…")}</option>
             {options.classes.map((c) => (
               <option key={c.class_id} value={c.class_id}>{c.name}</option>
             ))}
           </select>
         </Field>
-        <Field label="Date of birth" htmlFor="adm-dob">
+        <Field label={tr("Date of birth")} htmlFor="adm-dob">
           <Input id="adm-dob" type="date" {...form.register("date_of_birth")} />
         </Field>
-        <Field label="Gender" htmlFor="adm-gender">
+        <Field label={tr("Gender")} htmlFor="adm-gender">
           <select id="adm-gender" className="border-input bg-background h-9 rounded-md border px-3 text-sm" {...form.register("gender")}>
             <option value="">—</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
+            <option value="male">{tr("Male")}</option>
+            <option value="female">{tr("Female")}</option>
+            <option value="other">{tr("Other")}</option>
           </select>
         </Field>
-        <Field label="Previous school" htmlFor="adm-prev" className="sm:col-span-2">
+        <Field label={tr("Previous school")} htmlFor="adm-prev" className="sm:col-span-2">
           <Input id="adm-prev" {...form.register("previous_school")} />
         </Field>
-        <Field label="Parent / guardian name" htmlFor="adm-gname" required error={errors.guardian_name?.message}>
-          <Input id="adm-gname" autoComplete="name" aria-invalid={!!errors.guardian_name} {...form.register("guardian_name", { required: "Please enter a name" })} />
+        <Field label={tr("Parent / guardian name")} htmlFor="adm-gname" required error={errors.guardian_name?.message}>
+          <Input id="adm-gname" autoComplete="name" aria-invalid={!!errors.guardian_name} {...form.register("guardian_name", { required: tr("Please enter a name") })} />
         </Field>
-        <Field label="Relation to student" htmlFor="adm-rel">
-          <Input id="adm-rel" placeholder="Mother, father, uncle…" {...form.register("guardian_relation")} />
+        <Field label={tr("Relation to student")} htmlFor="adm-rel">
+          <Input id="adm-rel" placeholder={tr("Mother, father, uncle…")} {...form.register("guardian_relation")} />
         </Field>
-        <Field label="Phone" htmlFor="adm-phone" required error={errors.guardian_phone?.message}>
+        <Field label={tr("Phone")} htmlFor="adm-phone" required error={errors.guardian_phone?.message}>
           <Input
             id="adm-phone"
             type="tel"
             autoComplete="tel"
             aria-invalid={!!errors.guardian_phone}
-            {...form.register("guardian_phone", { required: "Please enter a phone number", minLength: { value: 5, message: "Phone number is too short" } })}
+            {...form.register("guardian_phone", { required: tr("Please enter a phone number"), minLength: { value: 5, message: tr("Phone number is too short") } })}
           />
         </Field>
-        <Field label="Email" htmlFor="adm-email" description="We send the reference and decisions here" error={errors.guardian_email?.message}>
+        <Field label={tr("Email")} htmlFor="adm-email" description={tr("We send the reference and decisions here")} error={errors.guardian_email?.message}>
           <Input
             id="adm-email"
             type="email"
             autoComplete="email"
             aria-invalid={!!errors.guardian_email}
-            {...form.register("guardian_email", { pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email address" } })}
+            {...form.register("guardian_email", { pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: tr("Enter a valid email address") } })}
           />
         </Field>
-        <Field label="Home address" htmlFor="adm-address" className="sm:col-span-2">
+        <Field label={tr("Home address")} htmlFor="adm-address" className="sm:col-span-2">
           <Textarea id="adm-address" rows={2} {...form.register("address")} />
         </Field>
-        <Field label="Anything we should know?" htmlFor="adm-notes" className="sm:col-span-2">
+        <Field label={tr("Anything we should know?")} htmlFor="adm-notes" className="sm:col-span-2">
           <Textarea id="adm-notes" rows={3} {...form.register("notes")} />
         </Field>
       </div>
 
       <div className="grid gap-2">
-        <p className="text-sm font-medium">Documents</p>
-        <p className="text-muted-foreground text-xs">Optional. Up to {MAX_DOCUMENTS} files: PDF, image or Word, each at most 10 MB.</p>
+        <p className="text-sm font-medium">{tr("Documents")}</p>
+        <p className="text-muted-foreground text-xs">{tn("Optional. Up to {MAX_DOCUMENTS} files: PDF, image or Word, each at most 10 MB.", { MAX_DOCUMENTS })}</p>
         {docs.map((d, i) => (
           <div key={i} className="flex flex-wrap items-center gap-2">
             <Input
-              aria-label={`Label for ${d.file.name}`}
+              aria-label={tr("Label for {name}", { name: d.file.name })}
               className="w-56"
               value={d.label}
-              placeholder="e.g. Birth certificate"
+              placeholder={tr("e.g. Birth certificate")}
               onChange={(e) => setDocs((ds) => ds.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))}
             />
             <span className="text-muted-foreground truncate text-sm">{d.file.name}</span>
             <Button type="button" variant="ghost" size="sm" onClick={() => setDocs((ds) => ds.filter((_, j) => j !== i))}>
-              Remove
-            </Button>
+              {tr("Remove")}</Button>
           </div>
         ))}
         {docs.length < MAX_DOCUMENTS && (
           <div>
             <label className="border-input hover:bg-accent inline-flex h-8 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm">
               <PaperclipIcon className="size-4" />
-              Attach a document
-              <input
+              {tr("Attach a document")}<input
                 type="file"
                 hidden
                 accept={DOCUMENT_ACCEPT}
@@ -1473,14 +1452,13 @@ function OnlineApplicationForm({ options, siteKey }: { options: AdmissionOptions
       {siteKey && (
         <div className="grid gap-1.5">
           <div ref={captcha.ref} onClick={() => setCaptchaError(false)} />
-          {captcha.failed && <p className="text-destructive text-xs">The spam check could not be loaded. Check your connection and reload the page.</p>}
-          {captchaError && !captcha.token && <p className="text-destructive text-xs">Please confirm you are not a robot.</p>}
+          {captcha.failed && <p className="text-destructive text-xs">{tr("The spam check could not be loaded. Check your connection and reload the page.")}</p>}
+          {captchaError && !captcha.token && <p className="text-destructive text-xs">{tr("Please confirm you are not a robot.")}</p>}
         </div>
       )}
       <Button type="submit" size="lg" className="w-full sm:w-fit" loading={send.isPending}>
         <SendIcon />
-        Submit application
-      </Button>
+        {tr("Submit application")}</Button>
     </form>
   );
 }
@@ -1494,21 +1472,20 @@ function AdmissionStatusCheck() {
   return (
     <form onSubmit={form.handleSubmit((v) => check.mutate({ reference: v.reference.trim(), phone: v.phone.trim() }))} className="grid gap-4">
       <div className="grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-        <Field label="Reference" htmlFor="adm-ref">
-          <Input id="adm-ref" placeholder="A26-1F2E3D" {...form.register("reference", { required: true })} />
+        <Field label={tr("Reference")} htmlFor="adm-ref">
+          <Input id="adm-ref" placeholder={tr("A26-1F2E3D")} {...form.register("reference", { required: true })} />
         </Field>
-        <Field label="Phone used on the application" htmlFor="adm-ref-phone">
+        <Field label={tr("Phone used on the application")} htmlFor="adm-ref-phone">
           <Input id="adm-ref-phone" type="tel" {...form.register("phone", { required: true })} />
         </Field>
         <Button type="submit" variant="outline" loading={check.isPending}>
           <SearchIcon />
-          Check status
-        </Button>
+          {tr("Check status")}</Button>
       </div>
       {result && (
         <p className="text-sm">
-          Application <span className="font-mono font-semibold">{result.reference}</span>: <Badge>{result.status_label}</Badge>
-          <span className="text-muted-foreground ml-2">updated {dayjs(result.updated_at).format("DD MMM YYYY")}</span>
+          {tr("Application")}{" "}<span className="font-mono font-semibold">{result.reference}</span>: <Badge>{result.status_label}</Badge>
+          <span className="text-muted-foreground ml-2">{tn("updated {dayjs}", { dayjs: dayjs(result.updated_at).format("DD MMM YYYY") })}</span>
         </p>
       )}
     </form>
@@ -1524,26 +1501,23 @@ export function PublicAdmissionPage() {
   return (
     <>
       <PageHero
-        title="Admission"
+        title={tr("Admission")}
         subtitle={
           online
-            ? `Applications for ${online.year} are open. Apply online below, or print the form and hand it in at the school office.`
-            : "Print the admission form, fill it in by hand and hand it in at the school office together with the listed documents."
+            ? tr("Applications for {year} are open. Apply online below, or print the form and hand it in at the school office.", { year: online.year })
+            : tr("Print the admission form, fill it in by hand and hand it in at the school office together with the listed documents.")
         }
       >
         <div className="mt-6 flex flex-wrap gap-3">
           <Button size="lg" variant={site?.theme === "ultimate" ? "secondary" : "default"} onClick={() => window.print()}>
             <PrinterIcon />
-            Print form
-          </Button>
+            {tr("Print form")}</Button>
           <Button size="lg" variant="outline" className="bg-background text-foreground" onClick={() => window.print()}>
             <DownloadIcon />
-            Save as PDF
-          </Button>
+            {tr("Save as PDF")}</Button>
           <Button asChild size="lg" variant="ghost">
             <Link to="/contact">
-              Questions? Contact us
-              <ArrowRightIcon />
+              {tr("Questions? Contact us")}<ArrowRightIcon />
             </Link>
           </Button>
         </div>
@@ -1553,22 +1527,22 @@ export function PublicAdmissionPage() {
         {online && (
           <Card>
             <CardHeader>
-              <CardTitle>Apply online</CardTitle>
-              <CardDescription>You get a reference number right away. The school office will contact you.</CardDescription>
+              <CardTitle>{tr("Apply online")}</CardTitle>
+              <CardDescription>{tr("You get a reference number right away. The school office will contact you.")}</CardDescription>
             </CardHeader>
             <CardContent>{site ? <OnlineApplicationForm options={online} siteKey={site.recaptcha_site_key || null} /> : <Skeleton className="h-96 w-full" />}</CardContent>
           </Card>
         )}
         <Card>
           <CardHeader>
-            <CardTitle>Check an application</CardTitle>
-            <CardDescription>Enter the reference you received and the phone number given on the application.</CardDescription>
+            <CardTitle>{tr("Check an application")}</CardTitle>
+            <CardDescription>{tr("Enter the reference you received and the phone number given on the application.")}</CardDescription>
           </CardHeader>
           <CardContent>
             <AdmissionStatusCheck />
           </CardContent>
         </Card>
-        {online && <h2 className="pt-4 text-xl font-semibold tracking-tight">Paper form</h2>}
+        {online && <h2 className="pt-4 text-xl font-semibold tracking-tight">{tr("Paper form")}</h2>}
       </Container>
 
       <Container className="mt-6 max-w-4xl print:mt-0 print:max-w-none print:px-0">
@@ -1580,67 +1554,65 @@ export function PublicAdmissionPage() {
                 <h2 className="text-2xl font-bold tracking-tight">{name}</h2>
                 {site?.address && <p className="text-sm">{site.address}</p>}
                 <p className="text-sm">{[site?.phone, site?.email].filter(Boolean).join(" · ")}</p>
-                <p className="mt-3 text-lg font-semibold tracking-wide uppercase">Admission form</p>
+                <p className="mt-3 text-lg font-semibold tracking-wide uppercase">{tr("Admission form")}</p>
                 <p className="text-muted-foreground text-xs print:text-black">
-                  Academic year: {year}–{year + 1} &nbsp;·&nbsp; Form no.: ____________
-                </p>
+                  {tn("Academic year: {year}–{value}  ·  Form no.: ____________", { year, value: year + 1 })}</p>
               </div>
             </div>
             <div className="border-foreground/50 hidden size-32 shrink-0 flex-col items-center justify-center rounded-md border-2 border-dashed p-2 text-center text-xs sm:flex print:flex print:border-black">
-              Affix passport-size photo
-            </div>
+              {tr("Affix passport-size photo")}</div>
           </div>
 
-          <FormSection n={1} title="Student information">
-            <Line label="Full name (in block letters)" />
+          <FormSection n={1} title={tr("Student information")}>
+            <Line label={tr("Full name (in block letters)")} />
             <div className="grid gap-4 sm:grid-cols-2 print:grid-cols-2">
-              <Line label="Date of birth" />
-              <Line label="Place of birth" />
-              <Boxes label="Gender" options={["Male", "Female", "Other"]} />
-              <Line label="Blood group" />
-              <Line label="Religion" />
-              <Line label="Nationality" />
-              <Line label="Class applying for" />
-              <Line label="Preferred section / shift" />
+              <Line label={tr("Date of birth")} />
+              <Line label={tr("Place of birth")} />
+              <Boxes label={tr("Gender")} options={[tr("Male"), tr("Female"), tr("Other")]} />
+              <Line label={tr("Blood group")} />
+              <Line label={tr("Religion")} />
+              <Line label={tr("Nationality")} />
+              <Line label={tr("Class applying for")} />
+              <Line label={tr("Preferred section / shift")} />
             </div>
-            <Line label="Home address" />
+            <Line label={tr("Home address")} />
             <Line label="" className="[&>span:first-child]:invisible" />
             <div className="grid gap-4 sm:grid-cols-2 print:grid-cols-2">
-              <Line label="Phone" />
-              <Line label="Email" />
+              <Line label={tr("Phone")} />
+              <Line label={tr("Email")} />
             </div>
           </FormSection>
 
-          <FormSection n={2} title="Parent / guardian information">
+          <FormSection n={2} title={tr("Parent / guardian information")}>
             <div className="grid gap-4 sm:grid-cols-2 print:grid-cols-2">
-              <Line label="Father's name" />
-              <Line label="Occupation" />
-              <Line label="Mobile" />
-              <Line label="Email" />
-              <Line label="Mother's name" />
-              <Line label="Occupation" />
-              <Line label="Mobile" />
-              <Line label="Email" />
+              <Line label={tr("Father's name")} />
+              <Line label={tr("Occupation")} />
+              <Line label={tr("Mobile")} />
+              <Line label={tr("Email")} />
+              <Line label={tr("Mother's name")} />
+              <Line label={tr("Occupation")} />
+              <Line label={tr("Mobile")} />
+              <Line label={tr("Email")} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2 print:grid-cols-2">
-              <Line label="Guardian (if other than parents)" />
-              <Line label="Relationship" />
+              <Line label={tr("Guardian (if other than parents)")} />
+              <Line label={tr("Relationship")} />
             </div>
-            <Line label="Emergency contact (name & phone)" />
+            <Line label={tr("Emergency contact (name & phone)")} />
           </FormSection>
 
-          <FormSection n={3} title="Educational background">
-            <Line label="Previous school" />
+          <FormSection n={3} title={tr("Educational background")}>
+            <Line label={tr("Previous school")} />
             <div className="grid gap-4 sm:grid-cols-3 print:grid-cols-3">
-              <Line label="Last class attended" />
-              <Line label="Year" />
-              <Line label="Result / GPA" />
+              <Line label={tr("Last class attended")} />
+              <Line label={tr("Year")} />
+              <Line label={tr("Result / GPA")} />
             </div>
-            <Line label="Reason for leaving" />
-            <Line label="Medical conditions / special needs (if any)" />
+            <Line label={tr("Reason for leaving")} />
+            <Line label={tr("Medical conditions / special needs (if any)")} />
           </FormSection>
 
-          <FormSection n={4} title="Documents attached">
+          <FormSection n={4} title={tr("Documents attached")}>
             <div className="grid gap-2 sm:grid-cols-2 print:grid-cols-2">
               {DOCUMENTS.map((d) => (
                 <span key={d} className="inline-flex items-center gap-2 text-sm">
@@ -1651,12 +1623,11 @@ export function PublicAdmissionPage() {
             </div>
           </FormSection>
 
-          <FormSection n={5} title="Declaration">
+          <FormSection n={5} title={tr("Declaration")}>
             <p className="text-sm leading-relaxed">
-              I declare that the information given above is true and complete. I agree to abide by the rules and regulations of {name}.
-            </p>
+              {tn("I declare that the information given above is true and complete. I agree to abide by the rules and regulations of {name}.", { name })}</p>
             <div className="grid gap-8 pt-8 sm:grid-cols-3 print:grid-cols-3">
-              {["Signature of parent / guardian", "Signature of student", "Date"].map((s) => (
+              {[tr("Signature of parent / guardian"), tr("Signature of student"), tr("Date")].map((s) => (
                 <div key={s} className="border-t border-current pt-1 text-center text-xs">
                   {s}
                 </div>
@@ -1665,14 +1636,14 @@ export function PublicAdmissionPage() {
           </FormSection>
 
           <div className="break-inside-avoid rounded-md border border-dashed p-4 print:border-black">
-            <p className="mb-4 text-xs font-bold tracking-wide uppercase">For office use only</p>
+            <p className="mb-4 text-xs font-bold tracking-wide uppercase">{tr("For office use only")}</p>
             <div className="grid gap-4 sm:grid-cols-3 print:grid-cols-3">
-              <Line label="Admission no." />
-              <Line label="Class / section" />
-              <Line label="Roll" />
-              <Line label="Received by" />
-              <Line label="Date" />
-              <Line label="Principal" />
+              <Line label={tr("Admission no.")} />
+              <Line label={tr("Class / section")} />
+              <Line label={tr("Roll")} />
+              <Line label={tr("Received by")} />
+              <Line label={tr("Date")} />
+              <Line label={tr("Principal")} />
             </div>
           </div>
         </div>

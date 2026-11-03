@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
 import { AppLayout } from "./layouts/AppLayout";
 import { canAccess } from "./nav";
+import { t } from "./i18n";
 
 // Each page module loads on first visit so the initial bundle stays small.
 const page = <M extends Record<string, unknown>>(load: () => Promise<M>, name: keyof M) =>
@@ -171,7 +172,7 @@ function NotFound() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-1">
       <h1 className="text-5xl font-bold tracking-tight">404</h1>
-      <p className="text-muted-foreground">Page not found</p>
+      <p className="text-muted-foreground">{t("Page not found")}</p>
     </div>
   );
 }
@@ -192,9 +193,9 @@ export default function App() {
           <Route path="teachers" element={<PublicTeachersPage />} />
           <Route path="contact" element={<PublicContactPage />} />
           <Route path="admission" element={<PublicAdmissionPage />} />
-          <Route path="about" element={<PublicTextPage field="about_us" title="About us" />} />
-          <Route path="terms" element={<PublicTextPage field="terms_conditions" title="Terms & conditions" />} />
-          <Route path="privacy" element={<PublicTextPage field="privacy_policy" title="Privacy policy" />} />
+          <Route path="about" element={<PublicTextPage field="about_us" title={t("About us")} />} />
+          <Route path="terms" element={<PublicTextPage field="terms_conditions" title={t("Terms & conditions")} />} />
+          <Route path="privacy" element={<PublicTextPage field="privacy_policy" title={t("Privacy policy")} />} />
         </Route>
 
         <Route path="login" element={<LoginPage />} />

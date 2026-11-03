@@ -31,6 +31,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { toOptions } from "../utils";
 import { PrintHeader, useChildSelect } from "./Academic";
+import { t, tn, tp } from "../i18n";
 
 const nameOf = <T,>(items: T[] | undefined, key: keyof T, id: unknown) =>
   id === null || id === undefined ? undefined : (items ?? []).find((x) => String(x[key]) === String(id));
@@ -39,34 +40,34 @@ export function ExamsPage() {
   return (
     <Tabs defaultValue="exams" className="gap-4">
       <TabsList>
-        <TabsTrigger value="exams">Exams</TabsTrigger>
-        <TabsTrigger value="grades">Grades</TabsTrigger>
+        <TabsTrigger value="exams">{t("Exams")}</TabsTrigger>
+        <TabsTrigger value="grades">{t("Grades")}</TabsTrigger>
       </TabsList>
       <TabsContent value="exams">
         <CrudPage
-          title="Exams"
-          subtitle="Exams of the running academic year"
+          title={t("Exams")}
+          subtitle={t("Exams of the running academic year")}
           path="/exams"
           idField="exam_id"
           fields={[
-            { name: "name", label: "Name", required: true },
-            { name: "date", label: "Date", type: "date" },
-            { name: "comment", label: "Comment", type: "textarea" },
-            { name: "year", label: "Year", tableOnly: true },
+            { name: "name", label: t("Name"), required: true },
+            { name: "date", label: t("Date"), type: "date" },
+            { name: "comment", label: t("Comment"), type: "textarea" },
+            { name: "year", label: t("Year"), tableOnly: true },
           ]}
         />
       </TabsContent>
       <TabsContent value="grades">
         <CrudPage
-          title="Grades"
+          title={t("Grades")}
           path="/grades"
           idField="grade_id"
           fields={[
-            { name: "name", label: "Grade", required: true },
-            { name: "grade_point", label: "Grade point", required: true },
-            { name: "mark_from", label: "Mark from", type: "number", required: true },
-            { name: "mark_upto", label: "Mark up to", type: "number", required: true },
-            { name: "comment", label: "Comment" },
+            { name: "name", label: t("Grade"), required: true },
+            { name: "grade_point", label: t("Grade point"), required: true },
+            { name: "mark_from", label: t("Mark from"), type: "number", required: true },
+            { name: "mark_upto", label: t("Mark up to"), type: "number", required: true },
+            { name: "comment", label: t("Comment") },
           ]}
         />
       </TabsContent>
@@ -100,16 +101,16 @@ function QuestionPaperDialog({ id, onClose }: { id: number | null; onClose: () =
   const { data, isLoading } = useGet<QuestionPaper>(id ? `/question-papers/${id}` : null);
   const className = nameOf(classes.data?.items, "class_id", data?.class_id)?.name;
   const examName = nameOf(exams.data?.items, "exam_id", data?.exam_id)?.name;
-  const meta = [examName, className && `Class ${className}`].filter(Boolean).join(" · ");
+  const meta = [examName, className && t("Class {className}", { className })].filter(Boolean).join(" · ");
 
   return (
     <Dialog open={id !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
         {id !== null && <style>{PAPER_PRINT_CSS}</style>}
-        <PrintHeader title={data?.title ?? "Question paper"} lines={meta ? [meta] : undefined} />
+        <PrintHeader title={data?.title ?? t("Question paper")} lines={meta ? [meta] : undefined} />
         <DialogHeader className="no-print">
-          <DialogTitle>{data?.title ?? "Question paper"}</DialogTitle>
-          <DialogDescription>{meta || "Question paper details"}</DialogDescription>
+          <DialogTitle>{data?.title ?? t("Question paper")}</DialogTitle>
+          <DialogDescription>{meta || t("Question paper details")}</DialogDescription>
         </DialogHeader>
         {isLoading ? (
           <div className="space-y-2">
@@ -120,18 +121,15 @@ function QuestionPaperDialog({ id, onClose }: { id: number | null; onClose: () =
         ) : data?.question_paper ? (
           <div className="rounded-md border p-4 text-sm leading-relaxed whitespace-pre-wrap print:border-0 print:p-0">{data.question_paper}</div>
         ) : (
-          <EmptyState icon={ClipboardListIcon} title="No questions written yet">
-            Edit the paper to add its questions.
-          </EmptyState>
+          <EmptyState icon={ClipboardListIcon} title={t("No questions written yet")}>
+            {t("Edit the paper to add its questions.")}</EmptyState>
         )}
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
+            {t("Close")}</Button>
           <Button onClick={() => window.print()} disabled={!data}>
             <PrinterIcon />
-            Print question paper
-          </Button>
+            {t("Print question paper")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -146,21 +144,21 @@ export function QuestionPapersPage() {
   return (
     <>
       <CrudPage
-        title="Question papers"
+        title={t("Question papers")}
         path="/question-papers"
         idField="question_paper_id"
         params={user.role === "teacher" ? { teacher_id: user.id } : undefined}
         fixed={user.role === "teacher" ? { teacher_id: user.id } : undefined}
         extraActions={(row) => (
-          <IconAction label="View & print" onClick={() => setViewing(Number(row.question_paper_id))}>
+          <IconAction label={t("View & print")} onClick={() => setViewing(Number(row.question_paper_id))}>
             <EyeIcon />
           </IconAction>
         )}
         fields={[
-          { name: "title", label: "Title", required: true },
-          { name: "class_id", label: "Class", type: "select", options: toOptions(classes.data?.items, "class_id", "name") },
-          { name: "exam_id", label: "Exam", type: "select", options: toOptions(exams.data?.items, "exam_id", "name") },
-          { name: "question_paper", label: "Questions", type: "textarea", formOnly: true },
+          { name: "title", label: t("Title"), required: true },
+          { name: "class_id", label: t("Class"), type: "select", options: toOptions(classes.data?.items, "class_id", "name") },
+          { name: "exam_id", label: t("Exam"), type: "select", options: toOptions(exams.data?.items, "exam_id", "name") },
+          { name: "question_paper", label: t("Questions"), type: "textarea", formOnly: true },
         ]}
       />
       <QuestionPaperDialog id={viewing} onClose={() => setViewing(null)} />
@@ -199,7 +197,7 @@ function MarksImport({ params, disabled }: { params: Record<string, string | nul
     setBusy(true);
     try {
       const { data } = await api.post<{ updated: number }>("/marks/import", body);
-      toast.success(`${data.updated} marks imported`);
+      toast.success(t("{updated} marks imported", { updated: data.updated }));
       qc.invalidateQueries({ queryKey: ["/marks"] });
     } catch (error) {
       const detail = axios.isAxiosError(error) ? (error.response?.data as { detail?: { errors?: string[] } })?.detail : undefined;
@@ -213,27 +211,25 @@ function MarksImport({ params, disabled }: { params: Record<string, string | nul
     <>
       <Button variant="outline" onClick={template}>
         <DownloadIcon />
-        Download template
-      </Button>
+        {t("Download template")}</Button>
       <FileButton onChange={upload} accept=".csv,text/csv">
         {(props) => (
-          <Button variant="outline" loading={busy} disabled={disabled} title={disabled ? "Save or reset your changes first" : undefined} {...props}>
+          <Button variant="outline" loading={busy} disabled={disabled} title={disabled ? t("Save or reset your changes first") : undefined} {...props}>
             <UploadIcon />
-            Import CSV
-          </Button>
+            {t("Import CSV")}</Button>
         )}
       </FileButton>
       <Dialog open={errors !== null} onOpenChange={(open) => !open && setErrors(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nothing was imported</DialogTitle>
-            <DialogDescription>Fix these rows in the file and import it again.</DialogDescription>
+            <DialogTitle>{t("Nothing was imported")}</DialogTitle>
+            <DialogDescription>{t("Fix these rows in the file and import it again.")}</DialogDescription>
           </DialogHeader>
           <ul className="max-h-80 list-disc space-y-1 overflow-y-auto pl-5 text-sm">
             {errors?.map((e) => <li key={e}>{e}</li>)}
           </ul>
           <DialogFooter>
-            <Button onClick={() => setErrors(null)}>Close</Button>
+            <Button onClick={() => setErrors(null)}>{t("Close")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -256,7 +252,7 @@ export function MarksPage() {
         ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, Number(v)])),
         items: rows.map((r) => ({ mark_id: r.mark_id, mark_obtained: r.mark_obtained, comment: r.comment || null })),
       }),
-    { success: "Marks saved", invalidate: [["/marks"]] },
+    { success: t("Marks saved"), invalidate: [["/marks"]] },
   );
   const update = (i: number, patch: Partial<MarkRow>) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
   const dirty = JSON.stringify(rows) !== JSON.stringify(sheet.data ?? []);
@@ -271,8 +267,8 @@ export function MarksPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Marks entry"
-        subtitle={user.role === "teacher" ? "Only subjects assigned to you are listed" : undefined}
+        title={t("Marks entry")}
+        subtitle={user.role === "teacher" ? t("Only subjects assigned to you are listed") : undefined}
         actions={ready && <MarksImport params={params} disabled={dirty} />}
       />
       <Card className="py-4">
@@ -286,14 +282,14 @@ export function MarksPage() {
             <table className="w-full min-w-[560px] caption-bottom text-sm">
               <TableHeader className="bg-muted sticky top-0 z-10 shadow-[inset_0_-1px_0_var(--border)]">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-20">Roll</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead className="w-32">Marks</TableHead>
-                  <TableHead>Comment</TableHead>
+                  <TableHead className="w-20">{t("Roll")}</TableHead>
+                  <TableHead>{t("Student")}</TableHead>
+                  <TableHead className="w-32">{t("Marks")}</TableHead>
+                  <TableHead>{t("Comment")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableState loading={sheet.isLoading} empty={!sheet.isLoading && rows.length === 0} colSpan={4} emptyText="No students enrolled in this section" />
+                <TableState loading={sheet.isLoading} empty={!sheet.isLoading && rows.length === 0} colSpan={4} emptyText={t("No students enrolled in this section")} />
                 {rows.map((r, i) => (
                   <TableRow key={r.mark_id}>
                     <TableCell className="text-muted-foreground py-1">{r.roll ?? <Dash />}</TableCell>
@@ -305,7 +301,7 @@ export function MarksPage() {
                         inputMode="decimal"
                         min={0}
                         max={1000}
-                        aria-label={`Marks for ${r.student_name}`}
+                        aria-label={t("Marks for {student_name}", { student_name: r.student_name })}
                         className="h-8 w-24 tabular-nums"
                         value={r.mark_obtained ?? ""}
                         onChange={(e) => update(i, { mark_obtained: e.target.value === "" ? null : Number(e.target.value) })}
@@ -315,7 +311,7 @@ export function MarksPage() {
                     <TableCell className="py-1">
                       <Input
                         id={`comment-${i}`}
-                        aria-label={`Comment for ${r.student_name}`}
+                        aria-label={t("Comment for {student_name}", { student_name: r.student_name })}
                         className="h-8 min-w-48"
                         value={r.comment ?? ""}
                         onChange={(e) => update(i, { comment: e.target.value })}
@@ -330,26 +326,22 @@ export function MarksPage() {
           <CardFooter className="bg-muted/30 flex-wrap justify-between gap-3 border-t px-4 py-3 [.border-t]:pt-3">
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <span>
-                {entered} of {rows.length} entered
-              </span>
-              {dirty && <Badge className="bg-warning/20 text-warning-foreground border-transparent">Unsaved changes</Badge>}
+                {tn("{entered} of {length} entered", { entered, length: rows.length })}</span>
+              {dirty && <Badge className="bg-warning/20 text-warning-foreground border-transparent">{t("Unsaved changes")}</Badge>}
             </div>
             <div className="flex gap-2">
               <Button variant="outline" disabled={!dirty || save.isPending} onClick={() => setRows(sheet.data ?? [])}>
                 <UndoIcon />
-                Reset
-              </Button>
+                {t("Reset")}</Button>
               <Button loading={save.isPending} disabled={rows.length === 0} onClick={() => save.mutate(undefined)}>
                 <SaveIcon />
-                Save marks
-              </Button>
+                {t("Save marks")}</Button>
             </div>
           </CardFooter>
         </Card>
       ) : (
-        <EmptyState icon={ClipboardListIcon} title="Choose an exam, class, section and subject">
-          The mark sheet for that subject opens here.
-        </EmptyState>
+        <EmptyState icon={ClipboardListIcon} title={t("Choose an exam, class, section and subject")}>
+          {t("The mark sheet for that subject opens here.")}</EmptyState>
       )}
     </div>
   );
@@ -386,15 +378,14 @@ export function MarksheetPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Marksheet"
+        title={t("Marksheet")}
         actions={
           <>
             {select}
             {data && (
               <Button variant="outline" onClick={() => window.print()}>
                 <PrinterIcon />
-                Print
-              </Button>
+                {t("Print")}</Button>
             )}
           </>
         }
@@ -402,21 +393,21 @@ export function MarksheetPage() {
       {staff && (
         <Card className="no-print py-4">
           <CardContent className="flex flex-wrap items-end gap-3 px-4">
-            <Field label="Class" className="w-44">
+            <Field label={t("Class")} className="w-44">
               <Combobox
                 data={toOptions(classes.data?.items, "class_id", "name")}
                 value={classId}
                 onChange={(v) => { setClassId(v); setStudentId(null); }}
-                placeholder="Choose class"
+                placeholder={t("Choose class")}
               />
             </Field>
-            <Field label="Student" className="w-64">
+            <Field label={t("Student")} className="w-64">
               <Combobox
                 disabled={!classId}
                 data={toOptions(students.data?.items, "student_id", "name")}
                 value={studentId}
                 onChange={setStudentId}
-                placeholder="Choose student"
+                placeholder={t("Choose student")}
               />
             </Field>
           </CardContent>
@@ -424,52 +415,51 @@ export function MarksheetPage() {
       )}
       {isLoading && <Skeleton className="h-48 w-full" />}
       {!id && staff && (
-        <EmptyState icon={ChartColumnIcon} title="Choose a class and student">
-          Their results for the running year appear here.
-        </EmptyState>
+        <EmptyState icon={ChartColumnIcon} title={t("Choose a class and student")}>
+          {t("Their results for the running year appear here.")}</EmptyState>
       )}
       {data && (
         <div className="space-y-4">
-          <PrintHeader title={`Marksheet ${data.year}`} />
+          <PrintHeader title={t("Marksheet {year}", { year: data.year })} />
           <Card className="py-4 print:border-0 print:py-0 print:shadow-none">
             <CardContent className="flex flex-wrap items-center gap-x-8 gap-y-2 px-4 text-sm">
               <div className="text-base font-semibold">{data.student.name}</div>
               {data.student.student_code && (
                 <div>
-                  <span className="text-muted-foreground">ID </span>
+                  <span className="text-muted-foreground">{t("ID")}{" "}</span>
                   {data.student.student_code}
                 </div>
               )}
               <div>
-                <span className="text-muted-foreground">Class </span>
-                {data.student.class_name ?? <Dash />} {data.student.section_name && `/ ${data.student.section_name}`}
+                <span className="text-muted-foreground">{t("Class")}{" "}</span>
+                {data.student.class_name ?? <Dash />} {data.student.section_name && t("/ {section_name}", { section_name: data.student.section_name })}
               </div>
               <div>
-                <span className="text-muted-foreground">Roll </span>
+                <span className="text-muted-foreground">{t("Roll")}{" "}</span>
                 {data.student.roll ?? <Dash />}
               </div>
               <Badge variant="secondary">{data.year}</Badge>
             </CardContent>
           </Card>
-          {data.exams.length === 0 && <EmptyState title="No exams in this academic year" />}
+          {data.exams.length === 0 && <EmptyState title={t("No exams in this academic year")} />}
           {data.exams.map((exam) => (
             <Card key={exam.exam_id} className="gap-0 overflow-hidden py-0 print:break-inside-avoid print:border-0 print:shadow-none">
               <CardHeader className="flex flex-wrap items-center justify-between gap-2 border-b py-3 [.border-b]:pb-3 print:border-0 print:px-0">
                 <CardTitle>{exam.name}</CardTitle>
                 <div className="flex gap-2">
-                  <Badge variant="secondary">Total {exam.total}</Badge>
-                  <Badge>GPA {exam.average_grade_point.toFixed(2)}</Badge>
+                  <Badge variant="secondary">{tn("Total {total}", { total: exam.total })}</Badge>
+                  <Badge>{tn("GPA {average_grade_point}", { average_grade_point: exam.average_grade_point.toFixed(2) })}</Badge>
                 </div>
               </CardHeader>
               <Table className={PRINT_TABLE}>
                 <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Marks</TableHead>
-                    <TableHead>Highest</TableHead>
-                    <TableHead>Grade</TableHead>
-                    <TableHead>Point</TableHead>
-                    <TableHead>Comment</TableHead>
+                    <TableHead>{t("Subject")}</TableHead>
+                    <TableHead>{t("Marks")}</TableHead>
+                    <TableHead>{t("Highest")}</TableHead>
+                    <TableHead>{t("Grade")}</TableHead>
+                    <TableHead>{t("Point")}</TableHead>
+                    <TableHead>{t("Comment")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -513,18 +503,17 @@ export function TabulationPage() {
 
   return (
     <div className="space-y-6">
-      <style>{"@media print { @page { size: landscape; } }"}</style>
+      <style>{t("@media print { @page { size: landscape; } }")}</style>
       <PageHeader
-        title="Tabulation sheet"
-        subtitle="Section is optional"
+        title={t("Tabulation sheet")}
+        subtitle={t("Section is optional")}
         actions={
           data && (
             <>
               <ExportButton size="default" path="/export/tabulation.xlsx" params={{ class_id: sel.classId, exam_id: sel.examId, section_id: sel.sectionId || undefined }} />
               <Button variant="outline" onClick={() => window.print()}>
                 <PrinterIcon />
-                Print
-              </Button>
+                {t("Print")}</Button>
             </>
           )
         }
@@ -535,33 +524,32 @@ export function TabulationPage() {
         </CardContent>
       </Card>
       {!ready && (
-        <EmptyState icon={ChartColumnIcon} title="Choose an exam and class">
-          Every student's marks for the exam appear in one sheet.
-        </EmptyState>
+        <EmptyState icon={ChartColumnIcon} title={t("Choose an exam and class")}>
+          {t("Every student's marks for the exam appear in one sheet.")}</EmptyState>
       )}
       {ready && (isLoading || data) && (
         <>
           <PrintHeader
-            title="Tabulation sheet"
-            lines={[examName, [className && `Class ${className}`, sectionName && `Section ${sectionName}`].filter(Boolean).join(" : ")]}
+            title={t("Tabulation sheet")}
+            lines={[examName, [className && t("Class {className}", { className }), sectionName && t("Section {sectionName}", { sectionName })].filter(Boolean).join(" : ")]}
           />
           <Card className="gap-0 overflow-hidden py-0 print:rounded-none print:shadow-none">
             <Table className="min-w-[600px] border-collapse [&_td]:border-r [&_td:last-child]:border-r-0 [&_th]:border-r [&_th:last-child]:border-r-0 print:[&_td]:border print:[&_th]:border">
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="w-16">Roll</TableHead>
-                  <TableHead>Student</TableHead>
+                  <TableHead className="w-16">{t("Roll")}</TableHead>
+                  <TableHead>{t("Student")}</TableHead>
                   {data?.subjects.map((s) => (
                     <TableHead key={s.subject_id} className="text-center">
                       {s.name}
                     </TableHead>
                   ))}
-                  <TableHead className="text-center">Total</TableHead>
-                  <TableHead className="text-center">GPA</TableHead>
+                  <TableHead className="text-center">{t("Total")}</TableHead>
+                  <TableHead className="text-center">{t("GPA")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableState loading={isLoading} empty={data?.rows.length === 0} colSpan={(data?.subjects.length ?? 0) + 4} emptyText="No students found" />
+                <TableState loading={isLoading} empty={data?.rows.length === 0} colSpan={(data?.subjects.length ?? 0) + 4} emptyText={t("No students found")} />
                 {data?.rows.map((r) => (
                   <TableRow key={r.student_id}>
                     <TableCell className="text-muted-foreground">{r.roll ?? <Dash />}</TableCell>
@@ -601,59 +589,53 @@ export function ExamSmsPage() {
           receiver,
         })
       ).data,
-    { onSuccess: (r) => toast.success(`${r.queued} message${r.queued === 1 ? "" : "s"} queued`) },
+    { onSuccess: (r) => toast.success(tp(r.queued, "{count} message queued", "{count} messages queued")) },
   );
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Marks by SMS" subtitle="Text each student's exam results to students or their parents" />
+      <PageHeader title={t("Marks by SMS")} subtitle={t("Text each student's exam results to students or their parents")} />
       <Alert>
         <InfoIcon />
-        <AlertTitle>An SMS service is required</AlertTitle>
+        <AlertTitle>{t("An SMS service is required")}</AlertTitle>
         <AlertDescription>
           <p>
-            Messages are only delivered when an SMS gateway (Clickatell, Twilio or MSG91) is selected and configured in{" "}
+            {t("Messages are only delivered when an SMS gateway (Clickatell, Twilio or MSG91) is selected and configured in")}{" "}
             <Link to="/app/settings" className="text-primary font-medium underline underline-offset-4">
-              System settings
-            </Link>
-            . Recipients without a phone number are skipped.
-          </p>
+              {t("System settings")}</Link>
+            {t(". Recipients without a phone number are skipped.")}</p>
         </AlertDescription>
       </Alert>
       <Card className="max-w-3xl">
         <CardHeader>
-          <CardTitle>Send results</CardTitle>
-          <CardDescription>Each message lists the student's marks per subject for the chosen exam.</CardDescription>
+          <CardTitle>{t("Send results")}</CardTitle>
+          <CardDescription>{t("Each message lists the student's marks per subject for the chosen exam.")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <ClassPicker value={sel} onChange={setSel} withExam />
             <p className="text-muted-foreground text-xs">
-              Leave the section empty to send to the whole class.
-              {sel.sectionId && (
+              {t("Leave the section empty to send to the whole class.")}{sel.sectionId && (
                 <>
                   {" "}
                   <button type="button" className="text-primary underline underline-offset-4" onClick={() => setSel({ ...sel, sectionId: null })}>
-                    Use all sections
-                  </button>
+                    {t("Use all sections")}</button>
                 </>
               )}
             </p>
           </div>
           <div className="grid gap-3">
-            <Label>Send to</Label>
+            <Label>{t("Send to")}</Label>
             <RadioGroup value={receiver} onValueChange={(v) => setReceiver(v as Receiver)} className="flex flex-wrap gap-6">
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="student" id="receiver-student" />
                 <Label htmlFor="receiver-student" className="font-normal">
-                  Students
-                </Label>
+                  {t("Students")}</Label>
               </div>
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="parent" id="receiver-parent" />
                 <Label htmlFor="receiver-parent" className="font-normal">
-                  Parents
-                </Label>
+                  {t("Parents")}</Label>
               </div>
             </RadioGroup>
           </div>
@@ -664,17 +646,16 @@ export function ExamSmsPage() {
             loading={send.isPending}
             onClick={() =>
               confirmAction({
-                title: "Send results by SMS?",
-                description: `Every ${receiver} in the selected ${sel.sectionId ? "section" : "class"} with a phone number will receive a text.`,
-                confirmLabel: "Send",
+                title: t("Send results by SMS?"),
+                description: t("Every {receiver} in the selected {value} with a phone number will receive a text.", { receiver, value: sel.sectionId ? "section" : "class" }),
+                confirmLabel: t("Send"),
                 destructive: false,
                 onConfirm: () => send.mutate(undefined),
               })
             }
           >
             <SendIcon />
-            Send SMS
-          </Button>
+            {t("Send SMS")}</Button>
         </CardFooter>
       </Card>
     </div>

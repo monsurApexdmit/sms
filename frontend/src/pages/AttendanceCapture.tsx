@@ -46,16 +46,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { cn } from "../lib/utils";
 import { initials, toOptions } from "../utils";
+import { t as tr, tn } from "../i18n";
 
 // --- per-period attendance ------------------------------------------------------------------
 
 const PERIOD_STATUS: { value: PeriodStatus; label: string; on: string; badge: string }[] = [
-  { value: "present", label: "Present", on: "data-[state=on]:bg-success/15 data-[state=on]:text-success", badge: "bg-success/15 text-success" },
-  { value: "absent", label: "Absent", on: "data-[state=on]:bg-destructive/10 data-[state=on]:text-destructive", badge: "bg-destructive/10 text-destructive" },
-  { value: "late", label: "Late", on: "data-[state=on]:bg-warning/20 data-[state=on]:text-amber-700", badge: "bg-warning/20 text-amber-700 dark:text-amber-300" },
-  { value: "excused", label: "Excused", on: "data-[state=on]:bg-muted data-[state=on]:text-foreground", badge: "bg-muted text-foreground" },
+  { value: "present", label: tr("Present"), on: "data-[state=on]:bg-success/15 data-[state=on]:text-success", badge: "bg-success/15 text-success" },
+  { value: "absent", label: tr("Absent"), on: "data-[state=on]:bg-destructive/10 data-[state=on]:text-destructive", badge: "bg-destructive/10 text-destructive" },
+  { value: "late", label: tr("Late"), on: "data-[state=on]:bg-warning/20 data-[state=on]:text-amber-700", badge: "bg-warning/20 text-amber-700 dark:text-amber-300" },
+  { value: "excused", label: tr("Excused"), on: "data-[state=on]:bg-muted data-[state=on]:text-foreground", badge: "bg-muted text-foreground" },
 ];
-const SHORT: Record<PeriodStatus, string> = { present: "P", absent: "A", late: "L", excused: "E" };
+const SHORT: Record<PeriodStatus, string> = { present: tr("P"), absent: tr("A"), late: tr("L"), excused: tr("E") };
 const statusBadge = (s: PeriodStatus) => PERIOD_STATUS.find((x) => x.value === s)?.badge;
 
 function PeriodSheetCard({ period, date, onClose }: { period: PeriodInfo; date: string; onClose: () => void }) {
@@ -67,7 +68,7 @@ function PeriodSheetCard({ period, date, onClose }: { period: PeriodInfo; date: 
   }, [sheet.data]);
   const save = useAction(
     () => api.put("/period-attendance/sheet", { class_routine_id: period.class_routine_id, date, items: Object.entries(marks).map(([id, status]) => ({ student_id: Number(id), status })) }),
-    { success: "Period attendance saved", invalidate: [["/period-attendance/sheet"], ["/period-attendance/periods"], ["/period-attendance/day"]] },
+    { success: tr("Period attendance saved"), invalidate: [["/period-attendance/sheet"], ["/period-attendance/periods"], ["/period-attendance/day"]] },
   );
   const rows = sheet.data?.rows ?? [];
   const count = (s: PeriodStatus) => Object.values(marks).filter((m) => m === s).length;
@@ -77,8 +78,7 @@ function PeriodSheetCard({ period, date, onClose }: { period: PeriodInfo; date: 
       <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
         <div>
           <div className="font-semibold">
-            {period.subject_name ?? "Subject"} · Class {period.class_name}
-            {period.section_name ? ` ${period.section_name}` : ""}
+            {tn("{value} · Class {class_name}{value2}", { value: period.subject_name ?? tr("Subject"), class_name: period.class_name, value2: period.section_name ? " " + tr("{section_name}", { section_name: period.section_name }) : "" })}
           </div>
           <div className="text-muted-foreground text-sm">
             {dayjs(date).format("dddd, DD MMM YYYY")} · {period.start}–{period.end}
@@ -95,26 +95,26 @@ function PeriodSheetCard({ period, date, onClose }: { period: PeriodInfo; date: 
       <Table className="min-w-[520px]">
         <TableHeader className="bg-muted/50">
           <TableRow>
-            <TableHead className="w-16">Roll</TableHead>
-            <TableHead>Student</TableHead>
-            <TableHead className="w-80">Status</TableHead>
+            <TableHead className="w-16">{tr("Roll")}</TableHead>
+            <TableHead>{tr("Student")}</TableHead>
+            <TableHead className="w-80">{tr("Status")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableState loading={sheet.isLoading} empty={!sheet.isLoading && rows.length === 0} colSpan={3} emptyText="No students enrolled in this section" />
+          <TableState loading={sheet.isLoading} empty={!sheet.isLoading && rows.length === 0} colSpan={3} emptyText={tr("No students enrolled in this section")} />
           {rows.map((r) => (
             <TableRow key={r.student_id}>
               <TableCell className="text-muted-foreground">{r.roll ?? <Dash />}</TableCell>
               <TableCell className="font-medium">
                 {r.name}
-                {r.on_leave && <Badge variant="secondary" className="ml-2">On leave</Badge>}
+                {r.on_leave && <Badge variant="secondary" className="ml-2">{tr("On leave")}</Badge>}
               </TableCell>
               <TableCell>
                 <ToggleGroup
                   type="single"
                   variant="outline"
                   size="sm"
-                  aria-label={`Period attendance for ${r.name}`}
+                  aria-label={tr("Period attendance for {name}", { name: r.name })}
                   value={marks[r.student_id] ?? "present"}
                   onValueChange={(v) => v && setMarks((m) => ({ ...m, [r.student_id]: v as PeriodStatus }))}
                 >
@@ -130,11 +130,10 @@ function PeriodSheetCard({ period, date, onClose }: { period: PeriodInfo; date: 
         </TableBody>
       </Table>
       <CardFooter className="bg-muted/30 justify-end gap-2 border-t px-4 py-3 [.border-t]:pt-3">
-        <Button variant="outline" onClick={onClose}>Back to periods</Button>
+        <Button variant="outline" onClick={onClose}>{tr("Back to periods")}</Button>
         <Button loading={save.isPending} disabled={rows.length === 0} onClick={() => save.mutate(undefined)}>
           <SaveIcon />
-          Save
-        </Button>
+          {tr("Save")}</Button>
       </CardFooter>
     </Card>
   );
@@ -154,8 +153,8 @@ function PeriodList({ date, onOpen }: { date: string; onOpen: (p: PeriodInfo) =>
         </Card>
       )}
       {periods.isLoading ? null : (periods.data ?? []).length === 0 ? (
-        <EmptyState icon={ClipboardListIcon} title="No periods on this day">
-          {user.role === "teacher" ? "None of your subjects is on the class routine for this weekday." : "Nothing on the class routine for this weekday."}
+        <EmptyState icon={ClipboardListIcon} title={tr("No periods on this day")}>
+          {user.role === "teacher" ? tr("None of your subjects is on the class routine for this weekday.") : tr("Nothing on the class routine for this weekday.")}
         </EmptyState>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -170,19 +169,18 @@ function PeriodList({ date, onOpen }: { date: string; onOpen: (p: PeriodInfo) =>
                 <ClockIcon className="size-3.5" />
                 {p.start}–{p.end}
               </div>
-              <div className="font-semibold">{p.subject_name ?? "Subject"}</div>
+              <div className="font-semibold">{p.subject_name ?? tr("Subject")}</div>
               <div className="text-muted-foreground text-sm">
-                Class {p.class_name}
-                {p.section_name ? ` · Section ${p.section_name}` : ""}
+                {tn("Class {class_name}{value}", { class_name: p.class_name, value: p.section_name ? " " + tr("· Section {section_name}", { section_name: p.section_name }) : "" })}
               </div>
               <div className="mt-1">
                 {p.marked ? (
                   <Badge className="bg-success/15 text-success border-transparent">
                     <CheckIcon />
-                    Taken ({p.marked})
+                    {tr("Taken (")}{p.marked})
                   </Badge>
                 ) : (
-                  <Badge variant="secondary">Not taken</Badge>
+                  <Badge variant="secondary">{tr("Not taken")}</Badge>
                 )}
               </div>
             </button>
@@ -207,7 +205,7 @@ function SectionDay({ date }: { date: string }) {
     () => api.post<{ updated: number; kept: number; skipped: number }>("/period-attendance/fill-daily", { class_id: Number(sel.classId), section_id: Number(sel.sectionId), date, overwrite }),
     {
       invalidate: [["/attendance/sheet"], ["/attendance/report"]],
-      onSuccess: (r) => toast.success(`Daily attendance: ${r.data.updated} updated, ${r.data.kept} already marked, ${r.data.skipped} without periods`),
+      onSuccess: (r) => toast.success(tr("Daily attendance: {updated} updated, {kept} already marked, {skipped} without periods", { updated: r.data.updated, kept: r.data.kept, skipped: r.data.skipped })),
     },
   );
   const periods = grid.data?.periods ?? [];
@@ -223,7 +221,7 @@ function SectionDay({ date }: { date: string }) {
           <Table className="border-collapse text-xs [&_td]:border [&_th]:border">
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="min-w-44">Student</TableHead>
+                <TableHead className="min-w-44">{tr("Student")}</TableHead>
                 {periods.map((p) => (
                   <TableHead key={p.class_routine_id} className="h-auto px-2 py-1 text-center">
                     <div className="text-[10px] font-normal">{p.start}</div>
@@ -233,7 +231,7 @@ function SectionDay({ date }: { date: string }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableState empty={grid.data.rows.length === 0} colSpan={periods.length + 1} emptyText="No students enrolled in this section" />
+              <TableState empty={grid.data.rows.length === 0} colSpan={periods.length + 1} emptyText={tr("No students enrolled in this section")} />
               {grid.data.rows.map((r) => (
                 <TableRow key={r.student_id}>
                   <TableCell className="font-medium">
@@ -254,28 +252,24 @@ function SectionDay({ date }: { date: string }) {
           </Table>
           <CardFooter className="bg-muted/30 flex-wrap justify-between gap-3 border-t px-4 py-3 [.border-t]:pt-3">
             <p className="text-muted-foreground max-w-xl text-sm">
-              Daily attendance is the official record. Filling it from periods marks a student present if they were present or late in at least one period, and absent if
-              absent in every marked period.
-            </p>
+              {tr("Daily attendance is the official record. Filling it from periods marks a student present if they were present or late in at least one period, and absent if absent in every marked period.")}</p>
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 text-sm">
                 <Checkbox checked={overwrite} onCheckedChange={(v) => setOverwrite(v === true)} />
-                Replace days already marked
-              </label>
+                {tr("Replace days already marked")}</label>
               <Button
                 disabled={periods.every((p) => !p.marked)}
                 loading={fill.isPending}
                 onClick={() =>
                   confirmAction({
-                    title: "Fill daily attendance from periods?",
-                    description: overwrite ? "Daily attendance already taken for this day will be replaced." : "Students already marked in the daily sheet are kept. No absence SMS is sent.",
+                    title: tr("Fill daily attendance from periods?"),
+                    description: overwrite ? tr("Daily attendance already taken for this day will be replaced.") : tr("Students already marked in the daily sheet are kept. No absence SMS is sent."),
                     onConfirm: () => fill.mutate(undefined),
                   })
                 }
               >
                 <WandSparklesIcon />
-                Fill daily attendance
-              </Button>
+                {tr("Fill daily attendance")}</Button>
             </div>
           </CardFooter>
         </Card>
@@ -289,7 +283,7 @@ export function PeriodAttendancePage() {
   const [open, setOpen] = useState<PeriodInfo | null>(null);
   const pickDate = (v: string) => {
     if (v && dayjs(v).isAfter(dayjs(), "day")) {
-      toast.error("Attendance can't be taken for a future date");
+      toast.error(tr("Attendance can't be taken for a future date"));
       return;
     }
     setDate(v);
@@ -298,18 +292,18 @@ export function PeriodAttendancePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Period attendance"
-        subtitle="Take attendance for each period of the class routine. Everyone starts as present; tap the exceptions."
+        title={tr("Period attendance")}
+        subtitle={tr("Take attendance for each period of the class routine. Everyone starts as present; tap the exceptions.")}
         actions={
-          <Field label="Date" className="w-48">
+          <Field label={tr("Date")} className="w-48">
             <DatePicker value={date} onChange={pickDate} clearable={false} />
           </Field>
         }
       />
       <Tabs defaultValue="periods" className="gap-6">
         <TabsList>
-          <TabsTrigger value="periods">Periods</TabsTrigger>
-          <TabsTrigger value="day">Section day</TabsTrigger>
+          <TabsTrigger value="periods">{tr("Periods")}</TabsTrigger>
+          <TabsTrigger value="day">{tr("Section day")}</TabsTrigger>
         </TabsList>
         <TabsContent value="periods">
           {open ? <PeriodSheetCard key={`${open.class_routine_id}-${date}`} period={open} date={date} onClose={() => setOpen(null)} /> : <PeriodList date={date} onOpen={setOpen} />}
@@ -378,7 +372,7 @@ function CameraScanner({ onCode }: { onCode: (code: string) => void }) {
           }
         }, 400);
       })
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : "Camera not available"));
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : tr("Camera not available")));
     return () => {
       stopped = true;
       window.clearInterval(timer);
@@ -421,20 +415,19 @@ export function KioskPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Check-in kiosk"
-        subtitle="Scan an ID card with a barcode/QR or RFID reader, or the camera. Students are marked present for the day; staff check in and out."
+        title={tr("Check-in kiosk")}
+        subtitle={tr("Scan an ID card with a barcode/QR or RFID reader, or the camera. Students are marked present for the day; staff check in and out.")}
         actions={
           <>
             {canCamera && (
               <Button variant="outline" onClick={() => setCamera((c) => !c)}>
                 {camera ? <CameraOffIcon /> : <CameraIcon />}
-                {camera ? "Stop camera" : "Use camera"}
+                {camera ? tr("Stop camera") : tr("Use camera")}
               </Button>
             )}
             <Button variant="outline" onClick={() => void document.documentElement.requestFullscreen?.()}>
               <MaximizeIcon />
-              Full screen
-            </Button>
+              {tr("Full screen")}</Button>
           </>
         }
       />
@@ -455,8 +448,8 @@ export function KioskPage() {
                 autoComplete="off"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="Scan a card…"
-                aria-label="Card code"
+                placeholder={tr("Scan a card…")}
+                aria-label={tr("Card code")}
                 className="h-16 pl-14 text-2xl"
               />
             </div>
@@ -472,20 +465,20 @@ export function KioskPage() {
                   <div className="text-foreground truncate text-3xl font-bold">{last.name ?? last.card_uid}</div>
                   <div className="mt-1 text-2xl font-semibold">{last.message}</div>
                   <div className="text-muted-foreground mt-2 text-sm">
-                    {last.holder_role ? `${last.holder_role} · ` : ""}
+                    {last.holder_role ? tr("{holder_role} ·", { holder_role: last.holder_role }) + " " : ""}
                     {last.punched_at ? dayjs(last.punched_at).format("HH:mm") : ""}
                   </div>
                 </div>
               </>
             ) : (
-              <p className="text-muted-foreground m-auto text-lg">Waiting for the first scan</p>
+              <p className="text-muted-foreground m-auto text-lg">{tr("Waiting for the first scan")}</p>
             )}
           </div>
         </div>
         <Card className="gap-0 py-0">
-          <div className="border-b p-3 font-semibold">Recent scans</div>
+          <div className="border-b p-3 font-semibold">{tr("Recent scans")}</div>
           <ul className="divide-y">
-            {recent.length === 0 && <li className="text-muted-foreground p-3 text-sm">None yet</li>}
+            {recent.length === 0 && <li className="text-muted-foreground p-3 text-sm">{tr("None yet")}</li>}
             {recent.map((r, i) => (
               <li key={i} className="flex items-center justify-between gap-2 p-3 text-sm">
                 <span className="truncate font-medium">{r.name ?? r.card_uid}</span>
@@ -502,10 +495,10 @@ export function KioskPage() {
 // --- ID cards, devices and settings (admin) ---------------------------------------------------
 
 const ROLES = [
-  { value: "student", label: "Student" },
-  { value: "teacher", label: "Teacher" },
-  { value: "librarian", label: "Librarian" },
-  { value: "accountant", label: "Accountant" },
+  { value: "student", label: tr("Student") },
+  { value: "teacher", label: tr("Teacher") },
+  { value: "librarian", label: tr("Librarian") },
+  { value: "accountant", label: tr("Accountant") },
 ];
 
 interface CardValues {
@@ -526,27 +519,27 @@ function IssueCardForm({ onDone }: { onDone: () => void }) {
       : (staff.data ?? []).filter((s) => s.staff_role === role).map((s) => ({ value: String(s.staff_id), label: s.name }));
   const save = useAction(
     (v: CardValues) => api.post("/id-cards", { holder_role: v.holder_role, holder_id: Number(v.holder_id), card_uid: v.card_uid.trim() || null }),
-    { success: "Card issued", invalidate: [["/id-cards"]], onSuccess: onDone },
+    { success: tr("Card issued"), invalidate: [["/id-cards"]], onSuccess: onDone },
   );
   return (
     <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
       <Controller control={form.control} name="holder_role" render={({ field }) => (
-        <Field label="Card for">
+        <Field label={tr("Card for")}>
           <Combobox data={ROLES} value={field.value} onChange={(v) => { field.onChange(v ?? "student"); form.setValue("holder_id", null); }} />
         </Field>
       )} />
       {role === "student" && <ClassPicker value={sel} onChange={setSel} />}
-      <Controller control={form.control} name="holder_id" rules={{ required: "Required" }} render={({ field, fieldState }) => (
-        <Field label="Person" required error={fieldState.error?.message}>
-          <Combobox data={holders} value={field.value} onChange={field.onChange} placeholder="Choose…" />
+      <Controller control={form.control} name="holder_id" rules={{ required: tr("Required") }} render={({ field, fieldState }) => (
+        <Field label={tr("Person")} required error={fieldState.error?.message}>
+          <Combobox data={holders} value={field.value} onChange={field.onChange} placeholder={tr("Choose…")} />
         </Field>
       )} />
-      <Field label="Card code" htmlFor="card-uid" description="Scan the RFID card or type its UID. Leave empty to generate a barcode code.">
+      <Field label={tr("Card code")} htmlFor="card-uid" description={tr("Scan the RFID card or type its UID. Leave empty to generate a barcode code.")}>
         <Input id="card-uid" autoComplete="off" {...form.register("card_uid")} />
       </Field>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={save.isPending}>Issue card</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{tr("Cancel")}</Button>
+        <Button type="submit" loading={save.isPending}>{tr("Issue card")}</Button>
       </DialogFooter>
     </form>
   );  // prettier-ignore
@@ -562,36 +555,33 @@ function CardsTab() {
   });  // prettier-ignore
   const bulk = useAction(() => api.post<{ created: number }>("/id-cards/bulk", { class_id: Number(sel.classId), section_id: sel.sectionId ? Number(sel.sectionId) : null }), {
     invalidate: [["/id-cards"]],
-    onSuccess: (r) => toast.success(`${r.data.created} card(s) created`),
+    onSuccess: (r) => toast.success(tr("{created} card(s) created", { created: r.data.created })),
   });
-  const revoke = useAction((id: number) => api.post(`/id-cards/${id}/revoke`), { success: "Card revoked", invalidate: [["/id-cards"]] });
+  const revoke = useAction((id: number) => api.post(`/id-cards/${id}/revoke`), { success: tr("Card revoked"), invalidate: [["/id-cards"]] });
   const rows = data?.items ?? [];
   return (
     <div className="space-y-4">
       <Card className="py-4">
         <CardContent className="flex flex-wrap items-end gap-3 px-4">
-          <Field label="Holder" className="w-44">
-            <Combobox data={ROLES} value={role} onChange={setRole} clearable placeholder="Everyone" />
+          <Field label={tr("Holder")} className="w-44">
+            <Combobox data={ROLES} value={role} onChange={setRole} clearable placeholder={tr("Everyone")} />
           </Field>
           <ClassPicker value={sel} onChange={setSel} />
           <label className="flex h-9 items-center gap-2 text-sm">
             <Switch checked={showRevoked} onCheckedChange={setShowRevoked} />
-            Include revoked
-          </label>
+            {tr("Include revoked")}</label>
           <div className="ml-auto flex gap-2">
             <Button
               variant="outline"
               disabled={!sel.classId}
               loading={bulk.isPending}
-              onClick={() => confirmAction({ title: "Create cards for this class?", description: "Students without an active card get one (their student code is used when set).", onConfirm: () => bulk.mutate(undefined) })}
+              onClick={() => confirmAction({ title: tr("Create cards for this class?"), description: tr("Students without an active card get one (their student code is used when set)."), onConfirm: () => bulk.mutate(undefined) })}
             >
               <WandSparklesIcon />
-              Cards for whole class
-            </Button>
+              {tr("Cards for whole class")}</Button>
             <Button onClick={() => setIssuing(true)}>
               <PlusIcon />
-              Issue card
-            </Button>
+              {tr("Issue card")}</Button>
           </div>
         </CardContent>
       </Card>
@@ -599,28 +589,28 @@ function CardsTab() {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Holder</TableHead>
-              <TableHead className="w-32">Role</TableHead>
-              <TableHead>Card code</TableHead>
-              <TableHead className="w-32">Issued</TableHead>
+              <TableHead>{tr("Holder")}</TableHead>
+              <TableHead className="w-32">{tr("Role")}</TableHead>
+              <TableHead>{tr("Card code")}</TableHead>
+              <TableHead className="w-32">{tr("Issued")}</TableHead>
               <TableHead className="w-24" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={5} emptyText="No cards" />
+            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={5} emptyText={tr("No cards")} />
             {rows.map((c) => (
               <TableRow key={c.card_id} className={cn(!c.active && "opacity-60")}>
                 <TableCell className="font-medium">{c.holder_name ?? <Dash />}</TableCell>
                 <TableCell className="capitalize">{c.holder_role}</TableCell>
                 <TableCell className="font-mono text-xs">
                   {c.card_uid}
-                  {!c.active && <Badge variant="secondary" className="ml-2">Revoked</Badge>}
+                  {!c.active && <Badge variant="secondary" className="ml-2">{tr("Revoked")}</Badge>}
                 </TableCell>
                 <TableCell>{dayjs(c.issued_on).format("DD MMM YYYY")}</TableCell>
                 <TableCell>
                   <div className="flex justify-end">
                     {c.active && (
-                      <IconAction label="Revoke" destructive onClick={() => confirmAction({ title: `Revoke card ${c.card_uid}?`, description: "It stops working at once.", onConfirm: () => revoke.mutate(c.card_id) })}>
+                      <IconAction label={tr("Revoke")} destructive onClick={() => confirmAction({ title: tr("Revoke card {card_uid}?", { card_uid: c.card_uid }), description: tr("It stops working at once."), onConfirm: () => revoke.mutate(c.card_id) })}>
                         <Trash2Icon />
                       </IconAction>
                     )}
@@ -635,8 +625,8 @@ function CardsTab() {
       <Dialog open={issuing} onOpenChange={setIssuing}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Issue a card</DialogTitle>
-            <DialogDescription>A person has one active card; issuing a new one revokes the old one.</DialogDescription>
+            <DialogTitle>{tr("Issue a card")}</DialogTitle>
+            <DialogDescription>{tr("A person has one active card; issuing a new one revokes the old one.")}</DialogDescription>
           </DialogHeader>
           {issuing && <IssueCardForm onDone={() => setIssuing(false)} />}
         </DialogContent>
@@ -660,54 +650,57 @@ function DevicesTab() {
       if (editing && editing !== "new") return (await api.put<AttendanceDeviceInfo>(`/attendance-devices/${editing.device_id}`, body)).data;
       return (await api.post<AttendanceDeviceInfo>("/attendance-devices", body)).data;
     },
-    { success: "Saved", invalidate: [["/attendance-devices"]], onSuccess: (d) => { setEditing(null); if (d.api_key) setKey(d); } },
+    { success: tr("Saved"), invalidate: [["/attendance-devices"]], onSuccess: (d) => { setEditing(null); if (d.api_key) setKey(d); } },
   );  // prettier-ignore
   const rotate = useAction((id: number) => api.post<AttendanceDeviceInfo>(`/attendance-devices/${id}/rotate-key`), { invalidate: [["/attendance-devices"]], onSuccess: (r) => setKey(r.data) });
-  const remove = useAction((id: number) => api.delete(`/attendance-devices/${id}`), { success: "Deleted", invalidate: [["/attendance-devices"]] });
+  const remove = useAction((id: number) => api.delete(`/attendance-devices/${id}`), { success: tr("Deleted"), invalidate: [["/attendance-devices"]] });
   const punchUrl = `${window.location.origin}/api/attendance-devices/punch`;
 
   return (
     <div className="space-y-4">
       <Alert>
         <KeyRoundIcon />
-        <AlertTitle>Connecting a terminal</AlertTitle>
+        <AlertTitle>{tr("Connecting a terminal")}</AlertTitle>
         <AlertDescription>
-          RFID or biometric terminals (or the middleware that reads them) send <code>POST {punchUrl}</code> with the header <code>X-Device-Key</code> and a JSON body{" "}
-          <code>{'{"card_uid": "…", "timestamp": "2026-03-09T07:45:00"}'}</code> or <code>{'{"punches": [...]}'}</code> for a backlog.
+          {tn("RFID or biometric terminals (or the middleware that reads them) send {request} with the header {header} and a JSON body {body} or {batch} for a backlog.", {
+            request: <code>POST {punchUrl}</code>,
+            header: <code>X-Device-Key</code>,
+            body: <code>{'{"card_uid": "…", "timestamp": "2026-03-09T07:45:00"}'}</code>,
+            batch: <code>{'{"punches": [...]}'}</code>,
+          })}
         </AlertDescription>
       </Alert>
       <div className="flex justify-end">
         <Button onClick={() => open("new")}>
           <PlusIcon />
-          Add device
-        </Button>
+          {tr("Add device")}</Button>
       </div>
       <Card className="gap-0 overflow-hidden py-0">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead className="w-28">Status</TableHead>
-              <TableHead className="w-44">Last seen</TableHead>
+              <TableHead>{tr("Name")}</TableHead>
+              <TableHead>{tr("Location")}</TableHead>
+              <TableHead className="w-28">{tr("Status")}</TableHead>
+              <TableHead className="w-44">{tr("Last seen")}</TableHead>
               <TableHead className="w-32" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={devices.isLoading} empty={!devices.isLoading && (devices.data ?? []).length === 0} colSpan={5} emptyText="No devices" />
+            <TableState loading={devices.isLoading} empty={!devices.isLoading && (devices.data ?? []).length === 0} colSpan={5} emptyText={tr("No devices")} />
             {(devices.data ?? []).map((d) => (
               <TableRow key={d.device_id}>
                 <TableCell className="font-medium">{d.name}</TableCell>
                 <TableCell>{d.location ?? <Dash />}</TableCell>
-                <TableCell>{d.active ? <Badge className="bg-success/15 text-success border-transparent">Active</Badge> : <Badge variant="secondary">Disabled</Badge>}</TableCell>
+                <TableCell>{d.active ? <Badge className="bg-success/15 text-success border-transparent">{tr("Active")}</Badge> : <Badge variant="secondary">{tr("Disabled")}</Badge>}</TableCell>
                 <TableCell>{d.last_seen_at ? dayjs(d.last_seen_at).format("DD MMM YYYY HH:mm") : <Dash />}</TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">
-                    <IconAction label="Edit" onClick={() => open(d)}><PencilIcon /></IconAction>
-                    <IconAction label="New key" onClick={() => confirmAction({ title: `Replace the key of ${d.name}?`, description: "The old key stops working at once.", onConfirm: () => rotate.mutate(d.device_id) })}>
+                    <IconAction label={tr("Edit")} onClick={() => open(d)}><PencilIcon /></IconAction>
+                    <IconAction label={tr("New key")} onClick={() => confirmAction({ title: tr("Replace the key of {name}?", { name: d.name }), description: tr("The old key stops working at once."), onConfirm: () => rotate.mutate(d.device_id) })}>
                       <RefreshCwIcon />
                     </IconAction>
-                    <IconAction label="Delete" destructive onClick={() => confirmAction({ title: `Delete ${d.name}?`, onConfirm: () => remove.mutate(d.device_id) })}>
+                    <IconAction label={tr("Delete")} destructive onClick={() => confirmAction({ title: tr("Delete {name}?", { name: d.name }), onConfirm: () => remove.mutate(d.device_id) })}>
                       <Trash2Icon />
                     </IconAction>
                   </div>
@@ -720,24 +713,23 @@ function DevicesTab() {
       <Dialog open={editing !== null} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing === "new" ? "Add device" : "Edit device"}</DialogTitle>
+            <DialogTitle>{editing === "new" ? tr("Add device") : tr("Edit device")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
-            <Field label="Name" htmlFor="dev-name" required error={form.formState.errors.name?.message}>
-              <Input id="dev-name" {...form.register("name", { required: "Required" })} />
+            <Field label={tr("Name")} htmlFor="dev-name" required error={form.formState.errors.name?.message}>
+              <Input id="dev-name" {...form.register("name", { required: tr("Required") })} />
             </Field>
-            <Field label="Location" htmlFor="dev-loc">
-              <Input id="dev-loc" placeholder="Main gate" {...form.register("location")} />
+            <Field label={tr("Location")} htmlFor="dev-loc">
+              <Input id="dev-loc" placeholder={tr("Main gate")} {...form.register("location")} />
             </Field>
             <Controller control={form.control} name="active" render={({ field }) => (
               <label className="flex items-center gap-2 text-sm">
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
-                Active
-              </label>
+                {tr("Active")}</label>
             )} />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-              <Button type="submit" loading={save.isPending}>Save</Button>
+              <Button type="button" variant="outline" onClick={() => setEditing(null)}>{tr("Cancel")}</Button>
+              <Button type="submit" loading={save.isPending}>{tr("Save")}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -745,17 +737,17 @@ function DevicesTab() {
       <Dialog open={key !== null} onOpenChange={(o) => !o && setKey(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Device key for {key?.name}</DialogTitle>
-            <DialogDescription>Copy it into the device now. It is shown only once; if it is lost, create a new key.</DialogDescription>
+            <DialogTitle>{tn("Device key for {name}", { name: key?.name })}</DialogTitle>
+            <DialogDescription>{tr("Copy it into the device now. It is shown only once; if it is lost, create a new key.")}</DialogDescription>
           </DialogHeader>
           <div className="bg-muted flex items-center gap-2 rounded-md p-3 font-mono text-xs break-all">
             <span className="flex-1">{key?.api_key}</span>
-            <IconAction label="Copy" onClick={() => void navigator.clipboard?.writeText(key?.api_key ?? "").then(() => toast.success("Copied"))}>
+            <IconAction label={tr("Copy")} onClick={() => void navigator.clipboard?.writeText(key?.api_key ?? "").then(() => toast.success(tr("Copied")))}>
               <CopyIcon />
             </IconAction>
           </div>
           <DialogFooter>
-            <Button onClick={() => setKey(null)}>Done</Button>
+            <Button onClick={() => setKey(null)}>{tr("Done")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -773,38 +765,37 @@ function SettingsTab() {
     setDup(String(data.duplicate_minutes));
   }, [data]);
   const save = useAction(() => api.put("/attendance-capture/settings", { late_after: lateAfter || null, duplicate_minutes: Number(dup) || 0 }), {
-    success: "Settings saved",
+    success: tr("Settings saved"),
     invalidate: [["/attendance-capture/settings"]],
   });
   return (
     <Card className="max-w-xl gap-4">
       <CardContent className="grid gap-4 sm:grid-cols-2">
-        <Field label="Late after" htmlFor="late-after" description="Scans after this time count as late. Empty = never late.">
+        <Field label={tr("Late after")} htmlFor="late-after" description={tr("Scans after this time count as late. Empty = never late.")}>
           <Input id="late-after" type="time" value={lateAfter} onChange={(e) => setLateAfter(e.target.value)} />
         </Field>
-        <Field label="Ignore repeat scans for (minutes)" htmlFor="dup-min">
+        <Field label={tr("Ignore repeat scans for (minutes)")} htmlFor="dup-min">
           <Input id="dup-min" type="number" min={0} max={240} value={dup} onChange={(e) => setDup(e.target.value)} />
         </Field>
       </CardContent>
       <CardFooter className="justify-end">
         <Button loading={save.isPending} onClick={() => save.mutate(undefined)}>
           <SaveIcon />
-          Save
-        </Button>
+          {tr("Save")}</Button>
       </CardFooter>
     </Card>
   );
 }
 
 const RESULT_LABEL: Record<string, string> = {
-  marked_present: "Present",
-  marked_late: "Late",
-  checked_out: "Checked out",
-  already_marked: "Already marked",
-  duplicate: "Repeat scan",
-  unknown_card: "Unknown card",
-  not_enrolled: "Not enrolled",
-  invalid_time: "Future time",
+  marked_present: tr("Present"),
+  marked_late: tr("Late"),
+  checked_out: tr("Checked out"),
+  already_marked: tr("Already marked"),
+  duplicate: tr("Repeat scan"),
+  unknown_card: tr("Unknown card"),
+  not_enrolled: tr("Not enrolled"),
+  invalid_time: tr("Future time"),
 };
 
 function ScanLogTab() {
@@ -813,22 +804,22 @@ function ScanLogTab() {
   const rows = data?.items ?? [];
   return (
     <div className="space-y-4">
-      <Field label="Date" className="w-48">
+      <Field label={tr("Date")} className="w-48">
         <DatePicker value={date} onChange={setDate} />
       </Field>
       <Card className="gap-0 overflow-hidden py-0">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="w-40">Time</TableHead>
-              <TableHead>Person</TableHead>
-              <TableHead>Card</TableHead>
-              <TableHead className="w-28">Source</TableHead>
-              <TableHead className="w-36">Result</TableHead>
+              <TableHead className="w-40">{tr("Time")}</TableHead>
+              <TableHead>{tr("Person")}</TableHead>
+              <TableHead>{tr("Card")}</TableHead>
+              <TableHead className="w-28">{tr("Source")}</TableHead>
+              <TableHead className="w-36">{tr("Result")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={5} emptyText="No scans" />
+            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={5} emptyText={tr("No scans")} />
             {rows.map((p) => (
               <TableRow key={p.punch_id}>
                 <TableCell className="tabular-nums">{dayjs(p.punched_at).format("DD MMM HH:mm:ss")}</TableCell>
@@ -854,13 +845,13 @@ function ScanLogTab() {
 export function CardsDevicesPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="ID cards & devices" subtitle="Cards people scan at the kiosk or at RFID/biometric terminals, the terminals themselves, and the scan log." />
+      <PageHeader title={tr("ID cards & devices")} subtitle={tr("Cards people scan at the kiosk or at RFID/biometric terminals, the terminals themselves, and the scan log.")} />
       <Tabs defaultValue="cards" className="gap-6">
         <TabsList>
-          <TabsTrigger value="cards">Cards</TabsTrigger>
-          <TabsTrigger value="devices">Devices</TabsTrigger>
-          <TabsTrigger value="log">Scan log</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="cards">{tr("Cards")}</TabsTrigger>
+          <TabsTrigger value="devices">{tr("Devices")}</TabsTrigger>
+          <TabsTrigger value="log">{tr("Scan log")}</TabsTrigger>
+          <TabsTrigger value="settings">{tr("Settings")}</TabsTrigger>
         </TabsList>
         <TabsContent value="cards"><CardsTab /></TabsContent>
         <TabsContent value="devices"><DevicesTab /></TabsContent>

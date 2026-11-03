@@ -29,6 +29,7 @@ import { Textarea } from "../components/ui/textarea";
 import { cn } from "../lib/utils";
 import { initials, toOptions } from "../utils";
 import { PrintHeader, useChildSelect } from "./Academic";
+import { t, tn } from "../i18n";
 
 const ANNUAL = "annual";
 
@@ -43,8 +44,8 @@ function ExamSelect({ value, onChange, withAnnual }: { value: string | null; onC
   const exams = useExams();
   const options = toOptions(exams.data?.items, "exam_id", "name");
   return (
-    <Field label="Exam" className="w-52">
-      <Combobox data={withAnnual ? [{ value: ANNUAL, label: "Annual (all exams)" }, ...options] : options} value={value} onChange={onChange} placeholder="Choose exam" />
+    <Field label={t("Exam")} className="w-52">
+      <Combobox data={withAnnual ? [{ value: ANNUAL, label: t("Annual (all exams)") }, ...options] : options} value={value} onChange={onChange} placeholder={t("Choose exam")} />
     </Field>
   );
 }
@@ -74,34 +75,34 @@ function PaperForm({ paper, examId, classId, onDone }: { paper: ExamPaper | null
       const body = { ...v, exam_id: Number(examId), class_id: Number(classId), subject_id: Number(v.subject_id), room: v.room || null };
       return (paper ? await api.put<ExamPaper>(`/exam-schedule/${paper.exam_schedule_id}`, body) : await api.post<ExamPaper>("/exam-schedule", body)).data;
     },
-    { success: "Saved", invalidate: [["/exam-schedule"]], onSuccess: onDone },
+    { success: t("Saved"), invalidate: [["/exam-schedule"]], onSuccess: onDone },
   );
   return (
     <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
-      <Controller control={form.control} name="subject_id" rules={{ required: "Required" }} render={({ field }) => (
-        <Field label="Subject" required error={errors.subject_id?.message}>
-          <Combobox data={toOptions(subjects.data?.items, "subject_id", "name")} value={field.value} onChange={field.onChange} placeholder="Choose subject" />
+      <Controller control={form.control} name="subject_id" rules={{ required: t("Required") }} render={({ field }) => (
+        <Field label={t("Subject")} required error={errors.subject_id?.message}>
+          <Combobox data={toOptions(subjects.data?.items, "subject_id", "name")} value={field.value} onChange={field.onChange} placeholder={t("Choose subject")} />
         </Field>
       )} />
-      <Controller control={form.control} name="exam_date" rules={{ required: "Required" }} render={({ field }) => (
-        <Field label="Date" required error={errors.exam_date?.message}>
+      <Controller control={form.control} name="exam_date" rules={{ required: t("Required") }} render={({ field }) => (
+        <Field label={t("Date")} required error={errors.exam_date?.message}>
           <DatePicker value={field.value} onChange={field.onChange} clearable={false} />
         </Field>
       )} />
       <div className="grid grid-cols-3 gap-4">
-        <Field label="Starts" htmlFor="paper-start" required>
+        <Field label={t("Starts")} htmlFor="paper-start" required>
           <Input id="paper-start" type="time" {...form.register("start_time", { required: true })} />
         </Field>
-        <Field label="Ends" htmlFor="paper-end" required>
+        <Field label={t("Ends")} htmlFor="paper-end" required>
           <Input id="paper-end" type="time" {...form.register("end_time", { required: true })} />
         </Field>
-        <Field label="Room" htmlFor="paper-room">
+        <Field label={t("Room")} htmlFor="paper-room">
           <Input id="paper-room" {...form.register("room")} />
         </Field>
       </div>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={save.isPending}>Save</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("Cancel")}</Button>
+        <Button type="submit" loading={save.isPending}>{t("Save")}</Button>
       </DialogFooter>
     </form>
   );  // prettier-ignore
@@ -115,15 +116,15 @@ function ScheduleTable({ rows, loading, onEdit, onDelete, showClashes = true }: 
     <Table>
       <TableHeader className="bg-muted/50">
         <TableRow>
-          <TableHead>Date</TableHead>
-          <TableHead>Time</TableHead>
-          <TableHead>Subject</TableHead>
-          <TableHead>Room</TableHead>
+          <TableHead>{t("Date")}</TableHead>
+          <TableHead>{t("Time")}</TableHead>
+          <TableHead>{t("Subject")}</TableHead>
+          <TableHead>{t("Room")}</TableHead>
           {editable && <TableHead className="no-print w-24" />}
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableState loading={loading} empty={!loading && rows.length === 0} colSpan={editable ? 5 : 4} emptyText="No papers scheduled yet" />
+        <TableState loading={loading} empty={!loading && rows.length === 0} colSpan={editable ? 5 : 4} emptyText={t("No papers scheduled yet")} />
         {rows.map((p) => (
           <TableRow key={p.exam_schedule_id} className={cn(showClashes && p.clashes.length > 0 && "bg-destructive/5")}>
             <TableCell>{fmtDate(p.exam_date)}</TableCell>
@@ -132,8 +133,7 @@ function ScheduleTable({ rows, loading, onEdit, onDelete, showClashes = true }: 
               {showClashes && p.clashes.length > 0 && (
                 <Badge className="bg-destructive/10 text-destructive no-print ml-2 border-transparent">
                   <TriangleAlertIcon />
-                  Overlaps
-                </Badge>
+                  {t("Overlaps")}</Badge>
               )}
             </TableCell>
             <TableCell className="font-medium">{p.subject ?? <Dash />}</TableCell>
@@ -141,8 +141,8 @@ function ScheduleTable({ rows, loading, onEdit, onDelete, showClashes = true }: 
             {editable && (
               <TableCell className="no-print">
                 <div className="flex justify-end gap-1">
-                  <IconAction label="Edit" onClick={() => onEdit(p)}><PencilIcon /></IconAction>
-                  <IconAction label="Delete" destructive onClick={() => onDelete(p)}><Trash2Icon /></IconAction>
+                  <IconAction label={t("Edit")} onClick={() => onEdit(p)}><PencilIcon /></IconAction>
+                  <IconAction label={t("Delete")} destructive onClick={() => onDelete(p)}><Trash2Icon /></IconAction>
                 </div>
               </TableCell>
             )}
@@ -157,7 +157,7 @@ function AdmitCardView({ card }: { card: AdmitCard }) {
   const s = card.student;
   return (
     <div className="break-inside-avoid print:break-after-page">
-      <PrintHeader title={`Admit card – ${card.exam.name}`} lines={[card.exam.year]} />
+      <PrintHeader title={t("Admit card – {name}", { name: card.exam.name })} lines={[card.exam.year]} />
       <Card className="gap-4 print:border-0 print:shadow-none">
         <CardContent className="flex flex-wrap items-center gap-4">
           <Avatar className="size-20 rounded-md">
@@ -166,12 +166,12 @@ function AdmitCardView({ card }: { card: AdmitCard }) {
           </Avatar>
           <div className="grid gap-1 text-sm">
             <div className="text-base font-semibold">{s.name}</div>
-            <div><span className="text-muted-foreground">Exam </span>{card.exam.name}</div>
+            <div><span className="text-muted-foreground">{t("Exam")}{" "}</span>{card.exam.name}</div>
             <div>
-              <span className="text-muted-foreground">Class </span>{s.class_name ?? <Dash />}
+              <span className="text-muted-foreground">{t("Class")}{" "}</span>{s.class_name ?? <Dash />}
               {s.section_name && <> / {s.section_name}</>}
-              <span className="text-muted-foreground ml-4">Roll </span>{s.roll ?? <Dash />}
-              {s.student_code && <><span className="text-muted-foreground ml-4">ID </span>{s.student_code}</>}
+              <span className="text-muted-foreground ml-4">{t("Roll")}{" "}</span>{s.roll ?? <Dash />}
+              {s.student_code && <><span className="text-muted-foreground ml-4">{t("ID")}{" "}</span>{s.student_code}</>}
             </div>
           </div>
         </CardContent>
@@ -179,8 +179,8 @@ function AdmitCardView({ card }: { card: AdmitCard }) {
           <ScheduleTable rows={card.schedule} showClashes={false} />
         </CardContent>
         <CardContent className="text-muted-foreground flex justify-between pt-8 text-xs">
-          <span className="border-t px-6 pt-1">Student's signature</span>
-          <span className="border-t px-6 pt-1">Principal's signature</span>
+          <span className="border-t px-6 pt-1">{t("Student's signature")}</span>
+          <span className="border-t px-6 pt-1">{t("Principal's signature")}</span>
         </CardContent>
       </Card>
     </div>
@@ -204,7 +204,7 @@ export function ExamTimetablePage() {
   );
   const cards = useGet<AdmitCard[]>(staff && admitCards && sel.examId && sel.classId ? "/admit-cards" : null, { exam_id: sel.examId, class_id: sel.classId, section_id: sel.sectionId || undefined });
   const ownCard = useGet<AdmitCard>(!staff && admitCards && ownExam && ownId ? `/admit-cards/student/${ownId}` : null, { exam_id: ownExam });
-  const remove = useAction((id: number) => api.delete(`/exam-schedule/${id}`), { success: "Deleted", invalidate: [["/exam-schedule"]] });
+  const remove = useAction((id: number) => api.delete(`/exam-schedule/${id}`), { success: t("Deleted"), invalidate: [["/exam-schedule"]] });
   const rows = papers.data ?? [];
   const clashes = rows.filter((p) => p.clashes.length > 0).length;
   const ready = !!examId && (staff ? !!sel.classId : !!ownId);
@@ -213,28 +213,26 @@ export function ExamTimetablePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Exam timetable"
-        subtitle="Papers by date for each class, and admit cards to print."
+        title={t("Exam timetable")}
+        subtitle={t("Papers by date for each class, and admit cards to print.")}
         actions={
           <>
             {select}
             {ready && (
               <Button variant={admitCards ? "default" : "outline"} onClick={() => setAdmitCards(!admitCards)}>
                 <IdCardIcon />
-                {admitCards ? "Show timetable" : "Admit cards"}
+                {admitCards ? t("Show timetable") : t("Admit cards")}
               </Button>
             )}
             {ready && (
               <Button variant="outline" onClick={() => window.print()}>
                 <PrinterIcon />
-                Print
-              </Button>
+                {t("Print")}</Button>
             )}
             {isAdmin && ready && !admitCards && (
               <Button onClick={() => setEditing("new")}>
                 <PlusIcon />
-                Add paper
-              </Button>
+                {t("Add paper")}</Button>
             )}
           </>
         }
@@ -246,25 +244,24 @@ export function ExamTimetablePage() {
       </Card>
 
       {!ready && (
-        <EmptyState icon={CalendarClockIcon} title={staff ? "Choose an exam and a class" : "Choose an exam"}>
-          The papers and their times appear here.
-        </EmptyState>
+        <EmptyState icon={CalendarClockIcon} title={staff ? t("Choose an exam and a class") : t("Choose an exam")}>
+          {t("The papers and their times appear here.")}</EmptyState>
       )}
       {ready && clashes > 0 && !admitCards && (
         <Alert variant="destructive" className="no-print">
           <TriangleAlertIcon />
-          <AlertDescription>{clashes} papers overlap with another paper of this class on the same day.</AlertDescription>
+          <AlertDescription>{tn("{clashes} papers overlap with another paper of this class on the same day.", { clashes })}</AlertDescription>
         </Alert>
       )}
       {ready && !admitCards && (
         <>
-          <PrintHeader title="Exam timetable" />
+          <PrintHeader title={t("Exam timetable")} />
           <Card className="gap-0 overflow-hidden py-0 print:border-0 print:shadow-none">
             <ScheduleTable
               rows={rows}
               loading={papers.isLoading}
               onEdit={isAdmin ? setEditing : undefined}
-              onDelete={isAdmin ? (p) => confirmAction({ title: `Delete the ${p.subject ?? ""} paper?`, onConfirm: () => remove.mutate(p.exam_schedule_id) }) : undefined}
+              onDelete={isAdmin ? (p) => confirmAction({ title: t("Delete the {value} paper?", { value: p.subject ?? "" }), onConfirm: () => remove.mutate(p.exam_schedule_id) }) : undefined}
             />
           </Card>
         </>
@@ -272,7 +269,7 @@ export function ExamTimetablePage() {
       {ready && admitCards && (
         <div className="space-y-6">
           {(cards.isLoading || ownCard.isLoading) && <Skeleton className="h-64 w-full" />}
-          {staff && cards.data?.length === 0 && <EmptyState title="No students enrolled" />}
+          {staff && cards.data?.length === 0 && <EmptyState title={t("No students enrolled")} />}
           {(staff ? cards.data ?? [] : ownCard.data ? [ownCard.data] : []).map((c) => (
             <AdmitCardView key={c.student.student_id} card={c} />
           ))}
@@ -282,7 +279,7 @@ export function ExamTimetablePage() {
       <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing === "new" ? "Add paper" : "Edit paper"}</DialogTitle>
+            <DialogTitle>{editing === "new" ? t("Add paper") : t("Edit paper")}</DialogTitle>
           </DialogHeader>
           {editing !== null && sel.examId && sel.classId && (
             <PaperForm key={editing === "new" ? "new" : editing.exam_schedule_id} paper={editing === "new" ? null : editing} examId={sel.examId} classId={sel.classId} onDone={() => setEditing(null)} />
@@ -302,17 +299,17 @@ function WeightsDialog({ open, onClose }: { open: boolean; onClose: () => void }
   const total = Object.values(values).reduce((acc, v) => acc + (Number(v) || 0), 0);
   const save = useAction(
     () => api.put("/exam-weights", { year: data!.year, weights: Object.entries(values).map(([id, w]) => ({ exam_id: Number(id), weight: w === "" ? null : Number(w) })) }),
-    { success: "Exam weights saved", invalidate: [["/exam-weights"], ["/report-cards"]], onSuccess: onClose },
+    { success: t("Exam weights saved"), invalidate: [["/exam-weights"], ["/report-cards"]], onSuccess: onClose },
   );
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Exam weights {data?.year}</DialogTitle>
-          <DialogDescription>Share of each exam in the annual result. Leave empty to leave an exam out. Weights should add up to 100%.</DialogDescription>
+          <DialogTitle>{tn("Exam weights {year}", { year: data?.year })}</DialogTitle>
+          <DialogDescription>{t("Share of each exam in the annual result. Leave empty to leave an exam out. Weights should add up to 100%.")}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-3">
-          {(data?.exams ?? []).length === 0 && <p className="text-muted-foreground text-sm">No exams in this year.</p>}
+          {(data?.exams ?? []).length === 0 && <p className="text-muted-foreground text-sm">{t("No exams in this year.")}</p>}
           {(data?.exams ?? []).map((e) => (
             <div key={e.exam_id} className="flex items-center justify-between gap-3">
               <label htmlFor={`weight-${e.exam_id}`} className="text-sm font-medium">{e.name}</label>
@@ -323,13 +320,13 @@ function WeightsDialog({ open, onClose }: { open: boolean; onClose: () => void }
             </div>
           ))}
           <div className={cn("flex justify-between border-t pt-3 text-sm font-semibold", Math.abs(total - 100) > 0.01 && "text-destructive")}>
-            <span>Total</span>
+            <span>{t("Total")}</span>
             <span className="tabular-nums">{total}%</span>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button loading={save.isPending} disabled={!data} onClick={() => save.mutate(undefined)}>Save</Button>
+          <Button variant="outline" onClick={onClose}>{t("Cancel")}</Button>
+          <Button loading={save.isPending} disabled={!data} onClick={() => save.mutate(undefined)}>{t("Save")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -359,25 +356,25 @@ function ReportCardView({ card, onRemark }: { card: ReportCard; onRemark?: () =>
   const att = card.attendance;
   return (
     <div className="space-y-4 break-inside-avoid print:break-after-page">
-      <PrintHeader title={annual ? `Annual report card ${card.year}` : `Report card – ${card.exam?.name ?? ""}`} lines={annual ? undefined : [card.year]} />
+      <PrintHeader title={annual ? t("Annual report card {year}", { year: card.year }) : t("Report card – {value}", { value: card.exam?.name ?? "" })} lines={annual ? undefined : [card.year]} />
       <Card className="gap-4 print:border-0 print:shadow-none">
         <CardContent className="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
           <div className="text-base font-semibold">{s.name}</div>
-          {s.student_code && <div><span className="text-muted-foreground">ID </span>{s.student_code}</div>}
-          <div><span className="text-muted-foreground">Class </span>{s.class_name ?? <Dash />}{s.section_name && ` / ${s.section_name}`}</div>
-          <div><span className="text-muted-foreground">Roll </span>{s.roll ?? <Dash />}</div>
-          <Badge variant="secondary" className="no-print">{annual ? `Annual ${card.year}` : card.exam?.name}</Badge>
+          {s.student_code && <div><span className="text-muted-foreground">{t("ID")}{" "}</span>{s.student_code}</div>}
+          <div><span className="text-muted-foreground">{t("Class")}{" "}</span>{s.class_name ?? <Dash />}{s.section_name && " " + t("/ {section_name}", { section_name: s.section_name })}</div>
+          <div><span className="text-muted-foreground">{t("Roll")}{" "}</span>{s.roll ?? <Dash />}</div>
+          <Badge variant="secondary" className="no-print">{annual ? t("Annual {year}", { year: card.year }) : card.exam?.name}</Badge>
         </CardContent>
         <CardContent className="px-0">
           {annual ? (
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead>Subject</TableHead>
+                  <TableHead>{t("Subject")}</TableHead>
                   {card.exams.map((e) => (
                     <TableHead key={e.exam_id} className="text-right">{e.name} <span className="text-muted-foreground font-normal">({e.weight}%)</span></TableHead>
                   ))}
-                  <TableHead className="text-right">Weighted %</TableHead>
+                  <TableHead className="text-right">{t("Weighted %")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -391,10 +388,10 @@ function ReportCardView({ card, onRemark }: { card: ReportCard; onRemark?: () =>
                   </TableRow>
                 ))}
                 <TableRow className="bg-muted/30">
-                  <TableCell className="font-medium">Exam result</TableCell>
+                  <TableCell className="font-medium">{t("Exam result")}</TableCell>
                   {card.exams.map((e) => (
                     <TableCell key={e.exam_id} className="text-right text-xs">
-                      {e.percentage ?? "—"}% · GPA {e.gpa ?? "—"} · {e.result}
+                      {tn("{value}% · GPA {value2} · {result}", { value: e.percentage ?? "—", value2: e.gpa ?? "—", result: e.result })}
                     </TableCell>
                   ))}
                   <TableCell />
@@ -405,12 +402,12 @@ function ReportCardView({ card, onRemark }: { card: ReportCard; onRemark?: () =>
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead>Subject</TableHead>
-                  <TableHead className="text-right">Full marks</TableHead>
-                  <TableHead className="text-right">Obtained</TableHead>
-                  <TableHead className="text-center">Grade</TableHead>
-                  <TableHead className="text-right">Grade point</TableHead>
-                  <TableHead>Comment</TableHead>
+                  <TableHead>{t("Subject")}</TableHead>
+                  <TableHead className="text-right">{t("Full marks")}</TableHead>
+                  <TableHead className="text-right">{t("Obtained")}</TableHead>
+                  <TableHead className="text-center">{t("Grade")}</TableHead>
+                  <TableHead className="text-right">{t("Grade point")}</TableHead>
+                  <TableHead>{t("Comment")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -425,7 +422,7 @@ function ReportCardView({ card, onRemark }: { card: ReportCard; onRemark?: () =>
                   </TableRow>
                 ))}
                 <TableRow className="bg-muted/30 font-semibold">
-                  <TableCell>Total</TableCell>
+                  <TableCell>{t("Total")}</TableCell>
                   <TableCell className="text-right tabular-nums">{card.full_total}</TableCell>
                   <TableCell className="text-right tabular-nums">{card.total}</TableCell>
                   <TableCell colSpan={3} />
@@ -443,23 +440,23 @@ function ReportCardView({ card, onRemark }: { card: ReportCard; onRemark?: () =>
           </CardContent>
         )}
         <CardContent className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3 lg:grid-cols-6 [print-color-adjust:exact] print:grid-cols-6">
-          <Stat label="Result"><Badge className={cn("border-transparent", RESULT_STYLE[card.result])}>{card.result}</Badge></Stat>
-          <Stat label={annual ? "CGPA" : "GPA"}>{card.gpa ?? "—"}</Stat>
-          <Stat label="Percentage">{card.percentage == null ? (card.result === "Incomplete" ? "Incomplete" : "—") : `${card.percentage}%`}</Stat>
-          <Stat label="Position in class">{card.position_class == null ? "—" : `${card.position_class} of ${card.class_size}`}</Stat>
-          <Stat label="Position in section">{card.position_section == null ? "—" : `${card.position_section} of ${card.section_size}`}</Stat>
-          <Stat label="Attendance">
-            {att.percent == null ? "—" : `${att.percent}%`}
-            <span className="text-muted-foreground ml-1 text-xs font-normal">{att.present}/{att.working_days} days</span>
+          <Stat label={t("Result")}><Badge className={cn("border-transparent", RESULT_STYLE[card.result])}>{card.result}</Badge></Stat>
+          <Stat label={annual ? t("CGPA") : t("GPA")}>{card.gpa ?? "—"}</Stat>
+          <Stat label={t("Percentage")}>{card.percentage == null ? (card.result === "Incomplete" ? t("Incomplete") : "—") : t("{percentage}%", { percentage: card.percentage })}</Stat>
+          <Stat label={t("Position in class")}>{card.position_class == null ? "—" : t("{position_class} of {class_size}", { position_class: card.position_class, class_size: card.class_size })}</Stat>
+          <Stat label={t("Position in section")}>{card.position_section == null ? "—" : t("{position_section} of {section_size}", { position_section: card.position_section, section_size: card.section_size })}</Stat>
+          <Stat label={t("Attendance")}>
+            {att.percent == null ? "—" : t("{percent}%", { percent: att.percent })}
+            <span className="text-muted-foreground ml-1 text-xs font-normal">{tn("{present}/{working_days} days", { present: att.present, working_days: att.working_days })}</span>
           </Stat>
         </CardContent>
         <CardContent className="text-sm">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground text-xs">Teacher's remark</span>
+            <span className="text-muted-foreground text-xs">{t("Teacher's remark")}</span>
             {onRemark && (
               <Button size="xs" variant="ghost" className="no-print" onClick={onRemark}>
                 <MessageSquareTextIcon />
-                {card.remark ? "Edit remark" : "Add remark"}
+                {card.remark ? t("Edit remark") : t("Add remark")}
               </Button>
             )}
           </div>
@@ -467,9 +464,9 @@ function ReportCardView({ card, onRemark }: { card: ReportCard; onRemark?: () =>
         </CardContent>
         <CardContent className="text-muted-foreground print-only">
           <div className="flex justify-between pt-10 text-xs">
-            <span className="border-t px-6 pt-1">Class teacher</span>
-            <span className="border-t px-6 pt-1">Guardian</span>
-            <span className="border-t px-6 pt-1">Principal</span>
+            <span className="border-t px-6 pt-1">{t("Class teacher")}</span>
+            <span className="border-t px-6 pt-1">{t("Guardian")}</span>
+            <span className="border-t px-6 pt-1">{t("Principal")}</span>
           </div>
         </CardContent>
       </Card>
@@ -482,20 +479,20 @@ function RemarkDialog({ card, onClose }: { card: ReportCard | null; onClose: () 
   useEffect(() => setText(card?.remark ?? ""), [card]);
   const save = useAction(
     () => api.put(`/report-cards/student/${card!.student.student_id}/remark`, { exam_id: card!.exam?.exam_id ?? null, year: card!.year, remark: text }),
-    { success: "Remark saved", invalidate: [["/report-cards"], [`/report-cards/student/${card?.student.student_id}`]], onSuccess: onClose },
+    { success: t("Remark saved"), invalidate: [["/report-cards"], [`/report-cards/student/${card?.student.student_id}`]], onSuccess: onClose },
   );
   return (
     <Dialog open={!!card} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Remark for {card?.student.name}</DialogTitle>
-          <DialogDescription>{card?.kind === "annual" ? `Annual report ${card.year}` : card?.exam?.name}</DialogDescription>
+          <DialogTitle>{tn("Remark for {name}", { name: card?.student.name })}</DialogTitle>
+          <DialogDescription>{card?.kind === "annual" ? t("Annual report {year}", { year: card.year }) : card?.exam?.name}</DialogDescription>
         </DialogHeader>
-        <Textarea rows={4} maxLength={2000} value={text} onChange={(e) => setText(e.target.value)} aria-label="Remark" />
+        <Textarea rows={4} maxLength={2000} value={text} onChange={(e) => setText(e.target.value)} aria-label={t("Remark")} />
         {card && <AiRemarkDrafts key={`${card.student.student_id}-${card.exam?.exam_id ?? "annual"}`} studentId={card.student.student_id} examId={card.exam?.exam_id ?? null} year={card.year} onPick={setText} />}
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button loading={save.isPending} onClick={() => save.mutate(undefined)}>Save</Button>
+          <Button variant="outline" onClick={onClose}>{t("Cancel")}</Button>
+          <Button loading={save.isPending} onClick={() => save.mutate(undefined)}>{t("Save")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -523,23 +520,22 @@ export function ReportCardsPage() {
 
   return (
     <div className="space-y-6">
-      <style>{"@media print { @page { size: A4 portrait; } }"}</style>
+      <style>{t("@media print { @page { size: A4 portrait; } }")}</style>
       <PageHeader
-        title="Report cards"
-        subtitle={staff ? "Results per exam or for the whole year, with positions, attendance and remarks. Print one or the whole section." : undefined}
+        title={t("Report cards")}
+        subtitle={staff ? t("Results per exam or for the whole year, with positions, attendance and remarks. Print one or the whole section.") : undefined}
         actions={
           <>
             {select}
             {user.role === "admin" && (
               <Button variant="outline" onClick={() => setWeightsOpen(true)}>
                 <ScaleIcon />
-                Exam weights
-              </Button>
+                {t("Exam weights")}</Button>
             )}
             {cards.length > 0 && (
               <Button variant="outline" onClick={() => window.print()}>
                 <PrinterIcon />
-                {cards.length > 1 ? `Print ${cards.length}` : "Print"}
+                {cards.length > 1 ? t("Print {length}", { length: cards.length }) : t("Print")}
               </Button>
             )}
           </>
@@ -550,20 +546,19 @@ export function ReportCardsPage() {
           <ExamSelect value={examId} onChange={setExamId} withAnnual />
           {staff && <ClassPicker value={sel} onChange={(v) => { setSel(v); setStudentId(null); }} />}
           {staff && (
-            <Field label="Single student (optional)" className="w-60">
-              <Combobox clearable disabled={!sel.classId} placeholder="Everyone" data={toOptions(students.data?.items, "student_id", "name")} value={studentId} onChange={setStudentId} />
+            <Field label={t("Single student (optional)")} className="w-60">
+              <Combobox clearable disabled={!sel.classId} placeholder={t("Everyone")} data={toOptions(students.data?.items, "student_id", "name")} value={studentId} onChange={setStudentId} />
             </Field>
           )}
         </CardContent>
       </Card>
 
       {!ready && (
-        <EmptyState icon={FileBadgeIcon} title={staff ? "Choose an exam and a class" : "Choose an exam"}>
-          Pick "Annual" for the weighted result of the whole year.
-        </EmptyState>
+        <EmptyState icon={FileBadgeIcon} title={staff ? t("Choose an exam and a class") : t("Choose an exam")}>
+          {t("Pick \"Annual\" for the weighted result of the whole year.")}</EmptyState>
       )}
       {ready && loading && <Skeleton className="h-96 w-full" />}
-      {ready && !loading && cards.length === 0 && <EmptyState title="No report cards" >Nobody is enrolled for this selection.</EmptyState>}
+      {ready && !loading && cards.length === 0 && <EmptyState title={t("No report cards")} >{t("Nobody is enrolled for this selection.")}</EmptyState>}
       <div className="space-y-8">
         {cards.map((c) => (
           <ReportCardView key={c.student.student_id} card={c} onRemark={staff ? () => setRemarkFor(c) : undefined} />

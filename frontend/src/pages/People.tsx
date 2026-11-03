@@ -7,19 +7,20 @@ import { CrudPage, IconAction, type FieldDef } from "../components/CrudPage";
 import { ExportButton } from "../components/ExportButton";
 import { FileButton } from "../components/file-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { t } from "../i18n";
 
 const GENDER = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
+  { value: "male", label: t("Male") },
+  { value: "female", label: t("Female") },
 ];
 
 const BLOOD = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((v) => ({ value: v, label: v }));
 
 const account = (extra: FieldDef[] = []): FieldDef[] => [
-  { name: "name", label: "Name", required: true },
-  { name: "email", label: "Email", type: "email", required: true },
+  { name: "name", label: t("Name"), required: true },
+  { name: "email", label: t("Email"), type: "email", required: true },
   ...extra,
-  { name: "password", label: "Password", type: "password", formOnly: true, createOnlyRequired: true },
+  { name: "password", label: t("Password"), type: "password", formOnly: true, createOnlyRequired: true },
 ];
 
 function PhotoButton({ path, id }: { path: string; id: unknown }) {
@@ -29,12 +30,12 @@ function PhotoButton({ path, id }: { path: string; id: unknown }) {
       body.append("file", file);
       return api.post(`${path}/${id}/photo`, body);
     },
-    { success: "Photo updated", invalidate: [[path]] },
+    { success: t("Photo updated"), invalidate: [[path]] },
   );
   return (
     <FileButton onChange={(f) => f && upload.mutate(f)} accept="image/png,image/jpeg,image/webp">
       {(props) => (
-        <IconAction label="Upload photo" loading={upload.isPending} {...props}>
+        <IconAction label={t("Upload photo")} loading={upload.isPending} {...props}>
           <ImageIcon />
         </IconAction>
       )}
@@ -47,7 +48,7 @@ export function TeachersPage() {
   const admin = user.role === "admin";
   return (
     <CrudPage
-      title="Teachers"
+      title={t("Teachers")}
       path="/teachers"
       idField="teacher_id"
       canWrite={admin}
@@ -56,15 +57,15 @@ export function TeachersPage() {
       headerExtra={<ExportButton size="default" path="/export/teachers.xlsx" />}
       extraActions={admin ? (row) => <PhotoButton path="/teachers" id={row.teacher_id} /> : undefined}
       fields={account([
-        { name: "designation", label: "Designation" },
-        { name: "phone", label: "Phone" },
-        { name: "sex", label: "Gender", type: "select", options: GENDER, formOnly: true },
-        { name: "birthday", label: "Birthday", type: "date", formOnly: true },
-        { name: "blood_group", label: "Blood group", type: "select", options: BLOOD, formOnly: true },
-        { name: "religion", label: "Religion", formOnly: true },
-        { name: "address", label: "Address", formOnly: true },
-        { name: "about", label: "About (shown on website)", type: "textarea", formOnly: true },
-        { name: "show_on_website", label: "Show on public website", type: "switch", formOnly: !admin },
+        { name: "designation", label: t("Designation") },
+        { name: "phone", label: t("Phone") },
+        { name: "sex", label: t("Gender"), type: "select", options: GENDER, formOnly: true },
+        { name: "birthday", label: t("Birthday"), type: "date", formOnly: true },
+        { name: "blood_group", label: t("Blood group"), type: "select", options: BLOOD, formOnly: true },
+        { name: "religion", label: t("Religion"), formOnly: true },
+        { name: "address", label: t("Address"), formOnly: true },
+        { name: "about", label: t("About (shown on website)"), type: "textarea", formOnly: true },
+        { name: "show_on_website", label: t("Show on public website"), type: "switch", formOnly: !admin },
       ]).filter((f) => admin || ["name", "email", "designation", "phone"].includes(f.name))}
     />
   );
@@ -73,15 +74,15 @@ export function TeachersPage() {
 export function ParentsPage() {
   return (
     <CrudPage
-      title="Parents"
+      title={t("Parents")}
       path="/parents"
       idField="parent_id"
       searchable
       headerExtra={<ExportButton size="default" path="/export/parents.xlsx" />}
       fields={account([
-        { name: "phone", label: "Phone" },
-        { name: "profession", label: "Profession" },
-        { name: "address", label: "Address", formOnly: true },
+        { name: "phone", label: t("Phone") },
+        { name: "profession", label: t("Profession") },
+        { name: "address", label: t("Address"), formOnly: true },
       ])}
     />
   );
@@ -91,18 +92,18 @@ export function StaffPage() {
   return (
     <Tabs defaultValue="admins" className="gap-4">
       <TabsList>
-        <TabsTrigger value="admins">Admins</TabsTrigger>
-        <TabsTrigger value="librarians">Librarians</TabsTrigger>
-        <TabsTrigger value="accountants">Accountants</TabsTrigger>
+        <TabsTrigger value="admins">{t("Admins")}</TabsTrigger>
+        <TabsTrigger value="librarians">{t("Librarians")}</TabsTrigger>
+        <TabsTrigger value="accountants">{t("Accountants")}</TabsTrigger>
       </TabsList>
       <TabsContent value="admins">
-        <CrudPage title="Admins" path="/admins" idField="admin_id" searchable fields={account([{ name: "phone", label: "Phone" }])} />
+        <CrudPage title={t("Admins")} path="/admins" idField="admin_id" searchable fields={account([{ name: "phone", label: t("Phone") }])} />
       </TabsContent>
       <TabsContent value="librarians">
-        <CrudPage title="Librarians" path="/librarians" idField="librarian_id" searchable fields={account()} />
+        <CrudPage title={t("Librarians")} path="/librarians" idField="librarian_id" searchable fields={account()} />
       </TabsContent>
       <TabsContent value="accountants">
-        <CrudPage title="Accountants" path="/accountants" idField="accountant_id" searchable fields={account()} />
+        <CrudPage title={t("Accountants")} path="/accountants" idField="accountant_id" searchable fields={account()} />
       </TabsContent>
     </Tabs>
   );

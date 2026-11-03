@@ -59,6 +59,7 @@ import { cn } from "../lib/utils";
 import { fromUnix, initials, money, titleCase, toOptions } from "../utils";
 import { PasswordInput } from "./Auth";
 import { BLOOD, GENDER, PhotoButton } from "./People";
+import { t as tr, tn } from "../i18n";
 
 interface ParentInfo {
   parent_id: number;
@@ -120,7 +121,7 @@ function StudentForm({ editing, onDone }: { editing: Student | null; onDone: () 
       };
       return editing ? api.put(`/students/${editing.student_id}`, payload) : api.post("/students", payload);
     },
-    { success: editing ? "Student updated" : "Student added", invalidate: [["/students"]], onSuccess: onDone },
+    { success: editing ? tr("Student updated") : tr("Student added"), invalidate: [["/students"]], onSuccess: onDone },
   );
 
   const text = (name: Key, label: string, o: { className?: string; required?: boolean; type?: string; placeholder?: string; rules?: RegisterOptions<FormValues, Key> } = {}) => (
@@ -150,7 +151,7 @@ function StudentForm({ editing, onDone }: { editing: Student | null; onDone: () 
       <Controller
         control={form.control}
         name={name}
-        rules={o.required ? { required: "Required" } : undefined}
+        rules={o.required ? { required: tr("Required") } : undefined}
         render={({ field }) => (
           <Combobox
             id={`st-${name}`}
@@ -174,51 +175,49 @@ function StudentForm({ editing, onDone }: { editing: Student | null; onDone: () 
   return (
     <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-6">
       <div className="grid gap-4 sm:grid-cols-12">
-        {text("name", "Name", { className: half, required: true, rules: { required: "Required" } })}
-        {text("student_code", "Student ID no.", { className: half, placeholder: "auto if empty" })}
-        {text("email", "Email", { className: half, required: true, type: "email", rules: { validate: (v) => (/^\S+@\S+$/.test(String(v)) ? true : "Valid email required") } })}
+        {text("name", tr("Name"), { className: half, required: true, rules: { required: tr("Required") } })}
+        {text("student_code", tr("Student ID no."), { className: half, placeholder: tr("auto if empty") })}
+        {text("email", tr("Email"), { className: half, required: true, type: "email", rules: { validate: (v) => (/^\S+@\S+$/.test(String(v)) ? true : tr("Valid email required")) } })}
         <Field
-          label="Password"
+          label={tr("Password")}
           htmlFor="st-password"
           required={!editing}
-          description={editing ? "Leave empty to keep" : "At least 8 characters"}
+          description={editing ? tr("Leave empty to keep") : tr("At least 8 characters")}
           error={errors.password?.message}
           className={half}
         >
           <Controller
             control={form.control}
             name="password"
-            rules={{ validate: (v) => (!editing && String(v).length < 8 ? "At least 8 characters" : true) }}
+            rules={{ validate: (v) => (!editing && String(v).length < 8 ? tr("At least 8 characters") : true) }}
             render={({ field }) => (
               <PasswordInput id="st-password" autoComplete="new-password" value={String(field.value ?? "")} onChange={field.onChange} onBlur={field.onBlur} aria-invalid={!!errors.password || undefined} />
             )}
           />
         </Field>
-        {select("class_id", "Class", toOptions(classes.data?.items, "class_id", "name"), { className: third, required: true, onPick: () => form.setValue("section_id", null) })}
-        {select("section_id", "Section", toOptions(sections.data?.items, "section_id", "name"), { className: third })}
-        {text("roll", "Roll", { className: third, type: "number" })}
-        {select("parent_id", "Parent", toOptions(parents.data?.items, "parent_id", "name"), { className: half })}
-        {text("phone", "Phone", { className: half, type: "tel" })}
-        {select("sex", "Gender", GENDER, { className: third })}
-        <Field label="Birthday" htmlFor="st-birthday" className={third}>
+        {select("class_id", tr("Class"), toOptions(classes.data?.items, "class_id", "name"), { className: third, required: true, onPick: () => form.setValue("section_id", null) })}
+        {select("section_id", tr("Section"), toOptions(sections.data?.items, "section_id", "name"), { className: third })}
+        {text("roll", tr("Roll"), { className: third, type: "number" })}
+        {select("parent_id", tr("Parent"), toOptions(parents.data?.items, "parent_id", "name"), { className: half })}
+        {text("phone", tr("Phone"), { className: half, type: "tel" })}
+        {select("sex", tr("Gender"), GENDER, { className: third })}
+        <Field label={tr("Birthday")} htmlFor="st-birthday" className={third}>
           <Controller control={form.control} name="birthday" render={({ field }) => <DatePicker id="st-birthday" value={String(field.value ?? "")} onChange={field.onChange} />} />
         </Field>
-        {select("blood_group", "Blood group", BLOOD, { className: third })}
-        {text("religion", "Religion", { className: half })}
-        {select("transport_id", "Transport route", toOptions(transports.data?.items, "transport_id", "route_name"), { className: half })}
-        {select("dormitory_id", "Dormitory", toOptions(dorms.data?.items, "dormitory_id", "name"), { className: half })}
-        {text("dormitory_room_number", "Room number", { className: half })}
-        <Field label="Address" htmlFor="st-address" className="sm:col-span-12">
+        {select("blood_group", tr("Blood group"), BLOOD, { className: third })}
+        {text("religion", tr("Religion"), { className: half })}
+        {select("transport_id", tr("Transport route"), toOptions(transports.data?.items, "transport_id", "route_name"), { className: half })}
+        {select("dormitory_id", tr("Dormitory"), toOptions(dorms.data?.items, "dormitory_id", "name"), { className: half })}
+        {text("dormitory_room_number", tr("Room number"), { className: half })}
+        <Field label={tr("Address")} htmlFor="st-address" className="sm:col-span-12">
           <Controller control={form.control} name="address" render={({ field }) => <Textarea id="st-address" rows={2} value={String(field.value ?? "")} onChange={field.onChange} />} />
         </Field>
       </div>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onDone}>
-          Cancel
-        </Button>
+          {tr("Cancel")}</Button>
         <Button type="submit" loading={save.isPending}>
-          Save
-        </Button>
+          {tr("Save")}</Button>
       </DialogFooter>
     </form>
   );
@@ -247,12 +246,11 @@ function MarksheetView({ studentId }: { studentId: number }) {
         <Skeleton className="h-32 w-full" />
       </div>
     );
-  if (error) return <EmptyState icon={CircleAlertIcon} title="Could not load marks">{errorMessage(error)}</EmptyState>;
+  if (error) return <EmptyState icon={CircleAlertIcon} title={tr("Could not load marks")}>{errorMessage(error)}</EmptyState>;
   if (!data?.exams.length)
     return (
-      <EmptyState icon={ClipboardListIcon} title="No marks yet">
-        No exam results for {data?.year ?? "the running year"}.
-      </EmptyState>
+      <EmptyState icon={ClipboardListIcon} title={tr("No marks yet")}>
+        {tn("No exam results for {value}.", { value: data?.year ?? tr("the running year") })}</EmptyState>
     );
   return (
     <div className="space-y-4">
@@ -261,18 +259,18 @@ function MarksheetView({ studentId }: { studentId: number }) {
           <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
             <span className="font-medium">{exam.name}</span>
             <div className="flex gap-2">
-              <Badge variant="secondary">Total {exam.total}</Badge>
-              <Badge variant="outline">GPA {exam.average_grade_point}</Badge>
+              <Badge variant="secondary">{tn("Total {total}", { total: exam.total })}</Badge>
+              <Badge variant="outline">{tn("GPA {average_grade_point}", { average_grade_point: exam.average_grade_point })}</Badge>
             </div>
           </div>
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Subject</TableHead>
-                <TableHead className="text-right">Obtained</TableHead>
-                <TableHead className="text-right">Highest</TableHead>
-                <TableHead>Grade</TableHead>
-                <TableHead>Comment</TableHead>
+                <TableHead>{tr("Subject")}</TableHead>
+                <TableHead className="text-right">{tr("Obtained")}</TableHead>
+                <TableHead className="text-right">{tr("Highest")}</TableHead>
+                <TableHead>{tr("Grade")}</TableHead>
+                <TableHead>{tr("Comment")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -285,7 +283,7 @@ function MarksheetView({ studentId }: { studentId: number }) {
                   <TableCell className="text-muted-foreground max-w-48 truncate">{s.comment || <Dash />}</TableCell>
                 </TableRow>
               ))}
-              <TableState empty={exam.subjects.length === 0} colSpan={5} emptyText="No subjects for this class" />
+              <TableState empty={exam.subjects.length === 0} colSpan={5} emptyText={tr("No subjects for this class")} />
             </TableBody>
           </Table>
         </Card>
@@ -314,12 +312,11 @@ function ParentCard({ parentId }: { parentId: number | null }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <UserRoundIcon className="text-muted-foreground size-4" />
-          Parent
-        </CardTitle>
+          {tr("Parent")}</CardTitle>
       </CardHeader>
       <CardContent>
         {!parentId ? (
-          <p className="text-muted-foreground text-sm">Parent information is not available.</p>
+          <p className="text-muted-foreground text-sm">{tr("Parent information is not available.")}</p>
         ) : isLoading ? (
           <Skeleton className="h-16 w-full" />
         ) : p ? (
@@ -348,7 +345,7 @@ function ParentCard({ parentId }: { parentId: number | null }) {
             )}
           </div>
         ) : (
-          <p className="text-muted-foreground text-sm">Parent information is not available.</p>
+          <p className="text-muted-foreground text-sm">{tr("Parent information is not available.")}</p>
         )}
       </CardContent>
     </Card>
@@ -365,16 +362,16 @@ function DetailsTab({ s }: { s: Student }) {
       <Card className="gap-2 py-4">
         <CardContent>
           <dl className="divide-y">
-            <InfoRow label="Email">{show(s.email)}</InfoRow>
-            <InfoRow label="Phone">{show(s.phone)}</InfoRow>
-            <InfoRow label="Gender">{s.sex ? titleCase(s.sex) : <Dash />}</InfoRow>
-            <InfoRow label="Birthday">{s.birthday && dayjs(s.birthday).isValid() ? dayjs(s.birthday).format("DD MMM YYYY") : show(s.birthday)}</InfoRow>
-            <InfoRow label="Blood group">{show(s.blood_group)}</InfoRow>
-            <InfoRow label="Religion">{show(s.religion)}</InfoRow>
-            <InfoRow label="Address">{show(s.address)}</InfoRow>
-            <InfoRow label="Transport">{s.transport_id ? (transport ?? `#${s.transport_id}`) : <Dash />}</InfoRow>
-            <InfoRow label="Dormitory">
-              {s.dormitory_id ? `${dorm ?? `#${s.dormitory_id}`}${s.dormitory_room_number ? ` · room ${s.dormitory_room_number}` : ""}` : <Dash />}
+            <InfoRow label={tr("Email")}>{show(s.email)}</InfoRow>
+            <InfoRow label={tr("Phone")}>{show(s.phone)}</InfoRow>
+            <InfoRow label={tr("Gender")}>{s.sex ? titleCase(s.sex) : <Dash />}</InfoRow>
+            <InfoRow label={tr("Birthday")}>{s.birthday && dayjs(s.birthday).isValid() ? dayjs(s.birthday).format("DD MMM YYYY") : show(s.birthday)}</InfoRow>
+            <InfoRow label={tr("Blood group")}>{show(s.blood_group)}</InfoRow>
+            <InfoRow label={tr("Religion")}>{show(s.religion)}</InfoRow>
+            <InfoRow label={tr("Address")}>{show(s.address)}</InfoRow>
+            <InfoRow label={tr("Transport")}>{s.transport_id ? (transport ?? tr("#{transport_id}", { transport_id: s.transport_id })) : <Dash />}</InfoRow>
+            <InfoRow label={tr("Dormitory")}>
+              {s.dormitory_id ? tr("{value}{value2}", { value: dorm ?? `#${s.dormitory_id}`, value2: s.dormitory_room_number ? " " + tr("· room {dormitory_room_number}", { dormitory_room_number: s.dormitory_room_number }) : "" }) : <Dash />}
             </InfoRow>
           </dl>
         </CardContent>
@@ -405,22 +402,21 @@ function PaymentsTab({ studentId }: { studentId: number }) {
         <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
           <span className="flex items-center gap-2 font-medium">
             <ReceiptIcon className="text-muted-foreground size-4" />
-            Invoices
-          </span>
-          {due > 0 && <Badge className="bg-warning/20 border-transparent text-amber-700 dark:text-amber-300">Due {money(due, currency)}</Badge>}
+            {tr("Invoices")}</span>
+          {due > 0 && <Badge className="bg-warning/20 border-transparent text-amber-700 dark:text-amber-300">{tn("Due {due}", { due: money(due, currency) })}</Badge>}
         </div>
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-right">Paid</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>{tr("Title")}</TableHead>
+              <TableHead className="text-right">{tr("Amount")}</TableHead>
+              <TableHead className="text-right">{tr("Paid")}</TableHead>
+              <TableHead>{tr("Status")}</TableHead>
+              <TableHead>{tr("Date")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={invoices.isLoading} empty={invoices.data?.items.length === 0} colSpan={5} emptyText="No invoices" />
+            <TableState loading={invoices.isLoading} empty={invoices.data?.items.length === 0} colSpan={5} emptyText={tr("No invoices")} />
             {invoices.data?.items.map((i) => (
               <TableRow key={i.invoice_id}>
                 <TableCell className="max-w-40 truncate">{i.title}</TableCell>
@@ -439,19 +435,18 @@ function PaymentsTab({ studentId }: { studentId: number }) {
       <Card className="gap-0 overflow-hidden py-0">
         <div className="flex items-center gap-2 border-b px-4 py-3 font-medium">
           <WalletIcon className="text-muted-foreground size-4" />
-          Payment history
-        </div>
+          {tr("Payment history")}</div>
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+              <TableHead>{tr("Date")}</TableHead>
+              <TableHead>{tr("Title")}</TableHead>
+              <TableHead>{tr("Method")}</TableHead>
+              <TableHead className="text-right">{tr("Amount")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={payments.isLoading} empty={payments.data?.items.length === 0} colSpan={4} emptyText="No payments recorded" />
+            <TableState loading={payments.isLoading} empty={payments.data?.items.length === 0} colSpan={4} emptyText={tr("No payments recorded")} />
             {payments.data?.items.map((p) => (
               <TableRow key={p.payment_id}>
                 <TableCell className="text-muted-foreground">{fromUnix(p.timestamp)}</TableCell>
@@ -464,7 +459,7 @@ function PaymentsTab({ studentId }: { studentId: number }) {
           {!!payments.data?.items.length && (
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={3}>Total paid</TableCell>
+                <TableCell colSpan={3}>{tr("Total paid")}</TableCell>
                 <TableCell className="text-right tabular-nums">
                   {money(
                     payments.data.items.reduce((sum, p) => sum + Number(p.amount ?? 0), 0),
@@ -502,7 +497,7 @@ function StudentProfile({ id }: { id: number }) {
     return (
       <>
         <SheetHeader>
-          <SheetTitle className="sr-only">Student profile</SheetTitle>
+          <SheetTitle className="sr-only">{tr("Student profile")}</SheetTitle>
           <div className="flex items-center gap-4">
             <Skeleton className="size-16 rounded-full" />
             <div className="space-y-2">
@@ -526,8 +521,8 @@ function StudentProfile({ id }: { id: number }) {
           <div className="min-w-0 space-y-1">
             <SheetTitle className="truncate text-lg">{s.name}</SheetTitle>
             <SheetDescription>
-              {classLabel(s) ?? "Not enrolled"}
-              {s.roll ? ` · Roll ${s.roll}` : ""}
+              {classLabel(s) ?? tr("Not enrolled")}
+              {s.roll ? " " + tr("· Roll {roll}", { roll: s.roll }) : ""}
             </SheetDescription>
             <div className="flex flex-wrap gap-1.5">
               {s.student_code && (
@@ -543,9 +538,9 @@ function StudentProfile({ id }: { id: number }) {
       <div className="px-4 pt-4 pb-6">
         <Tabs defaultValue="details" className="gap-4">
           <TabsList className="w-full">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="marks">Marks</TabsTrigger>
-            {canFinance && <TabsTrigger value="payments">Payments</TabsTrigger>}
+            <TabsTrigger value="details">{tr("Details")}</TabsTrigger>
+            <TabsTrigger value="marks">{tr("Marks")}</TabsTrigger>
+            {canFinance && <TabsTrigger value="payments">{tr("Payments")}</TabsTrigger>}
           </TabsList>
           <TabsContent value="details">
             <DetailsTab s={s} />
@@ -601,8 +596,7 @@ function BulkImport({ onDone }: { onDone: () => void }) {
     <div className="grid gap-4">
       <div className="bg-muted/50 flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm">
         <p className="min-w-0">
-          CSV columns: <code className="text-xs break-all">StudentName,Id,Email,Password,Phone,Address,ParentID,Gender</code> (same as the old template).
-        </p>
+          {tr("CSV columns:")}{" "}<code className="text-xs break-all">StudentName,Id,Email,Password,Phone,Address,ParentID,Gender</code> {" "}{tr("(same as the old template).")}</p>
         <Button
           type="button"
           variant="outline"
@@ -615,16 +609,15 @@ function BulkImport({ onDone }: { onDone: () => void }) {
           }}
         >
           <FileDownIcon />
-          Download template
-        </Button>
+          {tr("Download template")}</Button>
       </div>
       <ClassPicker value={sel} onChange={setSel} />
-      <Field label="CSV file">
+      <Field label={tr("CSV file")}>
         <FileButton onChange={setFile} accept=".csv,text/csv">
           {(props) => (
             <Button type="button" variant="outline" className="justify-start font-normal" {...props}>
               <FileSpreadsheetIcon />
-              <span className={cn("truncate", !file && "text-muted-foreground")}>{file?.name ?? "Choose a .csv file"}</span>
+              <span className={cn("truncate", !file && "text-muted-foreground")}>{file?.name ?? tr("Choose a .csv file")}</span>
             </Button>
           )}
         </FileButton>
@@ -632,7 +625,7 @@ function BulkImport({ onDone }: { onDone: () => void }) {
       {result && (
         <Alert>
           {result.errors.length ? <CircleAlertIcon className="text-amber-600" /> : <CircleCheckIcon className="text-success" />}
-          <AlertTitle>{result.created} students created</AlertTitle>
+          <AlertTitle>{tn("{created} students created", { created: result.created })}</AlertTitle>
           {result.errors.length > 0 && (
             <AlertDescription>
               <ul className="list-disc space-y-0.5 pl-4">
@@ -646,12 +639,10 @@ function BulkImport({ onDone }: { onDone: () => void }) {
       )}
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onDone}>
-          Close
-        </Button>
+          {tr("Close")}</Button>
         <Button disabled={!sel.classId || !file} loading={run.isPending} onClick={() => run.mutate(undefined)}>
           <UploadIcon />
-          Import
-        </Button>
+          {tr("Import")}</Button>
       </DialogFooter>
     </div>
   );
@@ -678,13 +669,13 @@ export function StudentsPage() {
     transport_id: transportId || undefined, dormitory_id: dormitoryId || undefined,
   };  // prettier-ignore
   const { data, isLoading } = useList<Student>("/students", { ...filters, limit: 500 });
-  const remove = useAction((id: number) => api.delete(`/students/${id}`), { success: "Student deleted", invalidate: [["/students"]] });
+  const remove = useAction((id: number) => api.delete(`/students/${id}`), { success: tr("Student deleted"), invalidate: [["/students"]] });
 
   return (
     <>
       <PageHeader
-        title="Students"
-        subtitle={data ? `${data.total} students` : undefined}
+        title={tr("Students")}
+        subtitle={data ? tr("{total} students", { total: data.total }) : undefined}
         actions={
           <>
             <ExportButton size="default" path="/export/students.xlsx" params={filters} />
@@ -692,8 +683,7 @@ export function StudentsPage() {
               <>
                 <Button variant="outline" onClick={() => setBulkOpen(true)}>
                   <UploadIcon />
-                  Bulk import
-                </Button>
+                  {tr("Bulk import")}</Button>
                 <Button
                   onClick={() => {
                     setEditing(null);
@@ -701,8 +691,7 @@ export function StudentsPage() {
                   }}
                 >
                   <PlusIcon />
-                  Add student
-                </Button>
+                  {tr("Add student")}</Button>
               </>
             )}
           </>
@@ -711,16 +700,16 @@ export function StudentsPage() {
       <Card className="gap-0 overflow-hidden py-0">
         <div className="flex flex-wrap items-end gap-3 border-b p-3">
           <ClassPicker value={sel} onChange={setSel} />
-          <Field label="Transport" className="w-44">
-            <Combobox data={toOptions(transports.data?.items, "transport_id", "route_name")} value={transportId} onChange={setTransportId} placeholder="Any route" clearable />
+          <Field label={tr("Transport")} className="w-44">
+            <Combobox data={toOptions(transports.data?.items, "transport_id", "route_name")} value={transportId} onChange={setTransportId} placeholder={tr("Any route")} clearable />
           </Field>
-          <Field label="Dormitory" className="w-44">
-            <Combobox data={toOptions(dorms.data?.items, "dormitory_id", "name")} value={dormitoryId} onChange={setDormitoryId} placeholder="Any dormitory" clearable />
+          <Field label={tr("Dormitory")} className="w-44">
+            <Combobox data={toOptions(dorms.data?.items, "dormitory_id", "name")} value={dormitoryId} onChange={setDormitoryId} placeholder={tr("Any dormitory")} clearable />
           </Field>
-          <Field label="Search" htmlFor="student-search" className="w-full sm:w-64">
+          <Field label={tr("Search")} htmlFor="student-search" className="w-full sm:w-64">
             <div className="relative">
               <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-              <Input id="student-search" placeholder="Name, email or ID" value={q} onChange={(e) => setQ(e.target.value)} className="pl-8" />
+              <Input id="student-search" placeholder={tr("Name, email or ID")} value={q} onChange={(e) => setQ(e.target.value)} className="pl-8" />
             </div>
           </Field>
         </div>
@@ -728,17 +717,17 @@ export function StudentsPage() {
           <TableHeader className="bg-muted/50">
             <TableRow>
               <TableHead className="w-12" />
-              <TableHead>Roll</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>ID</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Parent</TableHead>
+              <TableHead>{tr("Roll")}</TableHead>
+              <TableHead>{tr("Name")}</TableHead>
+              <TableHead>{tr("ID")}</TableHead>
+              <TableHead>{tr("Class")}</TableHead>
+              <TableHead>{tr("Email")}</TableHead>
+              <TableHead>{tr("Parent")}</TableHead>
               <TableHead className="w-44" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={data?.items.length === 0} colSpan={8} emptyText="No students found" />
+            <TableState loading={isLoading} empty={data?.items.length === 0} colSpan={8} emptyText={tr("No students found")} />
             {data?.items.map((s) => (
               <TableRow key={s.student_id}>
                 <TableCell>
@@ -751,25 +740,25 @@ export function StudentsPage() {
                   </button>
                 </TableCell>
                 <TableCell className="font-mono text-xs">{s.student_code ?? <Dash />}</TableCell>
-                <TableCell>{classLabel(s) ?? <span className="text-muted-foreground text-sm">not enrolled</span>}</TableCell>
+                <TableCell>{classLabel(s) ?? <span className="text-muted-foreground text-sm">{tr("not enrolled")}</span>}</TableCell>
                 <TableCell className="text-muted-foreground">{s.email ?? <Dash />}</TableCell>
                 <TableCell>{s.parent_name ?? <Dash />}</TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end gap-1">
-                    <IconAction label="View profile" onClick={() => setViewing(s.student_id)}>
+                    <IconAction label={tr("View profile")} onClick={() => setViewing(s.student_id)}>
                       <EyeIcon />
                     </IconAction>
-                    <IconAction label="Health, records & certificates" onClick={() => navigate(`/app/students/${s.student_id}/records`)}>
+                    <IconAction label={tr("Health, records & certificates")} onClick={() => navigate(`/app/students/${s.student_id}/records`)}>
                       <HeartPulseIcon />
                     </IconAction>
                     {admin && (
                       <>
-                        <IconAction label="ID card" onClick={() => navigate(`/app/id-cards?student_id=${s.student_id}`)}>
+                        <IconAction label={tr("ID card")} onClick={() => navigate(`/app/id-cards?student_id=${s.student_id}`)}>
                           <IdCardIcon />
                         </IconAction>
                         <PhotoButton path="/students" id={s.student_id} />
                         <IconAction
-                          label="Edit"
+                          label={tr("Edit")}
                           onClick={() => {
                             setEditing(s);
                             setFormOpen(true);
@@ -778,12 +767,12 @@ export function StudentsPage() {
                           <PencilIcon />
                         </IconAction>
                         <IconAction
-                          label="Delete"
+                          label={tr("Delete")}
                           destructive
                           onClick={() =>
                             confirmAction({
-                              title: `Delete ${s.name}?`,
-                              description: "This also removes the student's marks, attendance, invoices, payments and messages.",
+                              title: tr("Delete {name}?", { name: s.name }),
+                              description: tr("This also removes the student's marks, attendance, invoices, payments and messages."),
                               onConfirm: () => remove.mutate(s.student_id),
                             })
                           }
@@ -803,8 +792,8 @@ export function StudentsPage() {
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit student" : "Add student"}</DialogTitle>
-            <DialogDescription>{editing ? editing.name : "Create the student account and enrol them in the running year."}</DialogDescription>
+            <DialogTitle>{editing ? tr("Edit student") : tr("Add student")}</DialogTitle>
+            <DialogDescription>{editing ? editing.name : tr("Create the student account and enrol them in the running year.")}</DialogDescription>
           </DialogHeader>
           <StudentForm key={editing?.student_id ?? "new"} editing={editing} onDone={() => setFormOpen(false)} />
         </DialogContent>
@@ -812,8 +801,8 @@ export function StudentsPage() {
       <Dialog open={bulkOpen} onOpenChange={setBulkOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Bulk import students</DialogTitle>
-            <DialogDescription>Upload a CSV to create many students in one class at once.</DialogDescription>
+            <DialogTitle>{tr("Bulk import students")}</DialogTitle>
+            <DialogDescription>{tr("Upload a CSV to create many students in one class at once.")}</DialogDescription>
           </DialogHeader>
           <BulkImport onDone={() => setBulkOpen(false)} />
         </DialogContent>
@@ -844,7 +833,7 @@ export function PromotionPage() {
         to_year: toYear,
         items: (students.data?.items ?? []).map((s) => ({ student_id: s.student_id, class_id: Number(targets[s.student_id] ?? toClass) })),
       }),
-    { success: "Students enrolled for the new year", invalidate: [["/students"]] },
+    { success: tr("Students enrolled for the new year"), invalidate: [["/students"]] },
   );
   const classOptions = toOptions(classes.data?.items, "class_id", "name");
   const yearOptions = (years?.years ?? []).filter((y) => y > (years?.running_year ?? "")).map((y) => ({ value: y, label: y }));
@@ -852,22 +841,22 @@ export function PromotionPage() {
 
   return (
     <>
-      <PageHeader title="Student promotion" subtitle={`Enrol students of the running year (${years?.running_year ?? ""}) into next year's classes`} />
+      <PageHeader title={tr("Student promotion")} subtitle={tr("Enrol students of the running year ({value}) into next year's classes", { value: years?.running_year ?? "" })} />
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Promotion settings</CardTitle>
-            <CardDescription>Pick the class to promote, its default target class and the new academic year.</CardDescription>
+            <CardTitle>{tr("Promotion settings")}</CardTitle>
+            <CardDescription>{tr("Pick the class to promote, its default target class and the new academic year.")}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap items-end gap-3">
-            <Field label="Current class" className="w-full sm:w-48">
-              <Combobox data={classOptions} value={fromClass} onChange={setFromClass} placeholder="Choose class" />
+            <Field label={tr("Current class")} className="w-full sm:w-48">
+              <Combobox data={classOptions} value={fromClass} onChange={setFromClass} placeholder={tr("Choose class")} />
             </Field>
-            <Field label="Promote to class" className="w-full sm:w-48">
-              <Combobox data={classOptions} value={toClass} onChange={setToClass} placeholder="Choose class" />
+            <Field label={tr("Promote to class")} className="w-full sm:w-48">
+              <Combobox data={classOptions} value={toClass} onChange={setToClass} placeholder={tr("Choose class")} />
             </Field>
-            <Field label="Into academic year" className="w-full sm:w-48">
-              <Combobox data={yearOptions} value={toYear} onChange={setToYear} placeholder="Choose year" emptyText="No later year configured" />
+            <Field label={tr("Into academic year")} className="w-full sm:w-48">
+              <Combobox data={yearOptions} value={toYear} onChange={setToYear} placeholder={tr("Choose year")} emptyText={tr("No later year configured")} />
             </Field>
           </CardContent>
         </Card>
@@ -877,14 +866,14 @@ export function PromotionPage() {
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="w-16">Roll</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Target class</TableHead>
+                  <TableHead className="w-16">{tr("Roll")}</TableHead>
+                  <TableHead>{tr("Name")}</TableHead>
+                  <TableHead>{tr("Target class")}</TableHead>
                   <TableHead className="w-28" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableState loading={students.isLoading} empty={count === 0} colSpan={4} emptyText="No students in this class" />
+                <TableState loading={students.isLoading} empty={count === 0} colSpan={4} emptyText={tr("No students in this class")} />
                 {students.data?.items.map((s) => (
                   <TableRow key={s.student_id}>
                     <TableCell className="tabular-nums">{s.roll ?? <Dash />}</TableCell>
@@ -900,14 +889,13 @@ export function PromotionPage() {
                         data={classOptions}
                         value={targets[s.student_id] ?? toClass}
                         onChange={(v) => v && setTargets((t) => ({ ...t, [s.student_id]: v }))}
-                        placeholder="Choose class"
+                        placeholder={tr("Choose class")}
                       />
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="xs" onClick={() => setResults(s)}>
                         <ClipboardListIcon />
-                        Results
-                      </Button>
+                        {tr("Results")}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -916,14 +904,12 @@ export function PromotionPage() {
             <div className="flex justify-end border-t p-3">
               <Button disabled={!toClass || !toYear || !count} loading={promote.isPending} onClick={() => promote.mutate(undefined)}>
                 <GraduationCapIcon />
-                Enrol {count} students
-              </Button>
+                {tr("Enrol")}{" "}{count} {" "}{tr("students")}</Button>
             </div>
           </Card>
         ) : (
-          <EmptyState icon={GraduationCapIcon} title="Choose a class">
-            Students of the selected class appear here with their exam results.
-          </EmptyState>
+          <EmptyState icon={GraduationCapIcon} title={tr("Choose a class")}>
+            {tr("Students of the selected class appear here with their exam results.")}</EmptyState>
         )}
       </div>
 
@@ -932,8 +918,7 @@ export function PromotionPage() {
           <DialogHeader>
             <DialogTitle>{results?.name}</DialogTitle>
             <DialogDescription>
-              Exam results for {years?.running_year ?? "the running year"}
-              {results && classLabel(results) ? ` · ${classLabel(results)}` : ""}
+              {tn("Exam results for {value}{value2}", { value: years?.running_year ?? tr("the running year"), value2: results && classLabel(results) ? " " + tr("· {classLabel}", { classLabel: classLabel(results) }) : "" })}
             </DialogDescription>
           </DialogHeader>
           {results && <MarksheetView studentId={results.student_id} />}
@@ -957,17 +942,17 @@ function Barcode({ value }: { value: string }) {
       setOk(false);
     }
   }, [value]);
-  return <svg ref={ref} className={cn("h-[11mm] w-[44mm]", !ok && "hidden")} aria-label={`Barcode ${value}`} />;
+  return <svg ref={ref} className={cn("h-[11mm] w-[44mm]", !ok && "hidden")} aria-label={tr("Barcode {value}", { value })} />;
 }
 
 function IdCard({ s, parentPhone, year, cardUid }: { s: Student; parentPhone?: string | null; year?: string | null; cardUid?: string }) {
   const settings = usePublicSettings().data;
   const rows: [string, ReactNode][] = [
-    ["ID no.", s.student_code || s.student_id],
-    ["Roll", s.roll ?? "—"],
-    ["Blood group", s.blood_group || "N/A"],
-    ["Parent phone", parentPhone || s.phone || "—"],
-    ["Session", year || "—"],
+    [tr("ID no."), s.student_code || s.student_id],
+    [tr("Roll"), s.roll ?? "—"],
+    [tr("Blood group"), s.blood_group || tr("N/A")],
+    [tr("Parent phone"), parentPhone || s.phone || "—"],
+    [tr("Session"), year || "—"],
   ];
   return (
     <div className="flex h-[86mm] w-[54mm] shrink-0 break-inside-avoid flex-col overflow-hidden rounded-[3mm] border border-neutral-300 bg-white text-neutral-900 shadow-sm [-webkit-print-color-adjust:exact] [print-color-adjust:exact] print:m-[2mm] print:inline-flex print:align-top print:shadow-none">
@@ -980,7 +965,7 @@ function IdCard({ s, parentPhone, year, cardUid }: { s: Student; parentPhone?: s
           )}
         </div>
         <div className="min-w-0 leading-tight">
-          <div className="line-clamp-2 text-[7.5pt] font-semibold">{settings?.system_name || "School"}</div>
+          <div className="line-clamp-2 text-[7.5pt] font-semibold">{settings?.system_name || tr("School")}</div>
           {settings?.address && <div className="line-clamp-2 text-[5pt] opacity-85">{settings.address}</div>}
         </div>
       </div>
@@ -991,7 +976,7 @@ function IdCard({ s, parentPhone, year, cardUid }: { s: Student; parentPhone?: s
       </div>
       <div className="mt-[1.5mm] px-[3mm] text-center">
         <div className="line-clamp-2 text-[9.5pt] leading-tight font-bold">{s.name}</div>
-        <div className="mt-[0.5mm] text-[6.5pt] text-neutral-600">{classLabel(s) ?? "Not enrolled"}</div>
+        <div className="mt-[0.5mm] text-[6.5pt] text-neutral-600">{classLabel(s) ?? tr("Not enrolled")}</div>
       </div>
       <dl className="mt-[2mm] grid grid-cols-[auto_1fr] gap-x-[2mm] gap-y-[0.7mm] px-[4mm] text-[6.5pt] leading-tight">
         {rows.map(([k, v]) => (
@@ -1030,22 +1015,20 @@ export function IdCardsPage() {
 
   return (
     <>
-      <style>{"@media print { @page { size: A4 portrait; margin: 8mm; } }"}</style>
+      <style>{tr("@media print { @page { size: A4 portrait; margin: 8mm; } }")}</style>
       <PageHeader
-        title="ID cards"
-        subtitle={single ? "Single student card" : "Print student identity cards for a class or section"}
+        title={tr("ID cards")}
+        subtitle={single ? tr("Single student card") : tr("Print student identity cards for a class or section")}
         actions={
           <>
             {single && (
               <Button variant="outline" onClick={() => setParams({})}>
                 <ArrowLeftIcon />
-                Whole class
-              </Button>
+                {tr("Whole class")}</Button>
             )}
             <Button onClick={() => window.print()} disabled={!students.length}>
               <PrinterIcon />
-              Print
-            </Button>
+              {tr("Print")}</Button>
           </>
         }
       />
@@ -1069,8 +1052,8 @@ export function IdCardsPage() {
           ))}
         </div>
       ) : (
-        <EmptyState icon={IdCardIcon} title={single ? "Student not found" : sel.classId ? "No students in this class" : "Choose a class"}>
-          {!single && !sel.classId && "Pick a class (and optionally a section) to generate cards."}
+        <EmptyState icon={IdCardIcon} title={single ? tr("Student not found") : sel.classId ? tr("No students in this class") : tr("Choose a class")}>
+          {!single && !sel.classId && tr("Pick a class (and optionally a section) to generate cards.")}
         </EmptyState>
       )}
     </>

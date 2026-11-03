@@ -26,26 +26,27 @@ import { Textarea } from "../components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { cn } from "../lib/utils";
 import { toOptions } from "../utils";
+import { t, tn, tp } from "../i18n";
 
 const KINDS = [
-  { value: "sick", label: "Sick" },
-  { value: "casual", label: "Casual" },
-  { value: "family", label: "Family" },
-  { value: "other", label: "Other" },
+  { value: "sick", label: t("Sick") },
+  { value: "casual", label: t("Casual") },
+  { value: "family", label: t("Family") },
+  { value: "other", label: t("Other") },
 ];
 const kindLabel = (k: string) => KINDS.find((o) => o.value === k)?.label ?? k;
 
 const STATUS: Record<LeaveRequest["status"], [string, string]> = {
-  pending: ["Pending", "bg-warning/20 text-amber-700 dark:text-amber-300"],
-  approved: ["Approved", "bg-success/15 text-success"],
-  rejected: ["Rejected", "bg-destructive/10 text-destructive"],
-  cancelled: ["Cancelled", "bg-muted text-muted-foreground"],
+  pending: [t("Pending"), "bg-warning/20 text-amber-700 dark:text-amber-300"],
+  approved: [t("Approved"), "bg-success/15 text-success"],
+  rejected: [t("Rejected"), "bg-destructive/10 text-destructive"],
+  cancelled: [t("Cancelled"), "bg-muted text-muted-foreground"],
 };
 
 const STAFF_ROLES = [
-  { value: "teacher", label: "Teacher" },
-  { value: "librarian", label: "Librarian" },
-  { value: "accountant", label: "Accountant" },
+  { value: "teacher", label: t("Teacher") },
+  { value: "librarian", label: t("Librarian") },
+  { value: "accountant", label: t("Accountant") },
 ];
 
 const fmtSpan = (r: Pick<LeaveRequest, "from_date" | "to_date">) =>
@@ -73,9 +74,9 @@ function AdminPersonPicker({ who, form }: { who: "student" | "staff"; form: Retu
     return (
       <div className="grid gap-4 sm:grid-cols-2">
         <ClassPicker value={sel} onChange={(v) => { setSel(v); form.setValue("student_id", null); }} withSection={false} />
-        <Controller control={form.control} name="student_id" rules={{ required: "Choose a student" }} render={({ field, fieldState }) => (
-          <Field label="Student" required error={fieldState.error?.message}>
-            <Combobox disabled={!sel.classId} data={toOptions(students.data?.items, "student_id", "name")} value={field.value} onChange={field.onChange} placeholder="Choose student" />
+        <Controller control={form.control} name="student_id" rules={{ required: t("Choose a student") }} render={({ field, fieldState }) => (
+          <Field label={t("Student")} required error={fieldState.error?.message}>
+            <Combobox disabled={!sel.classId} data={toOptions(students.data?.items, "student_id", "name")} value={field.value} onChange={field.onChange} placeholder={t("Choose student")} />
           </Field>
         )} />
       </div>
@@ -83,13 +84,13 @@ function AdminPersonPicker({ who, form }: { who: "student" | "staff"; form: Retu
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <Controller control={form.control} name="staff_role" render={({ field }) => (
-        <Field label="Role">
+        <Field label={t("Role")}>
           <Combobox data={STAFF_ROLES} value={field.value} onChange={(v) => { field.onChange(v); form.setValue("staff_id", null); }} />
         </Field>
       )} />
-      <Controller control={form.control} name="staff_id" rules={{ required: "Choose a person" }} render={({ field, fieldState }) => (
-        <Field label="Staff member" required error={fieldState.error?.message}>
-          <Combobox disabled={!role} data={toOptions(staff.data?.items, `${role}_id`, "name")} value={field.value} onChange={field.onChange} placeholder="Choose person" />
+      <Controller control={form.control} name="staff_id" rules={{ required: t("Choose a person") }} render={({ field, fieldState }) => (
+        <Field label={t("Staff member")} required error={fieldState.error?.message}>
+          <Combobox disabled={!role} data={toOptions(staff.data?.items, `${role}_id`, "name")} value={field.value} onChange={field.onChange} placeholder={t("Choose person")} />
         </Field>
       )} />
     </div>
@@ -116,7 +117,7 @@ function ApplyForm({ onDone }: { onDone: () => void }) {
       if (user.role === "admin" && who === "staff") Object.assign(body, { staff_role: v.staff_role, staff_id: Number(v.staff_id) });
       return api.post("/leave", body);
     },
-    { success: user.role === "admin" ? "Leave recorded" : "Leave request sent", invalidate: [["/leave/mine"], ["/leave/approvals"]], onSuccess: onDone },
+    { success: user.role === "admin" ? t("Leave recorded") : t("Leave request sent"), invalidate: [["/leave/mine"], ["/leave/approvals"]], onSuccess: onDone },
   );
 
   return (
@@ -124,45 +125,45 @@ function ApplyForm({ onDone }: { onDone: () => void }) {
       {user.role === "admin" && (
         <>
           <ToggleGroup type="single" variant="outline" size="sm" value={who} onValueChange={(v) => v && setWho(v as "student" | "staff")} className="justify-start">
-            <ToggleGroupItem value="student">Student</ToggleGroupItem>
-            <ToggleGroupItem value="staff">Staff</ToggleGroupItem>
+            <ToggleGroupItem value="student">{t("Student")}</ToggleGroupItem>
+            <ToggleGroupItem value="staff">{t("Staff")}</ToggleGroupItem>
           </ToggleGroup>
           <AdminPersonPicker key={who} who={who} form={form} />
         </>
       )}
       {user.role === "parent" && (
-        <Controller control={form.control} name="student_id" rules={{ required: "Choose a child" }} render={({ field }) => (
-          <Field label="Child" required error={errors.student_id?.message}>
-            <Combobox data={toOptions(children.data, "student_id", "name")} value={field.value} onChange={field.onChange} placeholder="Choose child" />
+        <Controller control={form.control} name="student_id" rules={{ required: t("Choose a child") }} render={({ field }) => (
+          <Field label={t("Child")} required error={errors.student_id?.message}>
+            <Combobox data={toOptions(children.data, "student_id", "name")} value={field.value} onChange={field.onChange} placeholder={t("Choose child")} />
           </Field>
         )} />
       )}
       <div className="grid gap-4 sm:grid-cols-3">
         <Controller control={form.control} name="kind" render={({ field }) => (
-          <Field label="Type">
+          <Field label={t("Type")}>
             <Combobox data={KINDS} value={field.value} onChange={(v) => field.onChange(v ?? "other")} />
           </Field>
         )} />
-        <Controller control={form.control} name="from_date" rules={{ required: "Required" }} render={({ field }) => (
-          <Field label="From" required error={errors.from_date?.message}>
+        <Controller control={form.control} name="from_date" rules={{ required: t("Required") }} render={({ field }) => (
+          <Field label={t("From")} required error={errors.from_date?.message}>
             <DatePicker value={field.value} onChange={field.onChange} clearable={false} />
           </Field>
         )} />
-        <Controller control={form.control} name="to_date" rules={{ required: "Required", validate: (v) => !dayjs(v).isBefore(form.getValues("from_date")) || "Ends before it starts" }} render={({ field }) => (
-          <Field label="To" required error={errors.to_date?.message}>
+        <Controller control={form.control} name="to_date" rules={{ required: t("Required"), validate: (v) => !dayjs(v).isBefore(form.getValues("from_date")) || t("Ends before it starts") }} render={({ field }) => (
+          <Field label={t("To")} required error={errors.to_date?.message}>
             <DatePicker value={field.value} onChange={field.onChange} clearable={false} />
           </Field>
         )} />
       </div>
       <p className="text-muted-foreground text-sm">
-        {!rangeOk ? "Choose the dates" : days.data ? `${days.data.days} school day${days.data.days === 1 ? "" : "s"} (holidays and weekly days off are not counted)` : days.isError ? "That range is too long" : "…"}
+        {!rangeOk ? t("Choose the dates") : days.data ? tp(days.data.days, "{count} school day (holidays and weekly days off are not counted)", "{count} school days (holidays and weekly days off are not counted)") : days.isError ? t("That range is too long") : "…"}
       </p>
-      <Field label="Reason" htmlFor="leave-reason" required error={errors.reason?.message}>
-        <Textarea id="leave-reason" rows={3} aria-invalid={!!errors.reason} {...form.register("reason", { required: "Required", maxLength: { value: 2000, message: "Too long" } })} />
+      <Field label={t("Reason")} htmlFor="leave-reason" required error={errors.reason?.message}>
+        <Textarea id="leave-reason" rows={3} aria-invalid={!!errors.reason} {...form.register("reason", { required: t("Required"), maxLength: { value: 2000, message: t("Too long") } })} />
       </Field>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={save.isPending} disabled={days.data?.days === 0}>{user.role === "admin" ? "Record leave" : "Send request"}</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("Cancel")}</Button>
+        <Button type="submit" loading={save.isPending} disabled={days.data?.days === 0}>{user.role === "admin" ? t("Record leave") : t("Send request")}</Button>
       </DialogFooter>
     </form>
   );  // prettier-ignore
@@ -173,7 +174,7 @@ function ApplyForm({ onDone }: { onDone: () => void }) {
 function DecideForm({ request, approve, onDone }: { request: LeaveRequest; approve: boolean; onDone: () => void }) {
   const [note, setNote] = useState("");
   const decide = useAction(() => api.post(`/leave/${request.leave_id}/decision`, { approve, note: note || null }), {
-    success: approve ? "Leave approved" : "Leave rejected",
+    success: approve ? t("Leave approved") : t("Leave rejected"),
     invalidate: [["/leave/approvals"], ["/leave/mine"], ["/attendance/sheet"]],
     onSuccess: onDone,
   });
@@ -181,17 +182,17 @@ function DecideForm({ request, approve, onDone }: { request: LeaveRequest; appro
     <div className="grid gap-4">
       <div className="bg-muted/40 rounded-md border p-3 text-sm">
         <div className="font-medium">{request.person_name}{request.class_name && <span className="text-muted-foreground font-normal"> · {request.class_name}</span>}</div>
-        <div>{fmtSpan(request)} · {request.days} school day{request.days === 1 ? "" : "s"} · {kindLabel(request.kind)}</div>
+        <div>{fmtSpan(request)} · {tp(request.days, "{count} school day", "{count} school days")} · {kindLabel(request.kind)}</div>
         {request.reason && <div className="text-muted-foreground mt-1 whitespace-pre-wrap">{request.reason}</div>}
       </div>
-      <Field label="Note to the applicant (optional)" htmlFor="leave-note">
+      <Field label={t("Note to the applicant (optional)")} htmlFor="leave-note">
         <Textarea id="leave-note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} />
       </Field>
       <DialogFooter>
-        <Button variant="outline" onClick={onDone}>Cancel</Button>
+        <Button variant="outline" onClick={onDone}>{t("Cancel")}</Button>
         <Button variant={approve ? "default" : "destructive"} loading={decide.isPending} onClick={() => decide.mutate(undefined)}>
           {approve ? <CheckIcon /> : <XIcon />}
-          {approve ? "Approve" : "Reject"}
+          {approve ? t("Approve") : t("Reject")}
         </Button>
       </DialogFooter>
     </div>
@@ -205,7 +206,7 @@ function LeaveTable({ path, params, showPerson, emptyText, onDecide }: {
   onDecide?: (r: LeaveRequest, approve: boolean) => void;
 }) {  // prettier-ignore
   const { data, isLoading, page, setPage, pageSize } = usePagedList<LeaveRequest>(path, params);
-  const cancel = useAction((id: number) => api.post(`/leave/${id}/cancel`), { success: "Request cancelled", invalidate: [["/leave/mine"], ["/leave/approvals"]] });
+  const cancel = useAction((id: number) => api.post(`/leave/${id}/cancel`), { success: t("Request cancelled"), invalidate: [["/leave/mine"], ["/leave/approvals"]] });
   const rows = data?.items ?? [];
   const cols = showPerson ? 7 : 6;
   return (
@@ -213,12 +214,12 @@ function LeaveTable({ path, params, showPerson, emptyText, onDecide }: {
       <Table className="min-w-[760px]">
         <TableHeader className="bg-muted/50">
           <TableRow>
-            {showPerson && <TableHead>Who</TableHead>}
-            <TableHead className="w-44">Dates</TableHead>
-            <TableHead className="w-16 text-right">Days</TableHead>
-            <TableHead className="w-24">Type</TableHead>
-            <TableHead>Reason</TableHead>
-            <TableHead className="w-48">Status</TableHead>
+            {showPerson && <TableHead>{t("Who")}</TableHead>}
+            <TableHead className="w-44">{t("Dates")}</TableHead>
+            <TableHead className="w-16 text-right">{t("Days")}</TableHead>
+            <TableHead className="w-24">{t("Type")}</TableHead>
+            <TableHead>{t("Reason")}</TableHead>
+            <TableHead className="w-48">{t("Status")}</TableHead>
             <TableHead className="w-24" />
           </TableRow>
         </TableHeader>
@@ -239,25 +240,24 @@ function LeaveTable({ path, params, showPerson, emptyText, onDecide }: {
                 <TableCell>{kindLabel(r.kind)}</TableCell>
                 <TableCell className="whitespace-normal">
                   {r.reason ?? <Dash />}
-                  {r.applicant_role !== r.person_role && <div className="text-muted-foreground text-xs">By {r.applicant_name} ({r.applicant_role})</div>}
+                  {r.applicant_role !== r.person_role && <div className="text-muted-foreground text-xs">{tn("By {applicant_name} ({applicant_role})", { applicant_name: r.applicant_name, applicant_role: r.applicant_role })}</div>}
                 </TableCell>
                 <TableCell className="whitespace-normal">
                   <Badge className={cn("border-transparent", style)}>{label}</Badge>
-                  {r.decided_by_name && <div className="text-muted-foreground mt-1 text-xs">by {r.decided_by_name}</div>}
+                  {r.decided_by_name && <div className="text-muted-foreground mt-1 text-xs">{tn("by {decided_by_name}", { decided_by_name: r.decided_by_name })}</div>}
                   {r.decision_note && <div className="mt-1 text-xs">“{r.decision_note}”</div>}
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">
                     {r.can_decide && onDecide && (
                       <>
-                        <IconAction label="Approve" onClick={() => onDecide(r, true)}><CheckIcon className="text-success" /></IconAction>
-                        <IconAction label="Reject" destructive onClick={() => onDecide(r, false)}><XIcon /></IconAction>
+                        <IconAction label={t("Approve")} onClick={() => onDecide(r, true)}><CheckIcon className="text-success" /></IconAction>
+                        <IconAction label={t("Reject")} destructive onClick={() => onDecide(r, false)}><XIcon /></IconAction>
                       </>
                     )}
                     {r.can_cancel && (
-                      <Button size="sm" variant="ghost" onClick={() => confirmAction({ title: "Cancel this leave request?", onConfirm: () => cancel.mutate(r.leave_id) })}>
-                        Cancel
-                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => confirmAction({ title: t("Cancel this leave request?"), onConfirm: () => cancel.mutate(r.leave_id) })}>
+                        {t("Cancel")}</Button>
                     )}
                   </div>
                 </TableCell>
@@ -281,51 +281,51 @@ export function LeavePage() {
   const [status, setStatus] = useState("pending");
   const [who, setWho] = useState("all");
 
-  const mineTitle = user.role === "parent" ? "My children" : user.role === "admin" ? "Recorded by me" : "My requests";
+  const mineTitle = user.role === "parent" ? t("My children") : user.role === "admin" ? t("Recorded by me") : t("My requests");
   const subtitle =
     user.role === "admin"
-      ? "Approve leave requests, or record leave for a student or member of staff."
+      ? t("Approve leave requests, or record leave for a student or member of staff.")
       : user.role === "teacher"
-        ? "Apply for your own leave and decide leave requests from students in your classes."
+        ? t("Apply for your own leave and decide leave requests from students in your classes.")
         : user.role === "parent"
-          ? "Apply for leave for your children. Their class teacher or the school office decides."
-          : "Apply for leave. Approved leave is shown on the attendance sheet.";
+          ? t("Apply for leave for your children. Their class teacher or the school office decides.")
+          : t("Apply for leave. Approved leave is shown on the attendance sheet.");
 
   const mine = (
-    <LeaveTable path="/leave/mine" params={{}} showPerson={user.role === "parent" || user.role === "admin"} emptyText="No leave requests yet" />
+    <LeaveTable path="/leave/mine" params={{}} showPerson={user.role === "parent" || user.role === "admin"} emptyText={t("No leave requests yet")} />
   );
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Leave"
+        title={t("Leave")}
         subtitle={subtitle}
         actions={
           <Button onClick={() => setApplying(true)}>
             <PlusIcon />
-            {user.role === "admin" ? "Record leave" : "Apply for leave"}
+            {user.role === "admin" ? t("Record leave") : t("Apply for leave")}
           </Button>
         }
       />
       {canDecide ? (
         <Tabs defaultValue="approvals" className="gap-4">
           <TabsList>
-            <TabsTrigger value="approvals">Approvals</TabsTrigger>
+            <TabsTrigger value="approvals">{t("Approvals")}</TabsTrigger>
             <TabsTrigger value="mine">{mineTitle}</TabsTrigger>
           </TabsList>
           <TabsContent value="approvals" className="space-y-3">
             <div className="flex flex-wrap gap-3">
               <ToggleGroup type="single" variant="outline" size="sm" value={status} onValueChange={(v) => v && setStatus(v)}>
-                <ToggleGroupItem value="pending">Pending</ToggleGroupItem>
-                <ToggleGroupItem value="approved">Approved</ToggleGroupItem>
-                <ToggleGroupItem value="rejected">Rejected</ToggleGroupItem>
-                <ToggleGroupItem value="all">All</ToggleGroupItem>
+                <ToggleGroupItem value="pending">{t("Pending")}</ToggleGroupItem>
+                <ToggleGroupItem value="approved">{t("Approved")}</ToggleGroupItem>
+                <ToggleGroupItem value="rejected">{t("Rejected")}</ToggleGroupItem>
+                <ToggleGroupItem value="all">{t("All")}</ToggleGroupItem>
               </ToggleGroup>
               {user.role === "admin" && (
                 <ToggleGroup type="single" variant="outline" size="sm" value={who} onValueChange={(v) => v && setWho(v)}>
-                  <ToggleGroupItem value="all">Everyone</ToggleGroupItem>
-                  <ToggleGroupItem value="students">Students</ToggleGroupItem>
-                  <ToggleGroupItem value="staff">Staff</ToggleGroupItem>
+                  <ToggleGroupItem value="all">{t("Everyone")}</ToggleGroupItem>
+                  <ToggleGroupItem value="students">{t("Students")}</ToggleGroupItem>
+                  <ToggleGroupItem value="staff">{t("Staff")}</ToggleGroupItem>
                 </ToggleGroup>
               )}
             </div>
@@ -333,7 +333,7 @@ export function LeavePage() {
               path="/leave/approvals"
               params={{ status: status === "all" ? undefined : status, who: who === "all" ? undefined : who }}
               showPerson
-              emptyText={status === "pending" ? "Nothing waiting for a decision" : "No requests"}
+              emptyText={status === "pending" ? t("Nothing waiting for a decision") : t("No requests")}
               onDecide={(request, approve) => setDeciding({ request, approve })}
             />
           </TabsContent>
@@ -348,9 +348,9 @@ export function LeavePage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <PlaneIcon className="size-5" />
-              {user.role === "admin" ? "Record leave" : "Apply for leave"}
+              {user.role === "admin" ? t("Record leave") : t("Apply for leave")}
             </DialogTitle>
-            {user.role === "admin" && <DialogDescription>Leave you record is approved straight away.</DialogDescription>}
+            {user.role === "admin" && <DialogDescription>{t("Leave you record is approved straight away.")}</DialogDescription>}
           </DialogHeader>
           {applying && <ApplyForm onDone={() => setApplying(false)} />}
         </DialogContent>
@@ -358,7 +358,7 @@ export function LeavePage() {
       <Dialog open={!!deciding} onOpenChange={(open) => !open && setDeciding(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{deciding?.approve ? "Approve leave" : "Reject leave"}</DialogTitle>
+            <DialogTitle>{deciding?.approve ? t("Approve leave") : t("Reject leave")}</DialogTitle>
           </DialogHeader>
           {deciding && <DecideForm request={deciding.request} approve={deciding.approve} onDone={() => setDeciding(null)} />}
         </DialogContent>

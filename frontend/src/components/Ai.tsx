@@ -18,18 +18,19 @@ import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Textarea } from "./ui/textarea";
+import { t as tr } from "../i18n";
 
 const MASK = "********";
 const FEATURE_LABEL: Record<AiFeature, string> = {
-  report_remark: "Report-card remarks",
-  questions: "Exam questions",
-  progress_summary: "Progress summaries",
+  report_remark: tr("Report-card remarks"),
+  questions: tr("Exam questions"),
+  progress_summary: tr("Progress summaries"),
 };
 
 /** Whether the signed-in user can use an AI feature (all are off until an admin sets the assistant up). */
 export function useAiFeature(feature: AiFeature) {
   const { data } = useGet<AiStatus>("/ai/status");
-  return { available: !!data?.features.includes(feature), label: data?.label ?? "AI-generated, may contain mistakes" };
+  return { available: !!data?.features.includes(feature), label: data?.label ?? tr("AI-generated, may contain mistakes") };
 }
 
 export function AiLabel({ text, className }: { text: string; className?: string }) {
@@ -44,9 +45,9 @@ export function AiLabel({ text, className }: { text: string; className?: string 
 // --- report-card remarks ------------------------------------------------------------------
 
 const TONES = [
-  { value: "encouraging", label: "Encouraging" },
-  { value: "formal", label: "Formal" },
-  { value: "brief", label: "Brief" },
+  { value: "encouraging", label: tr("Encouraging") },
+  { value: "formal", label: tr("Formal") },
+  { value: "brief", label: tr("Brief") },
 ];
 
 /** Drafts remark options; picking one only fills the remark box (the teacher still saves it). */
@@ -65,22 +66,21 @@ export function AiRemarkDrafts({ studentId, examId, year, onPick }: { studentId:
     return (
       <Button type="button" size="sm" variant="outline" className="w-fit" onClick={() => setOpen(true)}>
         <SparklesIcon />
-        Draft with AI
-      </Button>
+        {tr("Draft with AI")}</Button>
     );
   return (
     <div className="bg-muted/30 grid gap-3 rounded-lg border p-3">
       <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
-        <Field label="Tone">
+        <Field label={tr("Tone")}>
           <Combobox data={TONES} value={tone} onChange={(v) => setTone(v ?? "encouraging")} />
         </Field>
-        <Field label="Your notes (optional)" htmlFor="ai-notes" description="Shared with the AI service. Don't include names or private details.">
-          <Input id="ai-notes" maxLength={500} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. helps classmates, needs to read more" />
+        <Field label={tr("Your notes (optional)")} htmlFor="ai-notes" description={tr("Shared with the AI service. Don't include names or private details.")}>
+          <Input id="ai-notes" maxLength={500} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={tr("e.g. helps classmates, needs to read more")} />
         </Field>
       </div>
       <Button type="button" size="sm" className="w-fit" loading={draft.isPending} onClick={() => draft.mutate(undefined)}>
         <SparklesIcon />
-        {options.length ? "Try again" : "Draft remarks"}
+        {options.length ? tr("Try again") : tr("Draft remarks")}
       </Button>
       {options.length > 0 && (
         <div className="grid gap-2">
@@ -94,7 +94,7 @@ export function AiRemarkDrafts({ studentId, examId, year, onPick }: { studentId:
               {o}
             </button>
           ))}
-          <AiLabel text={`${label}. Click one to put it in the remark box, then edit and save it.`} />
+          <AiLabel text={tr("{label}. Click one to put it in the remark box, then edit and save it.", { label })} />
         </div>
       )}
     </div>
@@ -104,9 +104,9 @@ export function AiRemarkDrafts({ studentId, examId, year, onPick }: { studentId:
 // --- exam questions ------------------------------------------------------------------------
 
 const TYPE_LABEL: Record<Question["type"], string> = {
-  multiple_choice: "Multiple choice",
-  true_false: "True / false",
-  fill_in_the_blanks: "Fill in the blanks",
+  multiple_choice: tr("Multiple choice"),
+  true_false: tr("True / false"),
+  fill_in_the_blanks: tr("Fill in the blanks"),
 };
 
 /** Drafts questions for an online exam. Nothing is saved: each draft opens the normal question form. */
@@ -137,19 +137,19 @@ export function AiQuestionDrafts({ examId, onReview }: { examId: number; onRevie
 
   return (
     <div className="grid gap-4">
-      <Field label="Topic or syllabus text" htmlFor="ai-topic" description="Shared with the AI service. Paste the topic, learning objectives or a short passage.">
+      <Field label={tr("Topic or syllabus text")} htmlFor="ai-topic" description={tr("Shared with the AI service. Paste the topic, learning objectives or a short passage.")}>
         <Textarea id="ai-topic" rows={4} maxLength={2000} value={topic} onChange={(e) => setTopic(e.target.value)} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-3">
-        <Field label="How many" htmlFor="ai-count">
+        <Field label={tr("How many")} htmlFor="ai-count">
           <Input id="ai-count" type="number" min={1} max={10} value={count} onChange={(e) => setCount(e.target.value)} />
         </Field>
-        <Field label="Marks each" htmlFor="ai-mark">
+        <Field label={tr("Marks each")} htmlFor="ai-mark">
           <Input id="ai-mark" type="number" min={0.5} step={0.5} value={mark} onChange={(e) => setMark(e.target.value)} />
         </Field>
-        <Field label="Difficulty">
+        <Field label={tr("Difficulty")}>
           <Combobox
-            data={[{ value: "easy", label: "Easy" }, { value: "medium", label: "Medium" }, { value: "hard", label: "Hard" }]}
+            data={[{ value: "easy", label: tr("Easy") }, { value: "medium", label: tr("Medium") }, { value: "hard", label: tr("Hard") }]}
             value={difficulty}
             onChange={(v) => setDifficulty(v ?? "medium")}
           />
@@ -167,11 +167,11 @@ export function AiQuestionDrafts({ examId, onReview }: { examId: number; onRevie
       </div>
       <Button type="button" className="w-fit" loading={generate.isPending} disabled={topic.trim().length < 3 || types.length === 0} onClick={() => generate.mutate(undefined)}>
         <SparklesIcon />
-        {drafts.length ? "Draft again" : "Draft questions"}
+        {drafts.length ? tr("Draft again") : tr("Draft questions")}
       </Button>
       {drafts.length > 0 && (
         <div className="grid gap-2">
-          <AiLabel text={`${label}. Check each question and answer before adding it.`} />
+          <AiLabel text={tr("{label}. Check each question and answer before adding it.", { label })} />
           {drafts.map((d, i) => (
             <div key={i} className="flex items-start justify-between gap-3 rounded-md border p-3 text-sm">
               <div className="min-w-0 space-y-1">
@@ -180,14 +180,13 @@ export function AiQuestionDrafts({ examId, onReview }: { examId: number; onRevie
                   {TYPE_LABEL[d.type]} ·{" "}
                   {d.type === "multiple_choice"
                     ? d.options.map((o, j) => `${j + 1}. ${o}${d.correct_answers.includes(String(j + 1)) ? " ✓" : ""}`).join("  ")
-                    : `Answer: ${d.correct_answers.join(", ")}`}
+                    : tr("Answer: {correct_answers}", { correct_answers: d.correct_answers.join(", ") })}
                 </div>
               </div>
               {used.includes(i) ? (
                 <Badge variant="secondary" className="shrink-0">
                   <CheckIcon />
-                  Opened
-                </Badge>
+                  {tr("Opened")}</Badge>
               ) : (
                 <Button
                   type="button"
@@ -199,8 +198,7 @@ export function AiQuestionDrafts({ examId, onReview }: { examId: number; onRevie
                     onReview(d);
                   }}
                 >
-                  Review & add
-                </Button>
+                  {tr("Review & add")}</Button>
               )}
             </div>
           ))}
@@ -224,10 +222,9 @@ export function AiProgressSummary({ studentId, className }: { studentId: number;
       <CardHeader className="flex flex-row items-center justify-between gap-2 px-4">
         <CardTitle className="flex items-center gap-2 text-base">
           <SparklesIcon className="text-primary size-4" />
-          Progress summary
-        </CardTitle>
+          {tr("Progress summary")}</CardTitle>
         <Button size="sm" variant="outline" loading={run.isPending} onClick={() => run.mutate(undefined)}>
-          {result ? "Refresh" : "Summarise progress"}
+          {result ? tr("Refresh") : tr("Summarise progress")}
         </Button>
       </CardHeader>
       {result && (
@@ -240,7 +237,7 @@ export function AiProgressSummary({ studentId, className }: { studentId: number;
               ))}
             </ul>
           )}
-          <AiLabel text={`${label} · ${dayjs(result.generated_at).format("DD MMM YYYY HH:mm")}`} />
+          <AiLabel text={tr("{label} · {dayjs}", { label, dayjs: dayjs(result.generated_at).format("DD MMM YYYY HH:mm") })} />
         </CardContent>
       )}
     </Card>
@@ -264,7 +261,7 @@ export function AiSettingsCard() {
         ai_monthly_cap: Number(values.ai_monthly_cap ?? 0),
         ai_daily_user_cap: Number(values.ai_daily_user_cap ?? 0),
       }),
-    { success: "AI assistant settings saved", invalidate: [["/ai/settings"], ["/ai/status"]] },
+    { success: tr("AI assistant settings saved"), invalidate: [["/ai/settings"], ["/ai/status"]] },
   );
   const set = <K extends keyof AiSettings>(key: K, value: AiSettings[K]) => setValues((v) => ({ ...v, [key]: value }));
 
@@ -273,46 +270,43 @@ export function AiSettingsCard() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            AI assistant
-            {data?.configured ? (
-              <Badge className="bg-success/15 text-success border-transparent">On</Badge>
+            {tr("AI assistant")}{data?.configured ? (
+              <Badge className="bg-success/15 text-success border-transparent">{tr("On")}</Badge>
             ) : (
-              <Badge variant="secondary">Off</Badge>
+              <Badge variant="secondary">{tr("Off")}</Badge>
             )}
           </CardTitle>
           <CardDescription>
-            Drafts report-card remarks, exam questions and progress summaries with Claude (Anthropic). Staff review every draft before it is saved. Student names, contact details, health and counselling
-            records are never sent.
-          </CardDescription>
+            {tr("Drafts report-card remarks, exam questions and progress summaries with Claude (Anthropic). Staff review every draft before it is saved. Student names, contact details, health and counselling records are never sent.")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-3">
             <Switch id="ai-enabled" checked={!!values.ai_enabled} onCheckedChange={(c) => set("ai_enabled", c)} />
-            <Label htmlFor="ai-enabled">Turn on the AI assistant</Label>
+            <Label htmlFor="ai-enabled">{tr("Turn on the AI assistant")}</Label>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
-              label="Anthropic API key"
+              label={tr("Anthropic API key")}
               htmlFor="ai-key"
-              description={data?.uses_environment_key ? "Using the ANTHROPIC_API_KEY from the server environment" : values.anthropic_api_key === MASK ? "Saved; type to replace" : "From console.anthropic.com"}
+              description={data?.uses_environment_key ? tr("Using the ANTHROPIC_API_KEY from the server environment") : values.anthropic_api_key === MASK ? tr("Saved; type to replace") : tr("From console.anthropic.com")}
             >
               <Input
                 id="ai-key"
                 type="password"
                 autoComplete="new-password"
-                placeholder="Not set"
+                placeholder={tr("Not set")}
                 value={values.anthropic_api_key ?? ""}
                 onFocus={(e) => values.anthropic_api_key === MASK && e.target.select()}
                 onChange={(e) => set("anthropic_api_key", e.target.value)}
               />
             </Field>
-            <Field label="Model">
+            <Field label={tr("Model")}>
               <Combobox data={(data?.models ?? []).map((m) => ({ value: m, label: m }))} value={values.ai_model ?? null} onChange={(v) => v && set("ai_model", v)} />
             </Field>
-            <Field label="Requests per month (whole school)" htmlFor="ai-month" description={data ? `${data.requests_this_month} used this month` : undefined}>
+            <Field label={tr("Requests per month (whole school)")} htmlFor="ai-month" description={data ? tr("{requests_this_month} used this month", { requests_this_month: data.requests_this_month }) : undefined}>
               <Input id="ai-month" type="number" min={0} value={values.ai_monthly_cap ?? ""} onChange={(e) => set("ai_monthly_cap", Number(e.target.value))} />
             </Field>
-            <Field label="Requests per person per day" htmlFor="ai-day">
+            <Field label={tr("Requests per person per day")} htmlFor="ai-day">
               <Input id="ai-day" type="number" min={0} value={values.ai_daily_user_cap ?? ""} onChange={(e) => set("ai_daily_user_cap", Number(e.target.value))} />
             </Field>
           </div>
@@ -320,29 +314,28 @@ export function AiSettingsCard() {
         <CardFooter className="justify-end border-t pt-6">
           <Button loading={save.isPending} onClick={() => save.mutate(undefined)}>
             <SaveIcon />
-            Save
-          </Button>
+            {tr("Save")}</Button>
         </CardFooter>
       </Card>
 
       <Card className="gap-0 overflow-hidden py-0">
         <CardHeader className="border-b py-4">
-          <CardTitle className="text-base">AI usage</CardTitle>
-          <CardDescription>Requests and tokens per month. Prompts and answers are not stored.</CardDescription>
+          <CardTitle className="text-base">{tr("AI usage")}</CardTitle>
+          <CardDescription>{tr("Requests and tokens per month. Prompts and answers are not stored.")}</CardDescription>
         </CardHeader>
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Month</TableHead>
-              <TableHead>Feature</TableHead>
-              <TableHead className="text-right">Requests</TableHead>
-              <TableHead className="text-right">Failed</TableHead>
-              <TableHead className="text-right">Input tokens</TableHead>
-              <TableHead className="text-right">Output tokens</TableHead>
+              <TableHead>{tr("Month")}</TableHead>
+              <TableHead>{tr("Feature")}</TableHead>
+              <TableHead className="text-right">{tr("Requests")}</TableHead>
+              <TableHead className="text-right">{tr("Failed")}</TableHead>
+              <TableHead className="text-right">{tr("Input tokens")}</TableHead>
+              <TableHead className="text-right">{tr("Output tokens")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={usage.isLoading} empty={!usage.isLoading && (usage.data?.rows ?? []).length === 0} colSpan={6} emptyText="No AI requests yet" />
+            <TableState loading={usage.isLoading} empty={!usage.isLoading && (usage.data?.rows ?? []).length === 0} colSpan={6} emptyText={tr("No AI requests yet")} />
             {(usage.data?.rows ?? []).map((r) => (
               <TableRow key={`${r.month}-${r.feature}`}>
                 <TableCell>{dayjs(`${r.month}-01`).format("MMMM YYYY")}</TableCell>

@@ -12,6 +12,7 @@ import { Button } from "../../components/ui/button";
 import { DialogFooter } from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
+import { t } from "../../i18n";
 
 // --- staff: exams ---------------------------------------------------------------
 
@@ -60,14 +61,14 @@ export function ExamForm({ exam, onDone }: { exam: OnlineExam | null; onDone: ()
       };
       return exam ? api.put(`/online-exams/${exam.online_exam_id}`, body) : api.post("/online-exams", body);
     },
-    { success: "Exam saved", invalidate: [["/online-exams"], [`/online-exams/${exam?.online_exam_id}`]], onSuccess: onDone },
+    { success: t("Exam saved"), invalidate: [["/online-exams"], [`/online-exams/${exam?.online_exam_id}`]], onSuccess: onDone },
   );
-  const required = { required: "Required" };
+  const required = { required: t("Required") };
   const { errors } = form.formState;
 
   return (
     <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
-      <Field label="Title" htmlFor="exam-title" required error={errors.title?.message}>
+      <Field label={t("Title")} htmlFor="exam-title" required error={errors.title?.message}>
         <Input id="exam-title" {...form.register("title", required)} aria-invalid={!!errors.title} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -76,7 +77,7 @@ export function ExamForm({ exam, onDone }: { exam: OnlineExam | null; onDone: ()
           name="class_id"
           rules={required}
           render={({ field, fieldState }) => (
-            <Field label="Class" required error={fieldState.error?.message}>
+            <Field label={t("Class")} required error={fieldState.error?.message}>
               <Combobox
                 data={(classes.data?.items ?? []).map((c) => ({ value: String(c.class_id), label: c.name }))}
                 value={field.value}
@@ -85,7 +86,7 @@ export function ExamForm({ exam, onDone }: { exam: OnlineExam | null; onDone: ()
                   form.setValue("section_id", null);
                   form.setValue("subject_id", null);
                 }}
-                placeholder="Choose class"
+                placeholder={t("Choose class")}
                 aria-invalid={!!fieldState.error}
               />
             </Field>
@@ -96,13 +97,13 @@ export function ExamForm({ exam, onDone }: { exam: OnlineExam | null; onDone: ()
           name="section_id"
           rules={required}
           render={({ field, fieldState }) => (
-            <Field label="Section" required error={fieldState.error?.message}>
+            <Field label={t("Section")} required error={fieldState.error?.message}>
               <Combobox
                 disabled={!classId}
                 data={(sections.data?.items ?? []).map((s) => ({ value: String(s.section_id), label: s.name }))}
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Choose section"
+                placeholder={t("Choose section")}
                 aria-invalid={!!fieldState.error}
               />
             </Field>
@@ -114,13 +115,13 @@ export function ExamForm({ exam, onDone }: { exam: OnlineExam | null; onDone: ()
         name="subject_id"
         rules={required}
         render={({ field, fieldState }) => (
-          <Field label="Subject" required error={fieldState.error?.message}>
+          <Field label={t("Subject")} required error={fieldState.error?.message}>
             <Combobox
               disabled={!classId}
               data={subjectItems.map((s) => ({ value: String(s.subject_id), label: s.name }))}
               value={field.value}
               onChange={field.onChange}
-              placeholder="Choose subject"
+              placeholder={t("Choose subject")}
               aria-invalid={!!fieldState.error}
             />
           </Field>
@@ -132,36 +133,34 @@ export function ExamForm({ exam, onDone }: { exam: OnlineExam | null; onDone: ()
           name="exam_date"
           rules={required}
           render={({ field, fieldState }) => (
-            <Field label="Date" required error={fieldState.error?.message}>
+            <Field label={t("Date")} required error={fieldState.error?.message}>
               <DatePicker value={field.value} onChange={field.onChange} clearable={false} />
             </Field>
           )}
         />
-        <Field label="Start" htmlFor="exam-start" required>
+        <Field label={t("Start")} htmlFor="exam-start" required>
           <Input id="exam-start" type="time" {...form.register("time_start", required)} />
         </Field>
-        <Field label="End" htmlFor="exam-end" required error={errors.time_end?.message}>
+        <Field label={t("End")} htmlFor="exam-end" required error={errors.time_end?.message}>
           <Input
             id="exam-end"
             type="time"
             aria-invalid={!!errors.time_end}
-            {...form.register("time_end", { validate: (v, all) => (v > all.time_start ? true : "Must be after start time") })}
+            {...form.register("time_end", { validate: (v, all) => (v > all.time_start ? true : t("Must be after start time")) })}
           />
         </Field>
       </div>
-      <Field label="Pass mark (%)" htmlFor="exam-pass" className="sm:w-1/3">
+      <Field label={t("Pass mark (%)")} htmlFor="exam-pass" className="sm:w-1/3">
         <Input id="exam-pass" type="number" min={0} max={100} {...form.register("minimum_percentage")} />
       </Field>
-      <Field label="Instructions" htmlFor="exam-instruction">
+      <Field label={t("Instructions")} htmlFor="exam-instruction">
         <Textarea id="exam-instruction" rows={3} {...form.register("instruction")} />
       </Field>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onDone}>
-          Cancel
-        </Button>
+          {t("Cancel")}</Button>
         <Button type="submit" loading={save.isPending}>
-          Save
-        </Button>
+          {t("Save")}</Button>
       </DialogFooter>
     </form>
   );

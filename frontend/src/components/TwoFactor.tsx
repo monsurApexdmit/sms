@@ -19,6 +19,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "./ui/input";
 import { Skeleton } from "./ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { t, tn } from "../i18n";
 
 /** Six-digit authenticator code input. */
 export function CodeInput({ id, value, onChange, autoFocus }: { id: string; value: string; onChange: (v: string) => void; autoFocus?: boolean }) {
@@ -43,13 +44,13 @@ export function RecoveryCodes({ codes }: { codes: string[] }) {
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("Recovery codes copied");
+      toast.success(t("Recovery codes copied"));
     } catch {
-      toast.error("Copy failed. Select the codes and copy them by hand.");
+      toast.error(t("Copy failed. Select the codes and copy them by hand."));
     }
   };
   const download = () => {
-    const url = URL.createObjectURL(new Blob([`Recovery codes (each works once)\n\n${text}\n`], { type: "text/plain" }));
+    const url = URL.createObjectURL(new Blob([t("Recovery codes (each works once)\n\n{text}", { text }) + "\n"], { type: "text/plain" }));
     const a = document.createElement("a");
     a.href = url;
     a.download = "recovery-codes.txt";
@@ -61,8 +62,7 @@ export function RecoveryCodes({ codes }: { codes: string[] }) {
       <Alert>
         <KeyRoundIcon />
         <AlertDescription>
-          Keep these somewhere safe. Each code signs you in once if you lose your phone. They won't be shown again.
-        </AlertDescription>
+          {t("Keep these somewhere safe. Each code signs you in once if you lose your phone. They won't be shown again.")}</AlertDescription>
       </Alert>
       <div className="bg-muted/40 grid grid-cols-2 gap-x-6 gap-y-1 rounded-md border p-3 font-mono text-sm">
         {codes.map((c) => (
@@ -72,12 +72,10 @@ export function RecoveryCodes({ codes }: { codes: string[] }) {
       <div className="flex gap-2">
         <Button type="button" variant="outline" size="sm" onClick={copy}>
           <CopyIcon />
-          Copy
-        </Button>
+          {t("Copy")}</Button>
         <Button type="button" variant="outline" size="sm" onClick={download}>
           <DownloadIcon />
-          Download
-        </Button>
+          {t("Download")}</Button>
       </div>
     </div>
   );
@@ -122,22 +120,21 @@ export function TotpSetup({ token, onConfirmed }: { token?: string; onConfirmed:
   return (
     <form onSubmit={confirm} className="grid gap-4">
       <ol className="text-muted-foreground list-decimal space-y-1 pl-5 text-sm">
-        <li>Open an authenticator app (Google Authenticator, Microsoft Authenticator, Authy…).</li>
-        <li>Scan this code, or type the key below.</li>
-        <li>Enter the 6-digit code the app shows.</li>
+        <li>{t("Open an authenticator app (Google Authenticator, Microsoft Authenticator, Authy…).")}</li>
+        <li>{t("Scan this code, or type the key below.")}</li>
+        <li>{t("Enter the 6-digit code the app shows.")}</li>
       </ol>
-      <img src={setup.qr} alt="QR code for your authenticator app" className="mx-auto size-48 rounded-md border bg-white p-1" />
+      <img src={setup.qr} alt={t("QR code for your authenticator app")} className="mx-auto size-48 rounded-md border bg-white p-1" />
       <div className="text-center">
-        <div className="text-muted-foreground text-xs">Key</div>
+        <div className="text-muted-foreground text-xs">{t("Key")}</div>
         <code className="font-mono text-sm break-all select-all">{setup.secret.match(/.{1,4}/g)?.join(" ")}</code>
       </div>
-      <Field label="Code from the app" htmlFor="totp-confirm" error={error ?? undefined}>
+      <Field label={t("Code from the app")} htmlFor="totp-confirm" error={error ?? undefined}>
         <CodeInput id="totp-confirm" value={code} onChange={setCode} autoFocus />
       </Field>
       <Button type="submit" loading={busy} disabled={code.length !== 6}>
         <ShieldCheckIcon />
-        Turn on
-      </Button>
+        {t("Turn on")}</Button>
     </form>
   );
 }
@@ -166,7 +163,7 @@ export function TwoFactorCard() {
     onSuccess: (r) => showCodes(r.data),
   });
   const disable = useAction(() => api.post("/auth/mfa/disable", { password, code }), {
-    success: "Two-factor authentication turned off",
+    success: t("Two-factor authentication turned off"),
     invalidate: [["/auth/mfa"]],
     onSuccess: close,
   });
@@ -176,25 +173,23 @@ export function TwoFactorCard() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          Two-factor authentication
-          {s?.enabled ? (
-            <Badge className="bg-success/15 text-success border-transparent">On</Badge>
+          {t("Two-factor authentication")}{s?.enabled ? (
+            <Badge className="bg-success/15 text-success border-transparent">{t("On")}</Badge>
           ) : (
-            <Badge variant="secondary">Off</Badge>
+            <Badge variant="secondary">{t("Off")}</Badge>
           )}
         </CardTitle>
-        <CardDescription>After your password, also ask for a code from an authenticator app on your phone.</CardDescription>
+        <CardDescription>{t("After your password, also ask for a code from an authenticator app on your phone.")}</CardDescription>
       </CardHeader>
       <CardContent className="text-sm">
         {!s ? (
           <Skeleton className="h-5 w-48" />
         ) : s.enabled ? (
           <p className="text-muted-foreground">
-            {s.recovery_codes_left} of 10 recovery codes left.
-            {s.required && " Your school requires two-factor authentication for your role."}
+            {tn("{recovery_codes_left} of 10 recovery codes left.{value}", { recovery_codes_left: s.recovery_codes_left, value: s.required && " " + t("Your school requires two-factor authentication for your role.") })}
           </p>
         ) : (
-          <p className="text-muted-foreground">{s.required ? "Your school requires it for your role." : "Recommended for staff accounts."}</p>
+          <p className="text-muted-foreground">{s.required ? t("Your school requires it for your role.") : t("Recommended for staff accounts.")}</p>
         )}
       </CardContent>
       <CardFooter className="justify-end gap-2 border-t">
@@ -202,20 +197,17 @@ export function TwoFactorCard() {
           <>
             <Button variant="outline" onClick={() => setOpen("regenerate")}>
               <RotateCcwIcon />
-              New recovery codes
-            </Button>
+              {t("New recovery codes")}</Button>
             {!s.required && (
               <Button variant="outline" className="text-destructive hover:text-destructive" onClick={() => setOpen("disable")}>
                 <ShieldOffIcon />
-                Turn off
-              </Button>
+                {t("Turn off")}</Button>
             )}
           </>
         ) : (
           <Button onClick={() => setOpen("enable")} disabled={!s}>
             <ShieldCheckIcon />
-            Turn on
-          </Button>
+            {t("Turn on")}</Button>
         )}
       </CardFooter>
 
@@ -224,7 +216,7 @@ export function TwoFactorCard() {
           {open === "enable" && (
             <>
               <DialogHeader>
-                <DialogTitle>Turn on two-factor authentication</DialogTitle>
+                <DialogTitle>{t("Turn on two-factor authentication")}</DialogTitle>
               </DialogHeader>
               <TotpSetup onConfirmed={showCodes} />
             </>
@@ -232,43 +224,43 @@ export function TwoFactorCard() {
           {open === "codes" && (
             <>
               <DialogHeader>
-                <DialogTitle>Your recovery codes</DialogTitle>
+                <DialogTitle>{t("Your recovery codes")}</DialogTitle>
               </DialogHeader>
               <RecoveryCodes codes={codes} />
               <DialogFooter>
-                <Button onClick={close}>I've saved them</Button>
+                <Button onClick={close}>{t("I've saved them")}</Button>
               </DialogFooter>
             </>
           )}
           {open === "regenerate" && (
             <form onSubmit={(e) => { e.preventDefault(); regenerate.mutate(code); }} className="grid gap-4">
               <DialogHeader>
-                <DialogTitle>New recovery codes</DialogTitle>
-                <DialogDescription>Your old recovery codes stop working.</DialogDescription>
+                <DialogTitle>{t("New recovery codes")}</DialogTitle>
+                <DialogDescription>{t("Your old recovery codes stop working.")}</DialogDescription>
               </DialogHeader>
-              <Field label="Code from your authenticator app" htmlFor="totp-regen">
+              <Field label={t("Code from your authenticator app")} htmlFor="totp-regen">
                 <CodeInput id="totp-regen" value={code} onChange={setCode} autoFocus />
               </Field>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={close}>Cancel</Button>
-                <Button type="submit" loading={regenerate.isPending} disabled={code.length !== 6}>Create codes</Button>
+                <Button type="button" variant="outline" onClick={close}>{t("Cancel")}</Button>
+                <Button type="submit" loading={regenerate.isPending} disabled={code.length !== 6}>{t("Create codes")}</Button>
               </DialogFooter>
             </form>
           )}
           {open === "disable" && (
             <form onSubmit={(e) => { e.preventDefault(); disable.mutate(undefined); }} className="grid gap-4">
               <DialogHeader>
-                <DialogTitle>Turn off two-factor authentication</DialogTitle>
+                <DialogTitle>{t("Turn off two-factor authentication")}</DialogTitle>
               </DialogHeader>
-              <Field label="Password" htmlFor="totp-off-pw">
+              <Field label={t("Password")} htmlFor="totp-off-pw">
                 <PasswordInput id="totp-off-pw" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
               </Field>
-              <Field label="Code from your app, or a recovery code" htmlFor="totp-off-code">
+              <Field label={t("Code from your app, or a recovery code")} htmlFor="totp-off-code">
                 <Input id="totp-off-code" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value.trim())} />
               </Field>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={close}>Cancel</Button>
-                <Button type="submit" variant="destructive" loading={disable.isPending} disabled={!password || code.length < 6}>Turn off</Button>
+                <Button type="button" variant="outline" onClick={close}>{t("Cancel")}</Button>
+                <Button type="submit" variant="destructive" loading={disable.isPending} disabled={!password || code.length < 6}>{t("Turn off")}</Button>
               </DialogFooter>
             </form>
           )}
@@ -282,21 +274,21 @@ export function TwoFactorCard() {
 export function TwoFactorUsers() {
   const { data, isLoading } = useGet<MfaEnrolledUser[]>("/auth/mfa/users");
   const reset = useAction((u: MfaEnrolledUser) => api.delete(`/auth/mfa/users/${u.role}/${u.user_id}`), {
-    success: "Two-factor authentication reset",
+    success: t("Two-factor authentication reset"),
     invalidate: [["/auth/mfa/users"]],
   });
   return (
     <Table>
       <TableHeader className="bg-muted/50">
         <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Since</TableHead>
+          <TableHead>{t("Name")}</TableHead>
+          <TableHead>{t("Role")}</TableHead>
+          <TableHead>{t("Since")}</TableHead>
           <TableHead className="w-16" />
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableState loading={isLoading} empty={!isLoading && (data ?? []).length === 0} colSpan={4} emptyText="Nobody has turned it on yet" />
+        <TableState loading={isLoading} empty={!isLoading && (data ?? []).length === 0} colSpan={4} emptyText={t("Nobody has turned it on yet")} />
         {(data ?? []).map((u) => (
           <TableRow key={`${u.role}-${u.user_id}`}>
             <TableCell>
@@ -304,15 +296,15 @@ export function TwoFactorUsers() {
               <div className="text-muted-foreground text-xs">{u.email}</div>
             </TableCell>
             <TableCell>{titleCase(u.role)}</TableCell>
-            <TableCell>{u.confirmed_at ? new Date(u.confirmed_at).toLocaleDateString() : <Badge variant="secondary">Setting up</Badge>}</TableCell>
+            <TableCell>{u.confirmed_at ? new Date(u.confirmed_at).toLocaleDateString() : <Badge variant="secondary">{t("Setting up")}</Badge>}</TableCell>
             <TableCell>
               <IconAction
-                label="Reset"
+                label={t("Reset")}
                 destructive
                 onClick={() =>
                   confirmAction({
-                    title: `Reset two-factor authentication for ${u.name ?? u.email}?`,
-                    description: "They can sign in with the password alone (or must set it up again if their role requires it). Use this when a phone is lost.",
+                    title: t("Reset two-factor authentication for {value}?", { value: u.name ?? u.email }),
+                    description: t("They can sign in with the password alone (or must set it up again if their role requires it). Use this when a phone is lost."),
                     onConfirm: () => reset.mutate(u),
                   })
                 }

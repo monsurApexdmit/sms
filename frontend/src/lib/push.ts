@@ -1,4 +1,5 @@
 import { api } from "../api/client";
+import { t } from "../i18n";
 
 /** Registers public/sw.js (production builds only, so the dev server never serves stale code). */
 export function registerServiceWorker() {
@@ -31,7 +32,7 @@ function keyBytes(base64url: string): Uint8Array<ArrayBuffer> {
 }
 
 export async function enablePush(publicKey: string): Promise<void> {
-  if ((await Notification.requestPermission()) !== "granted") throw new Error("Notifications are blocked in this browser.");
+  if ((await Notification.requestPermission()) !== "granted") throw new Error(t("Notifications are blocked in this browser."));
   const registration = await navigator.serviceWorker.ready;
   const subscription =
     (await registration.pushManager.getSubscription()) ??

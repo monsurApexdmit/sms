@@ -28,12 +28,13 @@ import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { cn } from "../lib/utils";
 import { toOptions } from "../utils";
 import { useChildSelect } from "./Academic";
+import { t, tn } from "../i18n";
 
-const FILE_HINT = "PDF, Office documents, images, audio/video or zip; max 10 MB";
+const FILE_HINT = t("PDF, Office documents, images, audio/video or zip; max 10 MB");
 const day = (d: string) => dayjs(d).format("DD MMM YYYY");
 const score = (marks: number | null, max: number | null) => (marks === null ? "—" : max ? `${marks} / ${max}` : String(marks));
 
-function FileLink({ url, label = "Download" }: { url: string | null; label?: string }) {
+function FileLink({ url, label = t("Download") }: { url: string | null; label?: string }) {
   if (!url) return <Dash />;
   return (
     <a href={url} target="_blank" rel="noopener" className="text-primary inline-flex items-center gap-1 hover:underline">
@@ -47,11 +48,11 @@ function FileLink({ url, label = "Download" }: { url: string | null; label?: str
 function StatusBadge({ hw }: { hw: Homework }) {
   const sub = hw.submission;
   const left = dayjs(hw.due_date).diff(dayjs().startOf("day"), "day");
-  if (sub?.graded_at) return <Badge className="bg-success/15 text-success border-transparent">Graded {score(sub.marks, hw.max_marks)}</Badge>;
-  if (sub) return <Badge className="bg-primary/10 text-primary border-transparent">Submitted{sub.is_late ? " late" : ""}</Badge>;
-  if (left < 0) return <Badge className="bg-destructive/10 text-destructive border-transparent">Overdue</Badge>;
-  if (left <= 2) return <Badge className="bg-warning/20 border-transparent text-amber-700 dark:text-amber-300">{left === 0 ? "Due today" : "Due soon"}</Badge>;
-  return <Badge variant="secondary">Due {day(hw.due_date)}</Badge>;
+  if (sub?.graded_at) return <Badge className="bg-success/15 text-success border-transparent">{tn("Graded {score}", { score: score(sub.marks, hw.max_marks) })}</Badge>;
+  if (sub) return <Badge className="bg-primary/10 text-primary border-transparent">{sub.is_late ? t("Submitted late") : t("Submitted")}</Badge>;
+  if (left < 0) return <Badge className="bg-destructive/10 text-destructive border-transparent">{t("Overdue")}</Badge>;
+  if (left <= 2) return <Badge className="bg-warning/20 border-transparent text-amber-700 dark:text-amber-300">{left === 0 ? t("Due today") : t("Due soon")}</Badge>;
+  return <Badge variant="secondary">{tn("Due {day}", { day: day(hw.due_date) })}</Badge>;
 }
 
 export function HomeworkPage() {
@@ -114,84 +115,82 @@ function HomeworkForm({ homework, onDone }: { homework: Homework | null; onDone:
         await api.post("/homework", body);
       }
     },
-    { success: "Homework saved", invalidate: [["/homework"]], onSuccess: onDone },
+    { success: t("Homework saved"), invalidate: [["/homework"]], onSuccess: onDone },
   );
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const next: typeof errors = {};
-    if (!form.title.trim()) next.title = "Required";
-    if (!form.class_id) next.class_id = "Required";
-    if (!form.subject_id) next.subject_id = "Required";
-    if (!form.due_date) next.due_date = "Required";
-    if (form.max_marks && !(Number(form.max_marks) > 0)) next.max_marks = "Must be more than 0";
+    if (!form.title.trim()) next.title = t("Required");
+    if (!form.class_id) next.class_id = t("Required");
+    if (!form.subject_id) next.subject_id = t("Required");
+    if (!form.due_date) next.due_date = t("Required");
+    if (form.max_marks && !(Number(form.max_marks) > 0)) next.max_marks = t("Must be more than 0");
     setErrors(next);
     if (Object.keys(next).length === 0) save.mutate(undefined);
   };
 
   return (
     <form onSubmit={submit} className="grid gap-4">
-      <Field label="Title" htmlFor="hw-title" required error={errors.title}>
+      <Field label={t("Title")} htmlFor="hw-title" required error={errors.title}>
         <Input id="hw-title" value={form.title} onChange={(e) => set("title", e.target.value)} aria-invalid={!!errors.title || undefined} />
       </Field>
-      <Field label="Instructions" htmlFor="hw-desc">
+      <Field label={t("Instructions")} htmlFor="hw-desc">
         <Textarea id="hw-desc" rows={4} value={form.description} onChange={(e) => set("description", e.target.value)} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-3">
-        <Field label="Class" required error={errors.class_id}>
+        <Field label={t("Class")} required error={errors.class_id}>
           <Combobox
             disabled={!!homework}
             data={toOptions(classes.data?.items, "class_id", "name")}
             value={form.class_id}
             onChange={(v) => setForm((f) => ({ ...f, class_id: v, section_id: null, subject_id: null }))}
-            placeholder="Choose class"
+            placeholder={t("Choose class")}
           />
         </Field>
-        <Field label="Section">
+        <Field label={t("Section")}>
           <Combobox
             clearable
             disabled={!form.class_id}
             data={toOptions(sections.data?.items, "section_id", "name")}
             value={form.section_id}
             onChange={(v) => set("section_id", v)}
-            placeholder="All sections"
+            placeholder={t("All sections")}
           />
         </Field>
-        <Field label="Subject" required error={errors.subject_id}>
+        <Field label={t("Subject")} required error={errors.subject_id}>
           <Combobox
             disabled={!form.class_id || !!homework}
             data={toOptions(ownSubjects, "subject_id", "name")}
             value={form.subject_id}
             onChange={(v) => set("subject_id", v)}
-            placeholder="Choose subject"
-            emptyText="You teach no subject in this class"
+            placeholder={t("Choose subject")}
+            emptyText={t("You teach no subject in this class")}
           />
         </Field>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Due date" required error={errors.due_date}>
+        <Field label={t("Due date")} required error={errors.due_date}>
           <DatePicker value={form.due_date} onChange={(v) => set("due_date", v)} clearable={false} />
         </Field>
-        <Field label="Out of (marks)" htmlFor="hw-max" error={errors.max_marks} description="Leave empty for ungraded homework">
+        <Field label={t("Out of (marks)")} htmlFor="hw-max" error={errors.max_marks} description={t("Leave empty for ungraded homework")}>
           <Input id="hw-max" type="number" min={0} step="0.5" value={form.max_marks} onChange={(e) => set("max_marks", e.target.value)} />
         </Field>
       </div>
       <label className="flex items-center gap-3 text-sm">
         <Switch checked={form.allow_late} onCheckedChange={(v) => set("allow_late", v)} />
-        Accept late submissions (marked as late)
-      </label>
-      <Field label={homework?.file_url ? "Replace attachment" : "Attachment"} htmlFor="hw-file" description={FILE_HINT}>
+        {t("Accept late submissions (marked as late)")}</label>
+      <Field label={homework?.file_url ? t("Replace attachment") : t("Attachment")} htmlFor="hw-file" description={FILE_HINT}>
         <Input id="hw-file" type="file" onChange={(e) => set("file", e.currentTarget.files?.[0] ?? null)} />
       </Field>
       {homework?.file_url && !form.file && (
         <label className="flex items-center gap-3 text-sm">
           <Switch checked={form.remove_file} onCheckedChange={(v) => set("remove_file", v)} />
-          Remove the current attachment
-        </label>
+          {t("Remove the current attachment")}</label>
       )}
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={save.isPending}>Save</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("Cancel")}</Button>
+        <Button type="submit" loading={save.isPending}>{t("Save")}</Button>
       </DialogFooter>
     </form>
   );
@@ -203,7 +202,7 @@ function GradeRow({ row, homework }: { row: HomeworkRosterRow; homework: Homewor
   const [feedback, setFeedback] = useState(sub?.feedback ?? "");
   const grade = useAction(
     () => api.put(`/homework/submissions/${sub!.submission_id}/grade`, { marks: marks === "" ? null : Number(marks), feedback: feedback.trim() || null }),
-    { success: `Saved grade for ${row.name}`, invalidate: [["/homework"], [`/homework/${homework.homework_id}/submissions`]] },
+    { success: t("Saved grade for {name}", { name: row.name }), invalidate: [["/homework"], [`/homework/${homework.homework_id}/submissions`]] },
   );
   return (
     <div className="space-y-2 rounded-lg border p-3">
@@ -213,30 +212,29 @@ function GradeRow({ row, homework }: { row: HomeworkRosterRow; homework: Homewor
           {row.name}
         </div>
         {!sub ? (
-          <Badge variant="secondary">Not submitted</Badge>
+          <Badge variant="secondary">{t("Not submitted")}</Badge>
         ) : (
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted-foreground">{dayjs(sub.submitted_at).format("DD MMM, HH:mm")}</span>
-            {sub.is_late && <Badge className="bg-warning/20 border-transparent text-amber-700 dark:text-amber-300">Late</Badge>}
-            {sub.graded_at && <Badge className="bg-success/15 text-success border-transparent">Graded</Badge>}
+            {sub.is_late && <Badge className="bg-warning/20 border-transparent text-amber-700 dark:text-amber-300">{t("Late")}</Badge>}
+            {sub.graded_at && <Badge className="bg-success/15 text-success border-transparent">{t("Graded")}</Badge>}
           </div>
         )}
       </div>
       {sub && (
         <>
           {sub.text && <p className="bg-muted/50 rounded-md p-2 text-sm whitespace-pre-wrap">{sub.text}</p>}
-          {sub.file_url && <FileLink url={sub.file_url} label="Attached file" />}
+          {sub.file_url && <FileLink url={sub.file_url} label={t("Attached file")} />}
           <div className="flex flex-wrap items-end gap-2">
-            <Field label={homework.max_marks ? `Marks (of ${homework.max_marks})` : "Marks"} className="w-32">
+            <Field label={homework.max_marks ? t("Marks (of {max_marks})", { max_marks: homework.max_marks }) : t("Marks")} className="w-32">
               <Input type="number" min={0} max={homework.max_marks ?? undefined} step="0.5" value={marks} onChange={(e) => setMarks(e.target.value)} />
             </Field>
-            <Field label="Feedback" className="min-w-48 flex-1">
-              <Input value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder="Optional" />
+            <Field label={t("Feedback")} className="min-w-48 flex-1">
+              <Input value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder={t("Optional")} />
             </Field>
             <Button size="sm" loading={grade.isPending} onClick={() => grade.mutate(undefined)}>
               <BookCheckIcon />
-              Save
-            </Button>
+              {t("Save")}</Button>
           </div>
         </>
       )}
@@ -254,12 +252,12 @@ function SubmissionsSheet({ homework, onClose }: { homework: Homework | null; on
         <SheetHeader>
           <SheetTitle>{homework?.title}</SheetTitle>
           <SheetDescription>
-            {homework && `${homework.subject_name ?? ""} · due ${day(homework.due_date)} · ${handedIn} of ${rows.length} handed in`}
+            {homework && t("{value} · due {day} · {handedIn} of {length} handed in", { value: homework.subject_name ?? "", day: day(homework.due_date), handedIn, length: rows.length })}
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-3 px-4 pb-6">
           {roster.isLoading && <Skeleton className="h-24 w-full" />}
-          {!roster.isLoading && rows.length === 0 && <p className="text-muted-foreground text-sm">No students are enrolled for this homework.</p>}
+          {!roster.isLoading && rows.length === 0 && <p className="text-muted-foreground text-sm">{t("No students are enrolled for this homework.")}</p>}
           {homework && rows.map((r) => <GradeRow key={`${r.student_id}-${r.submission?.graded_at ?? ""}`} row={r} homework={homework} />)}
         </div>
       </SheetContent>
@@ -280,19 +278,18 @@ function StaffHomework() {
   });  // prettier-ignore
   const [editing, setEditing] = useState<Homework | "new" | null>(null);
   const [grading, setGrading] = useState<Homework | null>(null);
-  const remove = useAction((id: number) => api.delete(`/homework/${id}`), { success: "Homework deleted", invalidate: [["/homework"]] });
+  const remove = useAction((id: number) => api.delete(`/homework/${id}`), { success: t("Homework deleted"), invalidate: [["/homework"]] });
   const rows = data?.items ?? [];
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Homework"
-        subtitle="Set homework for a class or section, collect answers and grade them."
+        title={t("Homework")}
+        subtitle={t("Set homework for a class or section, collect answers and grade them.")}
         actions={
           <Button onClick={() => setEditing("new")}>
             <PlusIcon />
-            New homework
-          </Button>
+            {t("New homework")}</Button>
         }
       />
       <Card className="gap-0 overflow-hidden py-0">
@@ -304,54 +301,54 @@ function StaffHomework() {
               data={toOptions(classes.data?.items, "class_id", "name")}
               value={classId}
               onChange={(v) => { setClassId(v); setSubjectId(null); }}
-              placeholder="All classes"
+              placeholder={t("All classes")}
             />
-            <Combobox className="w-44" clearable data={toOptions(subjectItems, "subject_id", "name")} value={subjectId} onChange={setSubjectId} placeholder="All subjects" />
+            <Combobox className="w-44" clearable data={toOptions(subjectItems, "subject_id", "name")} value={subjectId} onChange={setSubjectId} placeholder={t("All subjects")} />
           </div>
           <ToggleGroup type="single" variant="outline" size="sm" value={status} onValueChange={(v) => v && setStatus(v)}>
-            <ToggleGroupItem value="all">All</ToggleGroupItem>
-            <ToggleGroupItem value="open">Open</ToggleGroupItem>
-            <ToggleGroupItem value="closed">Past due</ToggleGroupItem>
+            <ToggleGroupItem value="all">{t("All")}</ToggleGroupItem>
+            <ToggleGroupItem value="open">{t("Open")}</ToggleGroupItem>
+            <ToggleGroupItem value="closed">{t("Past due")}</ToggleGroupItem>
           </ToggleGroup>
         </div>
         <Table className="min-w-[760px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Homework</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Due</TableHead>
-              <TableHead className="text-right">Handed in</TableHead>
-              <TableHead className="text-right">Graded</TableHead>
+              <TableHead>{t("Homework")}</TableHead>
+              <TableHead>{t("Class")}</TableHead>
+              <TableHead>{t("Due")}</TableHead>
+              <TableHead className="text-right">{t("Handed in")}</TableHead>
+              <TableHead className="text-right">{t("Graded")}</TableHead>
               <TableHead className="w-32" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={6} emptyText="No homework yet" />
+            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={6} emptyText={t("No homework yet")} />
             {rows.map((hw) => (
               <TableRow key={hw.homework_id}>
                 <TableCell className="whitespace-normal">
                   <div className="font-medium">{hw.title}</div>
                   <div className="text-muted-foreground text-xs">
                     {hw.subject_name}
-                    {hw.teacher_name ? ` · ${hw.teacher_name}` : ""}
-                    {hw.max_marks ? ` · out of ${hw.max_marks}` : ""}
+                    {hw.teacher_name ? " " + t("· {teacher_name}", { teacher_name: hw.teacher_name }) : ""}
+                    {hw.max_marks ? " " + t("· out of {max_marks}", { max_marks: hw.max_marks }) : ""}
                   </div>
                 </TableCell>
                 <TableCell>
                   {hw.class_name}
-                  <span className="text-muted-foreground">{hw.section_name ? ` · ${hw.section_name}` : " · all sections"}</span>
+                  <span className="text-muted-foreground">{hw.section_name ? " " + t("· {section_name}", { section_name: hw.section_name }) : " " + t("· all sections")}</span>
                 </TableCell>
                 <TableCell className={cn("tabular-nums", dayjs(hw.due_date).isBefore(dayjs(), "day") && "text-muted-foreground")}>{day(hw.due_date)}</TableCell>
                 <TableCell className="text-right tabular-nums">{hw.submitted ?? 0} / {hw.students ?? 0}</TableCell>
                 <TableCell className="text-right tabular-nums">{hw.graded ?? 0}</TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">
-                    <IconAction label="Submissions" onClick={() => setGrading(hw)}><UsersIcon /></IconAction>
-                    <IconAction label="Edit" onClick={() => setEditing(hw)}><PencilIcon /></IconAction>
+                    <IconAction label={t("Submissions")} onClick={() => setGrading(hw)}><UsersIcon /></IconAction>
+                    <IconAction label={t("Edit")} onClick={() => setEditing(hw)}><PencilIcon /></IconAction>
                     <IconAction
-                      label="Delete"
+                      label={t("Delete")}
                       destructive
-                      onClick={() => confirmAction({ title: `Delete "${hw.title}"?`, description: "Students' submissions and grades are deleted too.", onConfirm: () => remove.mutate(hw.homework_id) })}
+                      onClick={() => confirmAction({ title: t("Delete \"{title}\"?", { title: hw.title }), description: t("Students' submissions and grades are deleted too."), onConfirm: () => remove.mutate(hw.homework_id) })}
                     >
                       <Trash2Icon />
                     </IconAction>
@@ -367,7 +364,7 @@ function StaffHomework() {
       <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editing === "new" ? "New homework" : "Edit homework"}</DialogTitle>
+            <DialogTitle>{editing === "new" ? t("New homework") : t("Edit homework")}</DialogTitle>
           </DialogHeader>
           {editing !== null && <HomeworkForm key={editing === "new" ? "new" : editing.homework_id} homework={editing === "new" ? null : editing} onDone={() => setEditing(null)} />}
         </DialogContent>
@@ -389,33 +386,32 @@ function SubmitDialog({ homework, onClose }: { homework: Homework | null; onClos
       if (file) body.append("file", file);
       await api.post(`/homework/${homework!.homework_id}/submission`, body);
     },
-    { success: "Homework handed in", invalidate: [["/homework"]], onSuccess: onClose },
+    { success: t("Homework handed in"), invalidate: [["/homework"]], onSuccess: onClose },
   );
   const late = homework && dayjs().isAfter(dayjs(homework.due_date), "day");
   return (
     <Dialog open={homework !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{homework?.submission ? "Replace your answer" : "Hand in"}: {homework?.title}</DialogTitle>
+          <DialogTitle>{homework?.submission ? t("Replace your answer") : t("Hand in")}: {homework?.title}</DialogTitle>
           <DialogDescription>
-            {homework?.submission ? "Your new answer replaces the one you handed in, attachment included." : `Due ${homework ? day(homework.due_date) : ""}.`}
-            {late ? " This will be marked as late." : ""}
+            {homework?.submission ? t("Your new answer replaces the one you handed in, attachment included.") : t("Due {value}.", { value: homework ? day(homework.due_date) : "" })}
+            {late ? " " + t("This will be marked as late.") : ""}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
-          <Field label="Answer" htmlFor="sub-text">
+          <Field label={t("Answer")} htmlFor="sub-text">
             <Textarea id="sub-text" rows={6} value={text} onChange={(e) => setText(e.target.value)} />
           </Field>
-          <Field label="Attachment" htmlFor="sub-file" description={FILE_HINT}>
+          <Field label={t("Attachment")} htmlFor="sub-file" description={FILE_HINT}>
             <Input id="sub-file" type="file" onChange={(e) => setFile(e.currentTarget.files?.[0] ?? null)} />
           </Field>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>{t("Cancel")}</Button>
           <Button disabled={!text.trim() && !file} loading={submit.isPending} onClick={() => submit.mutate(undefined)}>
             <SendIcon />
-            Hand in
-          </Button>
+            {t("Hand in")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -431,8 +427,7 @@ function HomeworkCard({ hw, canSubmit, onSubmit }: { hw: Homework; canSubmit: bo
         <div className="space-y-1">
           <CardTitle className="text-base">{hw.title}</CardTitle>
           <CardDescription>
-            {hw.subject_name}
-            {hw.teacher_name ? ` · ${hw.teacher_name}` : ""} · set {day(hw.assigned_on)} · due {day(hw.due_date)}
+            {tn("{subject_name}{value} · set {day} · due {day2}", { subject_name: hw.subject_name, value: hw.teacher_name ? " " + t("· {teacher_name}", { teacher_name: hw.teacher_name }) : "", day: day(hw.assigned_on), day2: day(hw.due_date) })}
           </CardDescription>
         </div>
         <StatusBadge hw={hw} />
@@ -440,18 +435,18 @@ function HomeworkCard({ hw, canSubmit, onSubmit }: { hw: Homework; canSubmit: bo
       {(hw.description || hw.file_url) && (
         <CardContent className="space-y-2">
           {hw.description && <p className="text-sm whitespace-pre-wrap">{hw.description}</p>}
-          {hw.file_url && <FileLink url={hw.file_url} label="Homework sheet" />}
+          {hw.file_url && <FileLink url={hw.file_url} label={t("Homework sheet")} />}
         </CardContent>
       )}
       {sub && (
         <CardContent>
           <div className="bg-muted/40 space-y-1 rounded-md p-3 text-sm">
-            <div className="text-muted-foreground text-xs">Handed in {dayjs(sub.submitted_at).format("DD MMM YYYY, HH:mm")}</div>
+            <div className="text-muted-foreground text-xs">{tn("Handed in {dayjs}", { dayjs: dayjs(sub.submitted_at).format("DD MMM YYYY, HH:mm") })}</div>
             {sub.text && <p className="whitespace-pre-wrap">{sub.text}</p>}
-            {sub.file_url && <FileLink url={sub.file_url} label="Your file" />}
+            {sub.file_url && <FileLink url={sub.file_url} label={t("Your file")} />}
             {sub.graded_at && (
               <div className="border-t pt-2">
-                <span className="font-medium">Marks: {score(sub.marks, hw.max_marks)}</span>
+                <span className="font-medium">{tn("Marks: {score}", { score: score(sub.marks, hw.max_marks) })}</span>
                 {sub.feedback && <p className="text-muted-foreground">{sub.feedback}</p>}
               </div>
             )}
@@ -462,7 +457,7 @@ function HomeworkCard({ hw, canSubmit, onSubmit }: { hw: Homework; canSubmit: bo
         <CardFooter>
           <Button size="sm" variant={sub ? "outline" : "default"} onClick={onSubmit}>
             <SendIcon />
-            {sub ? "Replace answer" : "Hand in"}
+            {sub ? t("Replace answer") : t("Hand in")}
           </Button>
         </CardFooter>
       )}
@@ -484,24 +479,23 @@ function MyHomework() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Homework"
-        subtitle={user.role === "parent" ? "Your child's homework, what was handed in and the grades." : "Homework set for your class."}
+        title={t("Homework")}
+        subtitle={user.role === "parent" ? t("Your child's homework, what was handed in and the grades.") : t("Homework set for your class.")}
         actions={
           <>
             {select}
             <ToggleGroup type="single" variant="outline" size="sm" value={status} onValueChange={(v) => v && setStatus(v)}>
-              <ToggleGroupItem value="open">Open</ToggleGroupItem>
-              <ToggleGroupItem value="closed">Past due</ToggleGroupItem>
-              <ToggleGroupItem value="all">All</ToggleGroupItem>
+              <ToggleGroupItem value="open">{t("Open")}</ToggleGroupItem>
+              <ToggleGroupItem value="closed">{t("Past due")}</ToggleGroupItem>
+              <ToggleGroupItem value="all">{t("All")}</ToggleGroupItem>
             </ToggleGroup>
           </>
         }
       />
       {isLoading && <Skeleton className="h-40 w-full" />}
       {!isLoading && ready && rows.length === 0 && (
-        <EmptyState icon={BookCheckIcon} title={status === "open" ? "No open homework" : "No homework"}>
-          New homework appears here when a teacher sets it.
-        </EmptyState>
+        <EmptyState icon={BookCheckIcon} title={status === "open" ? t("No open homework") : t("No homework")}>
+          {t("New homework appears here when a teacher sets it.")}</EmptyState>
       )}
       <div className="grid gap-4 lg:grid-cols-2">
         {rows.map((hw) => (

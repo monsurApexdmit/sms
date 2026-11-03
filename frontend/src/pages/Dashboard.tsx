@@ -31,6 +31,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Skeleton } from "../components/ui/skeleton";
 import { cn } from "../lib/utils";
 import { fromUnix, initials, money } from "../utils";
+import { t, tn, tp } from "../i18n";
 
 interface StudentSummary {
   student_id: number;
@@ -80,16 +81,16 @@ function Stat({ label, value, icon: Icon, tone = "primary" }: { label: string; v
 }
 
 const COUNTS: Record<string, { label: string; icon: LucideIcon; tone: Tone }> = {
-  students: { label: "Students", icon: GraduationCapIcon, tone: "primary" },
-  teachers: { label: "Teachers", icon: PresentationIcon, tone: "info" },
-  parents: { label: "Parents", icon: UsersIcon, tone: "violet" },
-  present_today: { label: "Present today", icon: UserCheckIcon, tone: "success" },
-  absent_today: { label: "Absent today", icon: UserXIcon, tone: "danger" },
-  subjects: { label: "My subjects", icon: BookOpenIcon, tone: "info" },
-  online_exams: { label: "Online exams", icon: LaptopIcon, tone: "violet" },
-  books: { label: "Books", icon: BookOpenIcon, tone: "primary" },
-  copies_issued: { label: "Copies issued", icon: BookUpIcon, tone: "info" },
-  pending_requests: { label: "Pending requests", icon: ClipboardListIcon, tone: "warning" },
+  students: { label: t("Students"), icon: GraduationCapIcon, tone: "primary" },
+  teachers: { label: t("Teachers"), icon: PresentationIcon, tone: "info" },
+  parents: { label: t("Parents"), icon: UsersIcon, tone: "violet" },
+  present_today: { label: t("Present today"), icon: UserCheckIcon, tone: "success" },
+  absent_today: { label: t("Absent today"), icon: UserXIcon, tone: "danger" },
+  subjects: { label: t("My subjects"), icon: BookOpenIcon, tone: "info" },
+  online_exams: { label: t("Online exams"), icon: LaptopIcon, tone: "violet" },
+  books: { label: t("Books"), icon: BookOpenIcon, tone: "primary" },
+  copies_issued: { label: t("Copies issued"), icon: BookUpIcon, tone: "info" },
+  pending_requests: { label: t("Pending requests"), icon: ClipboardListIcon, tone: "warning" },
 };
 
 const GRID_COLS: Record<number, string> = {
@@ -110,20 +111,20 @@ function StudentCard({ s, currency }: { s: StudentSummary; currency: string }) {
         <div className="space-y-1">
           <CardTitle>{s.name}</CardTitle>
           <CardDescription className="flex flex-wrap items-center gap-2">
-            {s.roll && <Badge variant="secondary">Roll {s.roll}</Badge>}
+            {s.roll && <Badge variant="secondary">{tn("Roll {roll}", { roll: s.roll })}</Badge>}
             {s.unpaid_invoices > 0 && (
               <Badge className="bg-warning/20 border-transparent text-amber-700 dark:text-amber-300">
-                {s.unpaid_invoices} unpaid invoice{s.unpaid_invoices === 1 ? "" : "s"}
+                {tp(s.unpaid_invoices, "{count} unpaid invoice", "{count} unpaid invoices")}
               </Badge>
             )}
           </CardDescription>
         </div>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <MiniStat label="Present (month)" value={s.attendance_this_month.present} icon={UserCheckIcon} tone="success" />
-        <MiniStat label="Absent (month)" value={s.attendance_this_month.absent} icon={UserXIcon} tone="danger" />
-        <MiniStat label="Amount due" value={money(s.due, currency)} icon={CreditCardIcon} tone="warning" />
-        <MiniStat label="Online exams" value={s.upcoming_online_exams} icon={LaptopIcon} tone="violet" />
+        <MiniStat label={t("Present (month)")} value={s.attendance_this_month.present} icon={UserCheckIcon} tone="success" />
+        <MiniStat label={t("Absent (month)")} value={s.attendance_this_month.absent} icon={UserXIcon} tone="danger" />
+        <MiniStat label={t("Amount due")} value={money(s.due, currency)} icon={CreditCardIcon} tone="warning" />
+        <MiniStat label={t("Online exams")} value={s.upcoming_online_exams} icon={LaptopIcon} tone="violet" />
       </CardContent>
     </Card>
   );
@@ -169,7 +170,7 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHeader title={`Welcome, ${user.name}`} subtitle={data ? `Academic year ${data.running_year}` : undefined} />
+      <PageHeader title={t("Welcome, {name}", { name: user.name })} subtitle={data ? t("Academic year {running_year}", { running_year: data.running_year }) : undefined} />
       <div className="space-y-6">
         {isLoading && <StatSkeletons />}
         {user.role === "admin" && <TransportExpiryAlert />}
@@ -184,9 +185,9 @@ export function DashboardPage() {
         )}
         {data?.finance && (
           <div className="grid gap-4 sm:grid-cols-3">
-            <Stat label="Income this year" value={money(data.finance.income, currency)} icon={TrendingUpIcon} tone="success" />
-            <Stat label="Expenses this year" value={money(data.finance.expense, currency)} icon={TrendingDownIcon} tone="danger" />
-            <Stat label="Unpaid invoices" value={data.finance.unpaid_invoices} icon={ReceiptIcon} tone="warning" />
+            <Stat label={t("Income this year")} value={money(data.finance.income, currency)} icon={TrendingUpIcon} tone="success" />
+            <Stat label={t("Expenses this year")} value={money(data.finance.expense, currency)} icon={TrendingDownIcon} tone="danger" />
+            <Stat label={t("Unpaid invoices")} value={data.finance.unpaid_invoices} icon={ReceiptIcon} tone="warning" />
           </div>
         )}
         {data?.student && <StudentCard s={data.student} currency={currency} />}
@@ -197,9 +198,8 @@ export function DashboardPage() {
           </div>
         ))}
         {data?.children?.length === 0 && (
-          <EmptyState icon={UsersIcon} title="No children linked yet">
-            No children are linked to your account yet.
-          </EmptyState>
+          <EmptyState icon={UsersIcon} title={t("No children linked yet")}>
+            {t("No children are linked to your account yet.")}</EmptyState>
         )}
 
         <div className="grid gap-4 lg:grid-cols-12">
@@ -207,8 +207,7 @@ export function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MegaphoneIcon className="text-muted-foreground size-4" />
-                Latest notices
-              </CardTitle>
+                {t("Latest notices")}</CardTitle>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -223,7 +222,7 @@ export function DashboardPage() {
                   ))}
                 </ul>
               ) : (
-                <EmptyState icon={InboxIcon} title="No notices" className="p-6" />
+                <EmptyState icon={InboxIcon} title={t("No notices")} className="p-6" />
               )}
             </CardContent>
           </Card>
@@ -231,8 +230,7 @@ export function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CalendarDaysIcon className="text-muted-foreground size-4" />
-                Upcoming events
-              </CardTitle>
+                {t("Upcoming events")}</CardTitle>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -250,7 +248,7 @@ export function DashboardPage() {
                   ))}
                 </ul>
               ) : (
-                <EmptyState icon={CalendarIcon} title="No upcoming events" className="p-6" />
+                <EmptyState icon={CalendarIcon} title={t("No upcoming events")} className="p-6" />
               )}
             </CardContent>
           </Card>

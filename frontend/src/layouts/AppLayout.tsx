@@ -34,6 +34,7 @@ import {
 } from "../components/ui/sidebar";
 import { navFor } from "../nav";
 import { initials, titleCase } from "../utils";
+import { t, tn } from "../i18n";
 
 export function AppLayout() {
   const { user, loading } = useAuth();
@@ -52,7 +53,7 @@ export function AppLayout() {
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
           <span className="truncate font-medium">{settings.data?.system_title || settings.data?.system_name}</span>
           <div className="ml-auto flex items-center gap-2">
-            {settings.data?.running_year && <Badge variant="secondary">Session {settings.data.running_year}</Badge>}
+            {settings.data?.running_year && <Badge variant="secondary">{tn("Session {running_year}", { running_year: settings.data.running_year })}</Badge>}
             <NotificationBell />
           </div>
         </header>
@@ -91,8 +92,8 @@ function AppSidebar() {
                   )}
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{settings.data?.system_name || "School"}</span>
-                  <span className="text-muted-foreground truncate text-xs">{titleCase(user.role)} portal</span>
+                  <span className="truncate font-semibold">{settings.data?.system_name || t("School")}</span>
+                  <span className="text-muted-foreground truncate text-xs">{tn("{titleCase} portal", { titleCase: titleCase(user.role) })}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -155,8 +156,7 @@ function AppSidebar() {
                 <DropdownMenuItem asChild>
                   <Link to="/app/profile">
                     <UserIcon />
-                    My profile
-                  </Link>
+                    {t("My profile")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   variant="destructive"
@@ -166,8 +166,7 @@ function AppSidebar() {
                   }}
                 >
                   <LogOutIcon />
-                  Log out
-                </DropdownMenuItem>
+                  {t("Log out")}</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

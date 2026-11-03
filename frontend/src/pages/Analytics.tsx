@@ -44,6 +44,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { cn } from "../lib/utils";
 import { money, toOptions } from "../utils";
+import { t as tr, tn } from "../i18n";
 
 // --- shared pieces --------------------------------------------------------------------
 
@@ -90,7 +91,7 @@ function Legend({ items }: { items: { label: string; color: string }[] }) {
 function TableView({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
   return (
     <details className="text-sm">
-      <summary className="text-muted-foreground cursor-pointer text-xs">Table view</summary>
+      <summary className="text-muted-foreground cursor-pointer text-xs">{tr("Table view")}</summary>
       <Table className="mt-2">
         <TableHeader>
           <TableRow>{head.map((h, i) => <TableHead key={h} className={cn(i > 0 && "text-right")}>{h}</TableHead>)}</TableRow>
@@ -136,9 +137,9 @@ function Meter({ value, good = 90, warn = 75 }: { value: number | null; good?: n
 }
 
 const LEVEL: Record<RiskStudent["level"], [string, string, LucideIcon]> = {
-  high: ["High", "bg-destructive/10 text-destructive", OctagonAlertIcon],
-  medium: ["Medium", "bg-warning/20 text-amber-700 dark:text-amber-300", TriangleAlertIcon],
-  low: ["Low", "bg-muted text-muted-foreground", CircleAlertIcon],
+  high: [tr("High"), "bg-destructive/10 text-destructive", OctagonAlertIcon],
+  medium: [tr("Medium"), "bg-warning/20 text-amber-700 dark:text-amber-300", TriangleAlertIcon],
+  low: [tr("Low"), "bg-muted text-muted-foreground", CircleAlertIcon],
 };
 
 function LevelBadge({ level, score }: { level: RiskStudent["level"]; score: number }) {
@@ -162,8 +163,8 @@ function TileSkeleton() {
 function ClassFilter({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
   const classes = useClasses();
   return (
-    <Field label="Class" className="w-48">
-      <Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={value} onChange={onChange} clearable placeholder="All my classes" />
+    <Field label={tr("Class")} className="w-48">
+      <Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={value} onChange={onChange} clearable placeholder={tr("All my classes")} />
     </Field>
   );
 }
@@ -186,9 +187,9 @@ function AtRiskTab() {
       ) : (
         data && (
           <div className="grid gap-4 sm:grid-cols-3">
-            <Tile label="High risk" value={data.counts.high} hint="Score 50 or more" icon={OctagonAlertIcon} tone="destructive" />
-            <Tile label="Medium risk" value={data.counts.medium} hint="Score 25–49" icon={TriangleAlertIcon} tone="warning" />
-            <Tile label="Low concern" value={data.counts.low} hint="One minor signal" icon={CircleAlertIcon} />
+            <Tile label={tr("High risk")} value={data.counts.high} hint={tr("Score 50 or more")} icon={OctagonAlertIcon} tone="destructive" />
+            <Tile label={tr("Medium risk")} value={data.counts.medium} hint={tr("Score 25–49")} icon={TriangleAlertIcon} tone="warning" />
+            <Tile label={tr("Low concern")} value={data.counts.low} hint={tr("One minor signal")} icon={CircleAlertIcon} />
           </div>
         )
       )}
@@ -196,24 +197,24 @@ function AtRiskTab() {
         <Table className="min-w-[900px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead className="w-32">Risk</TableHead>
-              <TableHead>Why</TableHead>
-              <TableHead className="w-24 text-right">Attendance</TableHead>
-              <TableHead className="w-28 text-right">Latest exam</TableHead>
-              <TableHead className="w-24 text-right">Homework</TableHead>
+              <TableHead>{tr("Student")}</TableHead>
+              <TableHead className="w-32">{tr("Risk")}</TableHead>
+              <TableHead>{tr("Why")}</TableHead>
+              <TableHead className="w-24 text-right">{tr("Attendance")}</TableHead>
+              <TableHead className="w-28 text-right">{tr("Latest exam")}</TableHead>
+              <TableHead className="w-24 text-right">{tr("Homework")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={6} emptyText={isError ? "You can only see classes you teach" : "No students at risk"} />
+            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={6} emptyText={isError ? tr("You can only see classes you teach") : tr("No students at risk")} />
             {rows.map((r) => (
               <TableRow key={r.student_id} className="align-top">
                 <TableCell>
                   <Link to={`/app/students/${r.student_id}/records`} className="font-medium hover:underline">{r.name}</Link>
                   <div className="text-muted-foreground text-xs">
                     {r.class_name}
-                    {r.section_name && ` · ${r.section_name}`}
-                    {r.roll ? ` · Roll ${r.roll}` : ""}
+                    {r.section_name && " " + tr("· {section_name}", { section_name: r.section_name })}
+                    {r.roll ? " " + tr("· Roll {roll}", { roll: r.roll }) : ""}
                   </div>
                 </TableCell>
                 <TableCell><LevelBadge level={r.level} score={r.score} /></TableCell>
@@ -225,7 +226,7 @@ function AtRiskTab() {
                 <TableCell className="text-right tabular-nums">{fmtPct(r.attendance_pct)}</TableCell>
                 <TableCell className="text-right tabular-nums">
                   {fmtPct(r.latest_exam_pct)}
-                  {r.previous_exam_pct !== null && <div className="text-muted-foreground text-xs">was {fmtPct(r.previous_exam_pct)}</div>}
+                  {r.previous_exam_pct !== null && <div className="text-muted-foreground text-xs">{tn("was {fmtPct}", { fmtPct: fmtPct(r.previous_exam_pct) })}</div>}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">{r.homework_due ? fmtPct(r.homework_rate) : <Dash />}</TableCell>
               </TableRow>
@@ -235,9 +236,7 @@ function AtRiskTab() {
         <Pager page={page} pageSize={pageSize} total={data?.total ?? 0} onPage={setPage} />
       </Card>
       <p className="text-muted-foreground text-xs">
-        Score out of 100: attendance below 75% over the last 30 days (30, or 40 when below 60%), failing subjects in the latest exam (20 + 5 each),
-        results down 10+ points (15), overdue fees (10), under 60% of homework handed in (10), 10+ days of leave (5). High is 50 or more.
-      </p>
+        {tr("Score out of 100: attendance below 75% over the last 30 days (30, or 40 when below 60%), failing subjects in the latest exam (20 + 5 each), results down 10+ points (15), overdue fees (10), under 60% of homework handed in (10), 10+ days of leave (5). High is 50 or more.")}</p>
     </div>
   );
 }
@@ -256,17 +255,17 @@ function FeesTab() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile label={`Billed in ${data.year}`} value={m(data.billed)} icon={WalletIcon} />
-        <Tile label="Collected" value={m(data.collected)} icon={BanknoteIcon} tone="success" />
-        <Tile label="Collection rate" value={fmtPct(data.collection_rate)} hint={`${m(data.outstanding)} outstanding`} icon={PercentIcon} />
-        <Tile label="Overdue" value={m(data.overdue)} hint="Past the due date, all years" icon={CircleAlertIcon} tone="destructive" />
+        <Tile label={tr("Billed in {year}", { year: data.year })} value={m(data.billed)} icon={WalletIcon} />
+        <Tile label={tr("Collected")} value={m(data.collected)} icon={BanknoteIcon} tone="success" />
+        <Tile label={tr("Collection rate")} value={fmtPct(data.collection_rate)} hint={tr("{m} outstanding", { m: m(data.outstanding) })} icon={PercentIcon} />
+        <Tile label={tr("Overdue")} value={m(data.overdue)} hint={tr("Past the due date, all years")} icon={CircleAlertIcon} tone="destructive" />
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <ChartCard
-            title="Billed and collected by month"
-            legend={<Legend items={[{ label: "Billed", color: SERIES[0] }, { label: "Collected", color: SERIES[1] }]} />}
-            table={<TableView head={["Month", "Billed", "Collected"]} rows={data.monthly.map((r) => [monthLabel(r.month), m(r.billed), m(r.collected)])} />}
+            title={tr("Billed and collected by month")}
+            legend={<Legend items={[{ label: tr("Billed"), color: SERIES[0] }, { label: tr("Collected"), color: SERIES[1] }]} />}
+            table={<TableView head={[tr("Month"), tr("Billed"), tr("Collected")]} rows={data.monthly.map((r) => [monthLabel(r.month), m(r.billed), m(r.collected)])} />}
           >
             <ResponsiveContainer>
               <BarChart data={data.monthly} barGap={2} barCategoryGap="25%">
@@ -274,23 +273,23 @@ function FeesTab() {
                 <XAxis dataKey="month" {...AXIS} tickFormatter={(v: string) => dayjs(`${v}-01`).format("MMM")} />
                 <YAxis {...AXIS} width={48} tickFormatter={(v: number) => compact.format(v)} />
                 <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.5 }} content={(p) => <ChartTip {...p} format={m} labelFormat={monthLabel} />} />
-                <Bar dataKey="billed" name="Billed" fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={24} />
-                <Bar dataKey="collected" name="Collected" fill={SERIES[1]} radius={[4, 4, 0, 0]} maxBarSize={24} />
+                <Bar dataKey="billed" name={tr("Billed")} fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={24} />
+                <Bar dataKey="collected" name={tr("Collected")} fill={SERIES[1]} radius={[4, 4, 0, 0]} maxBarSize={24} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
         </div>
         <ChartCard
-          title="Overdue by days late"
-          table={<TableView head={["Days late", "Amount", "Invoices"]} rows={data.ageing.map((b) => [b.bucket, m(b.amount), b.invoices])} />}
+          title={tr("Overdue by days late")}
+          table={<TableView head={[tr("Days late"), tr("Amount"), tr("Invoices")]} rows={data.ageing.map((b) => [b.bucket, m(b.amount), b.invoices])} />}
         >
           <ResponsiveContainer>
             <BarChart data={data.ageing} margin={{ top: 20 }}>
               <CartesianGrid vertical={false} stroke="var(--border)" />
               <XAxis dataKey="bucket" {...AXIS} />
               <YAxis {...AXIS} width={48} tickFormatter={(v: number) => compact.format(v)} />
-              <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.5 }} content={(p) => <ChartTip {...p} format={m} labelFormat={(l) => `${l} days late`} />} />
-              <Bar dataKey="amount" name="Overdue" fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={24}>
+              <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.5 }} content={(p) => <ChartTip {...p} format={m} labelFormat={(l) => tr("{l} days late", { l })} />} />
+              <Bar dataKey="amount" name={tr("Overdue")} fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={24}>
                 <LabelList dataKey="amount" position="top" fill="var(--muted-foreground)" fontSize={12} formatter={(v: unknown) => (Number(v) ? compact.format(Number(v)) : "")} />
               </Bar>
             </BarChart>
@@ -300,17 +299,17 @@ function FeesTab() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="gap-0 overflow-hidden py-0">
-          <CardHeader className="py-4"><CardTitle className="text-base">Outstanding by class</CardTitle></CardHeader>
+          <CardHeader className="py-4"><CardTitle className="text-base">{tr("Outstanding by class")}</CardTitle></CardHeader>
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Class</TableHead>
-                <TableHead className="text-right">Students owing</TableHead>
-                <TableHead className="text-right">Outstanding</TableHead>
+                <TableHead>{tr("Class")}</TableHead>
+                <TableHead className="text-right">{tr("Students owing")}</TableHead>
+                <TableHead className="text-right">{tr("Outstanding")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableState empty={data.by_class.length === 0} colSpan={3} emptyText="Nothing outstanding" />
+              <TableState empty={data.by_class.length === 0} colSpan={3} emptyText={tr("Nothing outstanding")} />
               {data.by_class.map((c) => (
                 <TableRow key={c.class_id}>
                   <TableCell className="font-medium">{c.class_name || <Dash />}</TableCell>
@@ -322,23 +321,23 @@ function FeesTab() {
           </Table>
         </Card>
         <Card className="gap-0 overflow-hidden py-0">
-          <CardHeader className="py-4"><CardTitle className="text-base">Fee plan instalments</CardTitle></CardHeader>
+          <CardHeader className="py-4"><CardTitle className="text-base">{tr("Fee plan instalments")}</CardTitle></CardHeader>
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Instalment</TableHead>
-                <TableHead>Due</TableHead>
-                <TableHead className="text-right">Billed</TableHead>
-                <TableHead className="w-36 text-right">Collected</TableHead>
+                <TableHead>{tr("Instalment")}</TableHead>
+                <TableHead>{tr("Due")}</TableHead>
+                <TableHead className="text-right">{tr("Billed")}</TableHead>
+                <TableHead className="w-36 text-right">{tr("Collected")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableState empty={data.instalments.length === 0} colSpan={4} emptyText="No invoices generated from fee plans yet" />
+              <TableState empty={data.instalments.length === 0} colSpan={4} emptyText={tr("No invoices generated from fee plans yet")} />
               {data.instalments.map((i) => (
                 <TableRow key={i.fee_instalment_id}>
                   <TableCell>
                     <div className="font-medium">{i.instalment}</div>
-                    <div className="text-muted-foreground text-xs">{i.plan} · {i.invoices} invoices</div>
+                    <div className="text-muted-foreground text-xs">{tn("{plan} · {invoices} invoices", { plan: i.plan, invoices: i.invoices })}</div>
                   </TableCell>
                   <TableCell>{dayjs(i.due_date).format("DD MMM YYYY")}</TableCell>
                   <TableCell className="text-right tabular-nums">{m(i.billed)}</TableCell>
@@ -353,9 +352,9 @@ function FeesTab() {
       <Card className="gap-0 overflow-hidden py-0">
         <div className="flex flex-wrap items-end justify-between gap-3 border-b p-3">
           <div>
-            <div className="font-semibold">Defaulters</div>
+            <div className="font-semibold">{tr("Defaulters")}</div>
             <div className="text-muted-foreground text-sm">
-              {defaulters.data ? `${defaulters.data.total} students owe ${m(defaulters.data.amount)} past the due date` : " "}
+              {defaulters.data ? tr("{total} students owe {m} past the due date", { total: defaulters.data.total, m: m(defaulters.data.amount) }) : " "}
             </div>
           </div>
           <div className="flex flex-wrap items-end gap-3">
@@ -366,16 +365,16 @@ function FeesTab() {
         <Table className="min-w-[760px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead>Parent phone</TableHead>
-              <TableHead className="text-right">Invoices</TableHead>
-              <TableHead className="text-right">Oldest due</TableHead>
-              <TableHead className="text-right">Days late</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+              <TableHead>{tr("Student")}</TableHead>
+              <TableHead>{tr("Parent phone")}</TableHead>
+              <TableHead className="text-right">{tr("Invoices")}</TableHead>
+              <TableHead className="text-right">{tr("Oldest due")}</TableHead>
+              <TableHead className="text-right">{tr("Days late")}</TableHead>
+              <TableHead className="text-right">{tr("Amount")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={defaulters.isLoading} empty={!defaulters.isLoading && !defaulters.data?.items.length} colSpan={6} emptyText="No overdue fees" />
+            <TableState loading={defaulters.isLoading} empty={!defaulters.isLoading && !defaulters.data?.items.length} colSpan={6} emptyText={tr("No overdue fees")} />
             {defaulters.data?.items.map((d) => (
               <TableRow key={d.student_id}>
                 <TableCell>
@@ -408,26 +407,26 @@ function AttendanceTab() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end gap-3">
-        <Field label="Month" htmlFor="an-month" className="w-44">
+        <Field label={tr("Month")} htmlFor="an-month" className="w-44">
           <Input id="an-month" type="month" value={month} max={dayjs().format("YYYY-MM")} onChange={(e) => setMonth(e.target.value)} />
         </Field>
         <ClassFilter value={classId} onChange={setClassId} />
       </div>
-      {isError && <EmptyState title="You can only see classes you teach" />}
+      {isError && <EmptyState title={tr("You can only see classes you teach")} />}
       {isLoading || !data ? (
         !isError && <TileSkeleton />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Tile label={`Attendance in ${monthLabel(data.month)}`} value={fmtPct(data.rate)} hint="Present out of days marked" icon={CalendarCheckIcon} />
-            <Tile label="Present today" value={data.today.present} hint={`of ${data.today.enrolled} enrolled`} icon={UserCheckIcon} tone="success" />
-            <Tile label="Absent today" value={data.today.absent} icon={UserXIcon} tone="destructive" />
-            <Tile label="Not marked today" value={data.today.not_marked} icon={ClipboardListIcon} tone="warning" />
+            <Tile label={tr("Attendance in {monthLabel}", { monthLabel: monthLabel(data.month) })} value={fmtPct(data.rate)} hint={tr("Present out of days marked")} icon={CalendarCheckIcon} />
+            <Tile label={tr("Present today")} value={data.today.present} hint={tr("of {enrolled} enrolled", { enrolled: data.today.enrolled })} icon={UserCheckIcon} tone="success" />
+            <Tile label={tr("Absent today")} value={data.today.absent} icon={UserXIcon} tone="destructive" />
+            <Tile label={tr("Not marked today")} value={data.today.not_marked} icon={ClipboardListIcon} tone="warning" />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard
-              title="Attendance rate, last 6 months"
-              table={<TableView head={["Month", "Attendance"]} rows={data.trend.map((t) => [monthLabel(t.month), fmtPct(t.rate)])} />}
+              title={tr("Attendance rate, last 6 months")}
+              table={<TableView head={[tr("Month"), tr("Attendance")]} rows={data.trend.map((t) => [monthLabel(t.month), fmtPct(t.rate)])} />}
             >
               <ResponsiveContainer>
                 <LineChart data={data.trend} margin={{ top: 12, right: 16 }}>
@@ -437,7 +436,7 @@ function AttendanceTab() {
                   <Tooltip cursor={{ stroke: "var(--border)" }} content={(p) => <ChartTip {...p} format={(v) => `${v}%`} labelFormat={monthLabel} />} />
                   <Line
                     dataKey="rate"
-                    name="Attendance"
+                    name={tr("Attendance")}
                     stroke={SERIES[0]}
                     strokeWidth={2}
                     connectNulls
@@ -449,19 +448,19 @@ function AttendanceTab() {
             </ChartCard>
             <Card className="gap-0 overflow-hidden py-0">
               <CardHeader className="py-4">
-                <CardTitle className="text-base">Chronic absentees</CardTitle>
-                <CardDescription>Below {data.threshold}% this month, with at least 3 days marked</CardDescription>
+                <CardTitle className="text-base">{tr("Chronic absentees")}</CardTitle>
+                <CardDescription>{tn("Below {threshold}% this month, with at least 3 days marked", { threshold: data.threshold })}</CardDescription>
               </CardHeader>
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead className="text-right">Absent</TableHead>
-                    <TableHead className="w-36 text-right">Attendance</TableHead>
+                    <TableHead>{tr("Student")}</TableHead>
+                    <TableHead className="text-right">{tr("Absent")}</TableHead>
+                    <TableHead className="w-36 text-right">{tr("Attendance")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableState empty={data.chronic.length === 0} colSpan={3} emptyText="Nobody below the threshold" />
+                  <TableState empty={data.chronic.length === 0} colSpan={3} emptyText={tr("Nobody below the threshold")} />
                   {data.chronic.map((c) => (
                     <TableRow key={c.student_id}>
                       <TableCell>
@@ -477,21 +476,21 @@ function AttendanceTab() {
             </Card>
           </div>
           <Card className="gap-0 overflow-hidden py-0">
-            <CardHeader className="py-4"><CardTitle className="text-base">By class and section</CardTitle></CardHeader>
+            <CardHeader className="py-4"><CardTitle className="text-base">{tr("By class and section")}</CardTitle></CardHeader>
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead>Class</TableHead>
-                  <TableHead className="text-right">Present</TableHead>
-                  <TableHead className="text-right">Absent</TableHead>
-                  <TableHead className="w-40 text-right">Attendance</TableHead>
+                  <TableHead>{tr("Class")}</TableHead>
+                  <TableHead className="text-right">{tr("Present")}</TableHead>
+                  <TableHead className="text-right">{tr("Absent")}</TableHead>
+                  <TableHead className="w-40 text-right">{tr("Attendance")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableState empty={data.sections.length === 0} colSpan={4} emptyText="No attendance taken this month" />
+                <TableState empty={data.sections.length === 0} colSpan={4} emptyText={tr("No attendance taken this month")} />
                 {data.sections.map((s) => (
                   <TableRow key={`${s.class_id}-${s.section_id}`}>
-                    <TableCell className="font-medium">{s.class_name}{s.section_name && ` · ${s.section_name}`}</TableCell>
+                    <TableCell className="font-medium">{s.class_name}{s.section_name && " " + tr("· {section_name}", { section_name: s.section_name })}</TableCell>
                     <TableCell className="text-right tabular-nums">{s.present}</TableCell>
                     <TableCell className="text-right tabular-nums">{s.absent}</TableCell>
                     <TableCell><Meter value={s.rate} /></TableCell>
@@ -514,7 +513,7 @@ function Ranked({ title, rows }: { title: string; rows: ExamAnalytics["top"] }) 
       <CardHeader className="py-4"><CardTitle className="text-base">{title}</CardTitle></CardHeader>
       <Table>
         <TableBody>
-          <TableState empty={rows.length === 0} colSpan={3} emptyText="Not enough complete results" />
+          <TableState empty={rows.length === 0} colSpan={3} emptyText={tr("Not enough complete results")} />
           {rows.map((r) => (
             <TableRow key={r.student_id}>
               <TableCell>
@@ -542,24 +541,24 @@ function ExamsTab() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end gap-3">
-        <Field label="Exam" className="w-52">
-          <Combobox data={toOptions(data?.exams, "exam_id", "name")} value={examId ?? current} onChange={setExamId} placeholder="Latest exam" />
+        <Field label={tr("Exam")} className="w-52">
+          <Combobox data={toOptions(data?.exams, "exam_id", "name")} value={examId ?? current} onChange={setExamId} placeholder={tr("Latest exam")} />
         </Field>
         <ClassFilter value={classId} onChange={setClassId} />
       </div>
-      {isError && <EmptyState title="You can only see classes you teach" />}
+      {isError && <EmptyState title={tr("You can only see classes you teach")} />}
       {isLoading ? (
         <TileSkeleton />
       ) : data && !data.exam_id ? (
-        <EmptyState icon={ClipboardListIcon} title="No marks entered this year yet" />
+        <EmptyState icon={ClipboardListIcon} title={tr("No marks entered this year yet")} />
       ) : (
         data && (
           <>
             <div className="grid gap-4 lg:grid-cols-2">
               <ChartCard
-                title="Average result by class"
-                description="Students with every mark entered"
-                table={<TableView head={["Class", "Average", "Pass rate", "Complete"]} rows={data.classes.map((c) => [c.class_name, fmtPct(c.average), fmtPct(c.pass_rate), `${c.complete} of ${c.students}`])} />}
+                title={tr("Average result by class")}
+                description={tr("Students with every mark entered")}
+                table={<TableView head={[tr("Class"), tr("Average"), tr("Pass rate"), tr("Complete")]} rows={data.classes.map((c) => [c.class_name, fmtPct(c.average), fmtPct(c.pass_rate), tr("{complete} of {students}", { complete: c.complete, students: c.students })])} />}
               >
                 <ResponsiveContainer>
                   <BarChart data={data.classes} margin={{ top: 20 }}>
@@ -567,43 +566,43 @@ function ExamsTab() {
                     <XAxis dataKey="class_name" {...AXIS} />
                     <YAxis {...AXIS} width={40} domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(v: number) => `${v}%`} />
                     <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.5 }} content={(p) => <ChartTip {...p} format={(v) => `${v}%`} />} />
-                    <Bar dataKey="average" name="Average" fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={24} />
+                    <Bar dataKey="average" name={tr("Average")} fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={24} />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>
               <ChartCard
-                title="Grade distribution"
-                description="Every subject mark in the exam"
-                table={<TableView head={["Grade", "Marks"]} rows={data.grades.map((g) => [g.grade, g.count])} />}
+                title={tr("Grade distribution")}
+                description={tr("Every subject mark in the exam")}
+                table={<TableView head={[tr("Grade"), tr("Marks")]} rows={data.grades.map((g) => [g.grade, g.count])} />}
               >
                 <ResponsiveContainer>
                   <BarChart data={data.grades} margin={{ top: 20 }}>
                     <CartesianGrid vertical={false} stroke="var(--border)" />
                     <XAxis dataKey="grade" {...AXIS} />
                     <YAxis {...AXIS} width={40} allowDecimals={false} />
-                    <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.5 }} content={(p) => <ChartTip {...p} format={(v) => String(v)} labelFormat={(l) => `Grade ${l}`} />} />
-                    <Bar dataKey="count" name="Marks" fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={24} />
+                    <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.5 }} content={(p) => <ChartTip {...p} format={(v) => String(v)} labelFormat={(l) => tr("Grade {l}", { l })} />} />
+                    <Bar dataKey="count" name={tr("Marks")} fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={24} />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>
             </div>
             <Card className="gap-0 overflow-hidden py-0">
               <CardHeader className="py-4">
-                <CardTitle className="text-base">Subjects</CardTitle>
-                <CardDescription>Lowest pass rate first</CardDescription>
+                <CardTitle className="text-base">{tr("Subjects")}</CardTitle>
+                <CardDescription>{tr("Lowest pass rate first")}</CardDescription>
               </CardHeader>
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Class</TableHead>
-                    <TableHead className="text-right">Marks</TableHead>
-                    <TableHead className="text-right">Average</TableHead>
-                    <TableHead className="w-40 text-right">Pass rate</TableHead>
+                    <TableHead>{tr("Subject")}</TableHead>
+                    <TableHead>{tr("Class")}</TableHead>
+                    <TableHead className="text-right">{tr("Marks")}</TableHead>
+                    <TableHead className="text-right">{tr("Average")}</TableHead>
+                    <TableHead className="w-40 text-right">{tr("Pass rate")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableState empty={data.subjects.length === 0} colSpan={5} emptyText="No marks" />
+                  <TableState empty={data.subjects.length === 0} colSpan={5} emptyText={tr("No marks")} />
                   {data.subjects.map((s) => (
                     <TableRow key={`${s.class_id}-${s.subject_id}`}>
                       <TableCell className="font-medium">{s.subject}</TableCell>
@@ -617,8 +616,8 @@ function ExamsTab() {
               </Table>
             </Card>
             <div className="grid gap-4 lg:grid-cols-2">
-              <Ranked title="Top performers" rows={data.top} />
-              <Ranked title="Need the most help" rows={data.bottom} />
+              <Ranked title={tr("Top performers")} rows={data.top} />
+              <Ranked title={tr("Need the most help")} rows={data.bottom} />
             </div>
           </>
         )
@@ -637,19 +636,19 @@ function WorkloadTab() {
       <Table className="min-w-[860px]">
         <TableHeader className="bg-muted/50">
           <TableRow>
-            <TableHead>Teacher</TableHead>
-            <TableHead className="text-right">Periods / week</TableHead>
-            <TableHead className="text-right">Subjects</TableHead>
-            <TableHead className="text-right">Classes</TableHead>
-            <TableHead className="text-right">Homework set</TableHead>
-            <TableHead className="text-right">To mark</TableHead>
-            <TableHead className="text-right">Meetings</TableHead>
-            <TableHead className="text-right">Leave days</TableHead>
-            <TableHead className="w-36 text-right">Attendance</TableHead>
+            <TableHead>{tr("Teacher")}</TableHead>
+            <TableHead className="text-right">{tr("Periods / week")}</TableHead>
+            <TableHead className="text-right">{tr("Subjects")}</TableHead>
+            <TableHead className="text-right">{tr("Classes")}</TableHead>
+            <TableHead className="text-right">{tr("Homework set")}</TableHead>
+            <TableHead className="text-right">{tr("To mark")}</TableHead>
+            <TableHead className="text-right">{tr("Meetings")}</TableHead>
+            <TableHead className="text-right">{tr("Leave days")}</TableHead>
+            <TableHead className="w-36 text-right">{tr("Attendance")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={9} emptyText="No teachers" />
+          <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={9} emptyText={tr("No teachers")} />
           {rows.map((t) => (
             <TableRow key={t.teacher_id}>
               <TableCell className="font-medium">{t.name}</TableCell>
@@ -674,11 +673,11 @@ function WorkloadTab() {
 // --- page -----------------------------------------------------------------------------------------
 
 const TABS = [
-  { value: "risk", label: "At risk", roles: ["admin", "teacher"], body: <AtRiskTab /> },
-  { value: "fees", label: "Fees", roles: ["admin", "accountant"], body: <FeesTab /> },
-  { value: "attendance", label: "Attendance", roles: ["admin", "teacher"], body: <AttendanceTab /> },
-  { value: "exams", label: "Exams", roles: ["admin", "teacher"], body: <ExamsTab /> },
-  { value: "workload", label: "Workload", roles: ["admin", "teacher"], body: <WorkloadTab /> },
+  { value: "risk", label: tr("At risk"), roles: ["admin", "teacher"], body: <AtRiskTab /> },
+  { value: "fees", label: tr("Fees"), roles: ["admin", "accountant"], body: <FeesTab /> },
+  { value: "attendance", label: tr("Attendance"), roles: ["admin", "teacher"], body: <AttendanceTab /> },
+  { value: "exams", label: tr("Exams"), roles: ["admin", "teacher"], body: <ExamsTab /> },
+  { value: "workload", label: tr("Workload"), roles: ["admin", "teacher"], body: <WorkloadTab /> },
 ];
 
 export function AnalyticsPage() {
@@ -687,8 +686,8 @@ export function AnalyticsPage() {
   return (
     <>
       <PageHeader
-        title="Analytics"
-        subtitle={user.role === "teacher" ? "Your classes and your own workload, for the running year." : "Students who need attention, fee collection, attendance, results and workload for the running year."}
+        title={tr("Analytics")}
+        subtitle={user.role === "teacher" ? tr("Your classes and your own workload, for the running year.") : tr("Students who need attention, fee collection, attendance, results and workload for the running year.")}
       />
       <Tabs defaultValue={tabs[0]?.value} className="gap-6">
         <TabsList>

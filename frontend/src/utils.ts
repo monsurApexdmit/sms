@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 
+import { intlLocale, tDynamic } from "./i18n";
+
 /** Legacy tables store unix seconds, often as strings. */
 export function fromUnix(value: string | number | null | undefined, format = "DD MMM YYYY"): string {
   const n = Number(value);
@@ -10,14 +12,15 @@ export function fromUnix(value: string | number | null | undefined, format = "DD
 export function money(value: string | number | null | undefined, currency = "usd"): string {
   const n = Number(value ?? 0);
   try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: currency.toUpperCase() }).format(n);
+    return new Intl.NumberFormat(intlLocale(), { style: "currency", currency: currency.toUpperCase() }).format(n);
   } catch {
     return `${n.toFixed(2)} ${currency.toUpperCase()}`;
   }
 }
 
+/** Shows an API value such as "partially_paid" as "Partially Paid", translated when the catalog has that text (see i18n/dynamic.ts). */
 export function titleCase(value: string): string {
-  return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return tDynamic(value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
 }
 
 export const toOptions = <T,>(items: T[] | undefined, value: keyof T, label: keyof T) =>

@@ -2,6 +2,7 @@ import { useClasses, useExams, useSections, useSubjects } from "../api/hooks";
 import { toOptions } from "../utils";
 import { Combobox } from "./combobox";
 import { Field } from "./field";
+import { t } from "../i18n";
 
 export interface Selection {
   classId: string | null;
@@ -31,43 +32,43 @@ export function ClassPicker({ value, onChange, withSection = true, withSubject, 
   return (
     <div className="no-print flex flex-wrap items-end gap-3">
       {withExam && (
-        <Field label="Exam" className="w-52">
+        <Field label={t("Exam")} className="w-52">
           <Combobox
             data={toOptions(exams.data?.items, "exam_id", "name")}
             value={value.examId ?? null}
             onChange={(examId) => onChange({ ...value, examId })}
-            placeholder="Choose exam"
+            placeholder={t("Choose exam")}
           />
         </Field>
       )}
-      <Field label="Class" className="w-44">
+      <Field label={t("Class")} className="w-44">
         <Combobox
           data={toOptions(classes.data?.items, "class_id", "name")}
           value={value.classId}
           onChange={(classId) => onChange({ ...value, classId, sectionId: null, subjectId: null })}
-          placeholder="Choose class"
+          placeholder={t("Choose class")}
         />
       </Field>
       {withSection && (
-        <Field label="Section" className="w-40">
+        <Field label={t("Section")} className="w-40">
           <Combobox
             disabled={!value.classId}
             data={toOptions(sections.data?.items, "section_id", "name")}
             value={value.sectionId}
             onChange={(sectionId) => onChange({ ...value, sectionId })}
-            placeholder="Choose section"
+            placeholder={t("Choose section")}
           />
         </Field>
       )}
       {withSubject && (
-        <Field label="Subject" className="w-52">
+        <Field label={t("Subject")} className="w-52">
           <Combobox
             disabled={!value.classId}
             data={toOptions(subjectItems, "subject_id", "name")}
             value={value.subjectId ?? null}
             onChange={(subjectId) => onChange({ ...value, subjectId })}
-            placeholder="Choose subject"
-            emptyText={teacherId ? "No subjects assigned to you" : undefined}
+            placeholder={t("Choose subject")}
+            emptyText={teacherId ? t("No subjects assigned to you") : undefined}
           />
         </Field>
       )}

@@ -1,6 +1,7 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
 import type { TokenResponse } from "./types";
+import { t } from "../i18n";
 
 /** Access token lives in memory only; the refresh token is an httpOnly cookie. */
 let accessToken: string | null = null;
@@ -63,7 +64,7 @@ export function errorMessage(error: unknown): string {
         })
         .join("\n");
     }
-    if (error.response?.status === 403) return "You are not allowed to do that.";
+    if (error.response?.status === 403) return t("You are not allowed to do that.");
     return error.message;
   }
   return String(error);

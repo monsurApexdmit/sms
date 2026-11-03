@@ -21,6 +21,7 @@ import { Switch } from "./ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Textarea } from "./ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { t } from "../i18n";
 
 export interface FieldDef {
   name: string;
@@ -95,13 +96,13 @@ export function CrudPage({
       return editing ? api.put(`${path}/${editing[idField]}`, payload) : api.post(path, payload);
     },
     {
-      success: editing ? "Saved" : "Created",
+      success: editing ? t("Saved") : t("Created"),
       invalidate: [[path]],
       onSuccess: () => setOpened(false),
     },
   );
 
-  const remove = useAction((id: unknown) => api.delete(`${path}/${id}`), { success: "Deleted", invalidate: [[path]] });
+  const remove = useAction((id: unknown) => api.delete(`${path}/${id}`), { success: t("Deleted"), invalidate: [[path]] });
 
   const startCreate = () => {
     setEditing(null);
@@ -128,7 +129,7 @@ export function CrudPage({
   };
 
   const confirmDelete = (row: Values) =>
-    confirmAction({ title: `Delete ${singular.toLowerCase()}?`, onConfirm: () => remove.mutate(row[idField]) });
+    confirmAction({ title: t("Delete {toLowerCase}?", { toLowerCase: singular.toLowerCase() }), onConfirm: () => remove.mutate(row[idField]) });
 
   const optionLabel = useMemo(() => {
     const maps: Record<string, Map<string, string>> = {};
@@ -140,7 +141,7 @@ export function CrudPage({
     if (f.render) return f.render(row);
     const v = row[f.name];
     if (v === null || v === undefined || v === "") return <Dash />;
-    if (f.type === "switch") return Number(v) === 1 ? "Yes" : "No";
+    if (f.type === "switch") return Number(v) === 1 ? t("Yes") : t("No");
     if (optionLabel[f.name]) return optionLabel[f.name].get(String(v)) ?? String(v);
     return String(v);
   };
@@ -159,7 +160,7 @@ export function CrudPage({
             {canWrite && (
               <Button onClick={startCreate}>
                 <PlusIcon />
-                Add {singular.toLowerCase()}
+                {t("Add")}{" "}{singular.toLowerCase()}
               </Button>
             )}
           </>
@@ -170,7 +171,7 @@ export function CrudPage({
           <div className="border-b p-3">
             <div className="relative w-full max-w-xs">
               <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-              <Input placeholder="Search name or email" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
+              <Input placeholder={t("Search name or email")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
             </div>
           </div>
         )}
@@ -205,10 +206,10 @@ export function CrudPage({
                       {extraActions?.(row)}
                       {canWrite && (
                         <>
-                          <IconAction label="Edit" onClick={() => startEdit(row)}>
+                          <IconAction label={t("Edit")} onClick={() => startEdit(row)}>
                             <PencilIcon />
                           </IconAction>
-                          <IconAction label="Delete" destructive onClick={() => confirmDelete(row)}>
+                          <IconAction label={t("Delete")} destructive onClick={() => confirmDelete(row)}>
                             <Trash2Icon />
                           </IconAction>
                         </>
@@ -225,7 +226,7 @@ export function CrudPage({
       <Dialog open={opened} onOpenChange={setOpened}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>{editing ? `Edit ${singular.toLowerCase()}` : `Add ${singular.toLowerCase()}`}</DialogTitle>
+            <DialogTitle>{editing ? t("Edit {toLowerCase}", { toLowerCase: singular.toLowerCase() }) : t("Add {toLowerCase}", { toLowerCase: singular.toLowerCase() })}</DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
             {formFields.map((f) => (
@@ -236,7 +237,7 @@ export function CrudPage({
                 rules={{
                   validate: (v) =>
                     (f.required || (f.createOnlyRequired && !editing)) && (v === "" || v === null || v === undefined)
-                      ? `${f.label} is required`
+                      ? t("{label} is required", { label: f.label })
                       : true,
                 }}
                 render={({ field, fieldState }) => (
@@ -246,11 +247,9 @@ export function CrudPage({
             ))}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpened(false)}>
-                Cancel
-              </Button>
+                {t("Cancel")}</Button>
               <Button type="submit" loading={save.isPending}>
-                Save
-              </Button>
+                {t("Save")}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -333,7 +332,7 @@ function FormField({
       htmlFor={id}
       required={required}
       error={error}
-      description={f.type === "password" ? (editing ? "Leave empty to keep the current password" : "At least 8 characters") : undefined}
+      description={f.type === "password" ? (editing ? t("Leave empty to keep the current password") : t("At least 8 characters")) : undefined}
     >
       {control}
     </Field>

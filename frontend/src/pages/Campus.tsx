@@ -37,6 +37,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Textarea } from "../components/ui/textarea";
 import { fromUnix, initials, toOptions } from "../utils";
+import { t, tn } from "../i18n";
 
 // --- library ------------------------------------------------------------------
 
@@ -51,17 +52,17 @@ interface BookRequest {
 }
 
 const REQUEST_STATUS: Record<number, [string, string]> = {
-  0: ["Pending", "border-transparent bg-warning/20 text-amber-700 dark:text-amber-300"],
-  1: ["Issued", "border-transparent bg-success/15 text-success"],
-  2: ["Rejected", "border-destructive/50 text-destructive"],
-  3: ["Returned", "border-transparent bg-secondary text-secondary-foreground"],
+  0: [t("Pending"), "border-transparent bg-warning/20 text-amber-700 dark:text-amber-300"],
+  1: [t("Issued"), "border-transparent bg-success/15 text-success"],
+  2: [t("Rejected"), "border-destructive/50 text-destructive"],
+  3: [t("Returned"), "border-transparent bg-secondary text-secondary-foreground"],
 };
 
 function RequestBook({ bookId, onDone }: { bookId: number; onDone: () => void }) {
   const form = useForm({ defaultValues: { start: dayjs().format("YYYY-MM-DD"), end: dayjs().add(14, "day").format("YYYY-MM-DD") } });
   const send = useAction(
     (v: { start: string; end: string }) => api.post("/book-requests", { book_id: bookId, issue_start_date: v.start, issue_end_date: v.end }),
-    { success: "Request sent to the librarian", invalidate: [["/book-requests"]], onSuccess: onDone },
+    { success: t("Request sent to the librarian"), invalidate: [["/book-requests"]], onSuccess: onDone },
   );
   return (
     <form onSubmit={form.handleSubmit((v) => send.mutate(v))} className="grid gap-4">
@@ -69,9 +70,9 @@ function RequestBook({ bookId, onDone }: { bookId: number; onDone: () => void })
         <Controller
           control={form.control}
           name="start"
-          rules={{ required: "Pick a date" }}
+          rules={{ required: t("Pick a date") }}
           render={({ field, fieldState }) => (
-            <Field label="From" required error={fieldState.error?.message}>
+            <Field label={t("From")} required error={fieldState.error?.message}>
               <DatePicker value={field.value} onChange={field.onChange} clearable={false} />
             </Field>
           )}
@@ -80,22 +81,21 @@ function RequestBook({ bookId, onDone }: { bookId: number; onDone: () => void })
           control={form.control}
           name="end"
           rules={{
-            required: "Pick a date",
-            validate: (v, all) => (dayjs(v).isBefore(dayjs(all.start)) ? "Must be after the start date" : true),
+            required: t("Pick a date"),
+            validate: (v, all) => (dayjs(v).isBefore(dayjs(all.start)) ? t("Must be after the start date") : true),
           }}
           render={({ field, fieldState }) => (
-            <Field label="Until" required error={fieldState.error?.message}>
+            <Field label={t("Until")} required error={fieldState.error?.message}>
               <DatePicker value={field.value} onChange={field.onChange} clearable={false} />
             </Field>
           )}
         />
       </div>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("Cancel")}</Button>
         <Button type="submit" loading={send.isPending}>
           <BookUpIcon />
-          Send request
-        </Button>
+          {t("Send request")}</Button>
       </DialogFooter>
     </form>
   );
@@ -104,9 +104,9 @@ function RequestBook({ bookId, onDone }: { bookId: number; onDone: () => void })
 function Requests({ manage }: { manage: boolean }) {
   const { data, isLoading } = useList<BookRequest>("/book-requests");
   const setStatus = useAction(({ id, status }: { id: number; status: number }) => api.put(`/book-requests/${id}/status`, { status }), {
-    success: "Updated", invalidate: [["/book-requests"], ["/books"]],
+    success: t("Updated"), invalidate: [["/book-requests"], ["/books"]],
   });  // prettier-ignore
-  const giveBack = useAction((id: number) => api.post(`/book-requests/${id}/return`), { success: "Book returned", invalidate: [["/book-requests"], ["/books"]] });
+  const giveBack = useAction((id: number) => api.post(`/book-requests/${id}/return`), { success: t("Book returned"), invalidate: [["/book-requests"], ["/books"]] });
   const colSpan = manage ? 6 : 4;
   const pending = data?.items.filter((r) => (r.status ?? 0) === 0).length ?? 0;
 
@@ -114,33 +114,32 @@ function Requests({ manage }: { manage: boolean }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold">{manage ? "Book requests" : "My requests"}</h2>
+          <h2 className="text-lg font-semibold">{manage ? t("Book requests") : t("My requests")}</h2>
           <p className="text-muted-foreground text-sm">
-            {manage ? "Issue or reject requests from students, then mark books as returned." : "Track the books you asked the librarian for."}
+            {manage ? t("Issue or reject requests from students, then mark books as returned.") : t("Track the books you asked the librarian for.")}
           </p>
         </div>
         {pending > 0 && (
           <Badge variant="outline" className={REQUEST_STATUS[0][1]}>
-            {pending} pending
-          </Badge>
+            {tn("{pending} pending", { pending })}</Badge>
         )}
       </div>
       <Card className="gap-0 overflow-hidden py-0">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Book</TableHead>
-              {manage && <TableHead>Student</TableHead>}
-              <TableHead>From</TableHead>
-              <TableHead>Until</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>{t("Book")}</TableHead>
+              {manage && <TableHead>{t("Student")}</TableHead>}
+              <TableHead>{t("From")}</TableHead>
+              <TableHead>{t("Until")}</TableHead>
+              <TableHead>{t("Status")}</TableHead>
               {manage && <TableHead className="w-28" />}
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={data?.items.length === 0} colSpan={colSpan} emptyText="No requests" />
+            <TableState loading={isLoading} empty={data?.items.length === 0} colSpan={colSpan} emptyText={t("No requests")} />
             {data?.items.map((r) => {
-              const [label, className] = REQUEST_STATUS[r.status ?? 0] ?? ["Unknown", ""];
+              const [label, className] = REQUEST_STATUS[r.status ?? 0] ?? [t("Unknown"), ""];
               return (
                 <TableRow key={r.book_request_id}>
                   <TableCell className="font-medium">{r.book_name ?? <Dash />}</TableCell>
@@ -155,16 +154,16 @@ function Requests({ manage }: { manage: boolean }) {
                       <div className="flex items-center justify-end gap-1">
                         {(r.status ?? 0) === 0 && (
                           <>
-                            <IconAction label="Issue" onClick={() => setStatus.mutate({ id: r.book_request_id, status: 1 })}>
+                            <IconAction label={t("Issue")} onClick={() => setStatus.mutate({ id: r.book_request_id, status: 1 })}>
                               <CheckIcon className="text-success" />
                             </IconAction>
-                            <IconAction label="Reject" destructive onClick={() => setStatus.mutate({ id: r.book_request_id, status: 2 })}>
+                            <IconAction label={t("Reject")} destructive onClick={() => setStatus.mutate({ id: r.book_request_id, status: 2 })}>
                               <XIcon />
                             </IconAction>
                           </>
                         )}
                         {r.status === 1 && (
-                          <IconAction label="Mark returned" loading={giveBack.isPending && giveBack.variables === r.book_request_id} onClick={() => giveBack.mutate(r.book_request_id)}>
+                          <IconAction label={t("Mark returned")} loading={giveBack.isPending && giveBack.variables === r.book_request_id} onClick={() => giveBack.mutate(r.book_request_id)}>
                             <UndoIcon />
                           </IconAction>
                         )}
@@ -190,14 +189,14 @@ export function LibraryPage() {
     <Tabs defaultValue="books" className="gap-6">
       {(manage || user.role === "student") && (
         <TabsList>
-          <TabsTrigger value="books">Books</TabsTrigger>
-          <TabsTrigger value="requests">{manage ? "Book requests" : "My requests"}</TabsTrigger>
+          <TabsTrigger value="books">{t("Books")}</TabsTrigger>
+          <TabsTrigger value="requests">{manage ? t("Book requests") : t("My requests")}</TabsTrigger>
         </TabsList>
       )}
       <TabsContent value="books">
         <CrudPage
-          title="Library"
-          subtitle="Books in the school library and how many copies are out."
+          title={t("Library")}
+          subtitle={t("Books in the school library and how many copies are out.")}
           path="/books"
           idField="book_id"
           canWrite={manage}
@@ -207,22 +206,21 @@ export function LibraryPage() {
                   Number(row.total_copies ?? 0) - Number(row.issued_copies ?? 0) > 0 ? (
                     <Button size="xs" variant="secondary" onClick={() => setRequesting(Number(row.book_id))}>
                       <BookUpIcon />
-                      Request
-                    </Button>
+                      {t("Request")}</Button>
                   ) : (
-                    <Badge variant="outline" className="text-muted-foreground">Not available</Badge>
+                    <Badge variant="outline" className="text-muted-foreground">{t("Not available")}</Badge>
                   )
               : undefined
           }
           fields={[
-            { name: "name", label: "Title", required: true },
-            { name: "author", label: "Author" },
-            { name: "class_id", label: "Class", type: "select", options: toOptions(classes.data?.items, "class_id", "name") },
-            { name: "price", label: "Price" },
-            { name: "total_copies", label: "Copies", type: "number" },
+            { name: "name", label: t("Title"), required: true },
+            { name: "author", label: t("Author") },
+            { name: "class_id", label: t("Class"), type: "select", options: toOptions(classes.data?.items, "class_id", "name") },
+            { name: "price", label: t("Price") },
+            { name: "total_copies", label: t("Copies"), type: "number" },
             {
               name: "issued_copies",
-              label: "Available",
+              label: t("Available"),
               type: "number",
               tableOnly: true,
               render: (row) => {
@@ -235,14 +233,14 @@ export function LibraryPage() {
                 );
               },
             },
-            { name: "description", label: "Description", type: "textarea", formOnly: true },
+            { name: "description", label: t("Description"), type: "textarea", formOnly: true },
           ]}
         />
         <Dialog open={requesting !== null} onOpenChange={(open) => !open && setRequesting(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Request book</DialogTitle>
-              <DialogDescription>The librarian will issue the book or let you know if it is not available.</DialogDescription>
+              <DialogTitle>{t("Request book")}</DialogTitle>
+              <DialogDescription>{t("The librarian will issue the book or let you know if it is not available.")}</DialogDescription>
             </DialogHeader>
             {requesting !== null && <RequestBook bookId={requesting} onDone={() => setRequesting(null)} />}
           </DialogContent>
@@ -272,8 +270,8 @@ function ResidentsSheet({ target, onClose }: { target: Residents; onClose: () =>
         <SheetHeader>
           <SheetTitle>{target?.name}</SheetTitle>
           <SheetDescription>
-            {dorm ? "Students staying in this dormitory" : "Students using this route"}
-            {data && ` · ${data.items.length}`}
+            {dorm ? t("Students staying in this dormitory") : t("Students using this route")}
+            {data && " " + t("· {length}", { length: data.items.length })}
           </SheetDescription>
         </SheetHeader>
         <div className="px-4 pb-6">
@@ -281,14 +279,14 @@ function ResidentsSheet({ target, onClose }: { target: Residents; onClose: () =>
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Class</TableHead>
-                  <TableHead>Roll</TableHead>
-                  {dorm && <TableHead>Room</TableHead>}
+                  <TableHead>{t("Student")}</TableHead>
+                  <TableHead>{t("Class")}</TableHead>
+                  <TableHead>{t("Roll")}</TableHead>
+                  {dorm && <TableHead>{t("Room")}</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableState loading={isLoading} empty={data?.items.length === 0} colSpan={colSpan} emptyText="No students assigned" />
+                <TableState loading={isLoading} empty={data?.items.length === 0} colSpan={colSpan} emptyText={t("No students assigned")} />
                 {data?.items.map((s) => (
                   <TableRow key={s.student_id}>
                     <TableCell>
@@ -323,53 +321,53 @@ export function FacilitiesPage() {
     <>
       <Tabs defaultValue="transport" className="gap-6">
         <TabsList>
-          <TabsTrigger value="transport">Transport</TabsTrigger>
-          <TabsTrigger value="dormitory">Dormitory</TabsTrigger>
+          <TabsTrigger value="transport">{t("Transport")}</TabsTrigger>
+          <TabsTrigger value="dormitory">{t("Dormitory")}</TabsTrigger>
         </TabsList>
         <TabsContent value="transport">
           <CrudPage
-            title="Transport routes"
-            subtitle="School bus routes, vehicles and fares."
+            title={t("Transport routes")}
+            subtitle={t("School bus routes, vehicles and fares.")}
             path="/transports"
             idField="transport_id"
             canWrite={admin}
             extraActions={
               staff
                 ? (row) => (
-                    <IconAction label="Students" onClick={() => setResidents({ kind: "transport", id: Number(row.transport_id), name: String(row.route_name ?? "Route") })}>
+                    <IconAction label={t("Students")} onClick={() => setResidents({ kind: "transport", id: Number(row.transport_id), name: String(row.route_name ?? t("Route")) })}>
                       <UsersIcon />
                     </IconAction>
                   )
                 : undefined
             }
             fields={[
-              { name: "route_name", label: "Route", required: true },
-              { name: "number_of_vehicle", label: "Vehicles" },
-              { name: "route_fare", label: "Fare" },
-              { name: "description", label: "Description", type: "textarea" },
+              { name: "route_name", label: t("Route"), required: true },
+              { name: "number_of_vehicle", label: t("Vehicles") },
+              { name: "route_fare", label: t("Fare") },
+              { name: "description", label: t("Description"), type: "textarea" },
             ]}
           />
         </TabsContent>
         <TabsContent value="dormitory">
           <CrudPage
-            title="Dormitories"
-            subtitle="Boarding houses and their rooms."
+            title={t("Dormitories")}
+            subtitle={t("Boarding houses and their rooms.")}
             path="/dormitories"
             idField="dormitory_id"
             canWrite={admin}
             extraActions={
               staff
                 ? (row) => (
-                    <IconAction label="Students" onClick={() => setResidents({ kind: "dormitory", id: Number(row.dormitory_id), name: String(row.name ?? "Dormitory") })}>
+                    <IconAction label={t("Students")} onClick={() => setResidents({ kind: "dormitory", id: Number(row.dormitory_id), name: String(row.name ?? t("Dormitory")) })}>
                       <UsersIcon />
                     </IconAction>
                   )
                 : undefined
             }
             fields={[
-              { name: "name", label: "Name", required: true },
-              { name: "number_of_room", label: "Rooms" },
-              { name: "description", label: "Description", type: "textarea" },
+              { name: "name", label: t("Name"), required: true },
+              { name: "number_of_room", label: t("Rooms") },
+              { name: "description", label: t("Description"), type: "textarea" },
             ]}
           />
         </TabsContent>
@@ -416,27 +414,27 @@ function NoticeForm({ notice, onDone }: { notice: Notice | null; onDone: () => v
       if (v.image) body.append("image", v.image);
       return notice ? api.put(`/notices/${notice.notice_id}`, body) : api.post("/notices", body);
     },
-    { success: "Notice saved", invalidate: [["/notices"], ["/notices/all"]], onSuccess: onDone },
+    { success: t("Notice saved"), invalidate: [["/notices"], ["/notices/all"]], onSuccess: onDone },
   );
   const switches: { name: "status" | "show_on_website" | "send_sms"; label: string; description: string }[] = [
-    { name: "status", label: "Published", description: "Off moves the notice to Archived" },
-    { name: "show_on_website", label: "Show on public website", description: "Listed on the school website's notice page" },
-    { name: "send_sms", label: "Also send as SMS", description: "Texts the title and date to everyone with a phone number" },
+    { name: "status", label: t("Published"), description: t("Off moves the notice to Archived") },
+    { name: "show_on_website", label: t("Show on public website"), description: t("Listed on the school website's notice page") },
+    { name: "send_sms", label: t("Also send as SMS"), description: t("Texts the title and date to everyone with a phone number") },
   ];
 
   return (
     <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="grid gap-4">
-      <Field label="Title" htmlFor="notice-title" required error={errors.notice_title?.message}>
-        <Input id="notice-title" aria-invalid={!!errors.notice_title} {...form.register("notice_title", { required: "Required" })} />
+      <Field label={t("Title")} htmlFor="notice-title" required error={errors.notice_title?.message}>
+        <Input id="notice-title" aria-invalid={!!errors.notice_title} {...form.register("notice_title", { required: t("Required") })} />
       </Field>
-      <Field label="Notice" htmlFor="notice-body">
+      <Field label={t("Notice")} htmlFor="notice-body">
         <Textarea id="notice-body" rows={6} {...form.register("notice")} />
       </Field>
       <Controller
         control={form.control}
         name="image"
         render={({ field }) => (
-          <Field label="Image" htmlFor="notice-image" description={notice?.image_url && !field.value ? "Leave empty to keep the current image" : undefined}>
+          <Field label={t("Image")} htmlFor="notice-image" description={notice?.image_url && !field.value ? t("Leave empty to keep the current image") : undefined}>
             <Input id="notice-image" type="file" accept="image/*" onChange={(e) => field.onChange(e.target.files?.[0] ?? null)} />
           </Field>
         )}
@@ -460,8 +458,8 @@ function NoticeForm({ notice, onDone }: { notice: Notice | null; onDone: () => v
         ))}
       </div>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={save.isPending}>Save</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("Cancel")}</Button>
+        <Button type="submit" loading={save.isPending}>{t("Save")}</Button>
       </DialogFooter>
     </form>
   );
@@ -489,15 +487,15 @@ function NoticeCard({ notice: n, admin, onEdit, onDelete }: { notice: Notice; ad
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="font-semibold break-words">{n.notice_title}</h3>
-                {admin && n.status !== 1 && <Badge variant="secondary">Hidden</Badge>}
-                {admin && n.show_on_website === 1 && <Badge variant="outline">Website</Badge>}
+                {admin && n.status !== 1 && <Badge variant="secondary">{t("Hidden")}</Badge>}
+                {admin && n.show_on_website === 1 && <Badge variant="outline">{t("Website")}</Badge>}
               </div>
               <p className="text-muted-foreground text-xs">{fromUnix(n.create_timestamp, "dddd, DD MMM YYYY")}</p>
             </div>
             {admin && (
               <div className="flex shrink-0 items-center gap-1">
-                <IconAction label="Edit" onClick={onEdit}><PencilIcon /></IconAction>
-                <IconAction label="Delete" destructive onClick={onDelete}><Trash2Icon /></IconAction>
+                <IconAction label={t("Edit")} onClick={onEdit}><PencilIcon /></IconAction>
+                <IconAction label={t("Delete")} destructive onClick={onDelete}><Trash2Icon /></IconAction>
               </div>
             )}
           </div>
@@ -506,7 +504,7 @@ function NoticeCard({ notice: n, admin, onEdit, onDelete }: { notice: Notice; ad
               <p className={expanded ? "text-sm whitespace-pre-wrap" : "line-clamp-3 text-sm whitespace-pre-wrap"}>{n.notice}</p>
               {long && (
                 <Button variant="link" size="sm" className="h-auto px-0" onClick={() => setExpanded((e) => !e)}>
-                  {expanded ? "Show less" : "Read more"}
+                  {expanded ? t("Show less") : t("Read more")}
                 </Button>
               )}
             </div>
@@ -516,8 +514,7 @@ function NoticeCard({ notice: n, admin, onEdit, onDelete }: { notice: Notice; ad
               {expanded && <img src={n.image_url} alt="" className="max-h-60 w-auto rounded-md border object-contain" />}
               <a href={n.image_url} target="_blank" rel="noopener" className="text-primary inline-flex items-center gap-1.5 text-sm hover:underline">
                 <ImageIcon className="size-4" />
-                View attachment
-              </a>
+                {t("View attachment")}</a>
             </div>
           )}
         </div>
@@ -532,7 +529,7 @@ export function NoticesPage() {
   const { data, isLoading } = useList<Notice>(admin ? "/notices/all" : "/notices");
   const [editing, setEditing] = useState<Notice | null>(null);
   const [opened, setOpened] = useState(false);
-  const remove = useAction((id: number) => api.delete(`/notices/${id}`), { success: "Deleted", invalidate: [["/notices"], ["/notices/all"]] });
+  const remove = useAction((id: number) => api.delete(`/notices/${id}`), { success: t("Deleted"), invalidate: [["/notices"], ["/notices/all"]] });
 
   const notices = data?.items ?? [];
   const current = notices.filter((n) => !isArchived(n));
@@ -558,7 +555,7 @@ export function NoticesPage() {
               setEditing(n);
               setOpened(true);
             }}
-            onDelete={() => confirmAction({ title: "Delete notice?", onConfirm: () => remove.mutate(n.notice_id) })}
+            onDelete={() => confirmAction({ title: t("Delete notice?"), onConfirm: () => remove.mutate(n.notice_id) })}
           />
         ))}
       </div>
@@ -567,8 +564,8 @@ export function NoticesPage() {
   return (
     <>
       <PageHeader
-        title="Noticeboard"
-        subtitle="School announcements and circulars."
+        title={t("Noticeboard")}
+        subtitle={t("School announcements and circulars.")}
         actions={
           admin && (
             <Button
@@ -578,8 +575,7 @@ export function NoticesPage() {
               }}
             >
               <PlusIcon />
-              New notice
-            </Button>
+              {t("New notice")}</Button>
           )
         }
       />
@@ -587,27 +583,24 @@ export function NoticesPage() {
         <Tabs defaultValue="current" className="gap-6">
           <TabsList>
             <TabsTrigger value="current">
-              Running
-              {!isLoading && <Badge variant="secondary" className="ml-1 px-1.5">{current.length}</Badge>}
+              {t("Running")}{!isLoading && <Badge variant="secondary" className="ml-1 px-1.5">{current.length}</Badge>}
             </TabsTrigger>
             <TabsTrigger value="archived">
-              Archived
-              {!isLoading && <Badge variant="secondary" className="ml-1 px-1.5">{archived.length}</Badge>}
+              {t("Archived")}{!isLoading && <Badge variant="secondary" className="ml-1 px-1.5">{archived.length}</Badge>}
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="current">{list(current, "No running notices")}</TabsContent>
-          <TabsContent value="archived">{list(archived, "No archived notices")}</TabsContent>
+          <TabsContent value="current">{list(current, t("No running notices"))}</TabsContent>
+          <TabsContent value="archived">{list(archived, t("No archived notices"))}</TabsContent>
         </Tabs>
       ) : (
-        list(current, "No notices")
+        list(current, t("No notices"))
       )}
       <Dialog open={opened} onOpenChange={setOpened}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit notice" : "New notice"}</DialogTitle>
+            <DialogTitle>{editing ? t("Edit notice") : t("New notice")}</DialogTitle>
             <DialogDescription>
-              Unpublished notices are archived and hidden from students, parents and staff.
-            </DialogDescription>
+              {t("Unpublished notices are archived and hidden from students, parents and staff.")}</DialogDescription>
           </DialogHeader>
           {opened && <NoticeForm key={editing?.notice_id ?? "new"} notice={editing} onDone={() => setOpened(false)} />}
         </DialogContent>
