@@ -25,8 +25,7 @@ from app.models import (
     Teacher,
 )
 from app.services.access import children_ids, current_enroll
-from app.services.jobs import enqueue
-from app.services.notify import send_email
+from app.services.notifications import notify, user
 from app.services.settings import get_setting
 
 router = APIRouter(prefix="/meetings", tags=["meetings"])
@@ -220,7 +219,7 @@ def _deactivate(booking: MeetingBooking, slot: MeetingSlot) -> None:
 
 
 def _notify(db: Session, tasks: BackgroundTasks, booking: MeetingBooking, slot: MeetingSlot, session: MeetingSession, what: str) -> None:
-    """Email the parent and the teacher that a booking was made or cancelled."""
+    """Tell the parent and the teacher that a booking was made or cancelled."""
     school = get_setting(db, "system_name", "School")
     parent, teacher, student = db.get(Parent, booking.parent_id), db.get(Teacher, slot.teacher_id), db.get(Student, booking.student_id)
     when = f"{session.date:%d %b %Y}, {slot.start_time:%H:%M}–{slot.end_time:%H:%M}"
@@ -232,9 +231,11 @@ def _notify(db: Session, tasks: BackgroundTasks, booking: MeetingBooking, slot: 
         f"Teacher: {teacher.name if teacher else '-'}\n"
         f"{f'Agenda: {booking.note}' if booking.note else ''}\n\n{school}"
     )
-    for person in (parent, teacher):
-        if person is not None and person.email:
-            enqueue(tasks, send_email, person.email, subject, body)
+    short = f"{child} with {teacher.name if teacher else 'the teacher'}, {when}"
+    if parent is not None:
+        notify(db, tasks, [user("parent", parent.parent_id)], "meetings", subject, short, "/app/book-meeting", email_body=body)
+    if teacher is not None:
+        notify(db, tasks, [user("teacher", teacher.teacher_id)], "meetings", subject, short, "/app/my-meetings", email_body=body)
 
 
 def _booking_out(db: Session, b: MeetingBooking, *, for_staff: bool) -> dict:

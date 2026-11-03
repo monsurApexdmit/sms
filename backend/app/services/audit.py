@@ -30,6 +30,8 @@ AUDITED: tuple[type, ...] = (
 )  # fmt: skip
 AUDITED += (models.ExamSchedule, models.ExamWeight, models.ReportRemark)  # report cards
 AUDITED += (models.Vehicle, models.Driver, models.RouteStop, models.StudentTransport)
+# push_subscription is left out: its keys are secrets and it changes on every browser sign-up
+AUDITED += (models.NotificationPreference,)
 
 SENSITIVE_COLUMNS = {"password", "authentication_key"}
 # Settings rows whose value is a credential (or a JSON blob holding one).

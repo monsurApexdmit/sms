@@ -2,6 +2,7 @@ import {
   AwardIcon,
   BookCheckIcon,
   BanknoteIcon,
+  BellIcon,
   BookOpenIcon,
   BuildingIcon,
   BusFrontIcon,
@@ -116,6 +117,7 @@ export const NAV: NavItem[] = [
   { label: "Website", path: "website", icon: GlobeIcon, roles: ["admin"], group: "Settings" },
   { label: "System settings", path: "settings", icon: SettingsIcon, roles: ["admin"], group: "Settings" },
   { label: "Audit log", path: "audit-log", icon: HistoryIcon, roles: ["admin"], group: "Settings" },
+  { label: "Notifications", path: "notifications", icon: BellIcon, roles: ALL, group: "Settings" },
   { label: "My profile", path: "profile", icon: UserIcon, roles: ALL, group: "Settings" },
   { label: "Public website", path: "/", icon: HouseIcon, roles: ALL, group: "Settings" },
 ];

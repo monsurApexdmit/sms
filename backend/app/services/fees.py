@@ -28,8 +28,7 @@ from app.models import (
     Student,
 )
 from app.services.invoices import fmt, num, refresh_status
-from app.services.jobs import enqueue
-from app.services.notify import send_email, send_sms, sms_enabled
+from app.services.notifications import notify, user
 from app.services.settings import get_setting
 
 
@@ -153,7 +152,6 @@ def send_due_reminders(db: Session, tasks: BackgroundTasks, today: date, days_be
     reminded. The caller commits."""
     school = get_setting(db, "system_name", "School")
     currency = get_setting(db, "currency").upper()
-    with_sms = sms_enabled(db)
     reminded = 0
     for link, inv, instalment, _plan in _open_fee_invoices(db):
         if instalment.due_date > today + timedelta(days=days_before) or link.last_reminded_on == today:
@@ -165,11 +163,18 @@ def send_due_reminders(db: Session, tasks: BackgroundTasks, today: date, days_be
         due = fmt(num(inv.due) if inv.due not in (None, "") else num(inv.amount) - num(inv.amount_paid))
         when = "was due" if instalment.due_date < today else "is due"
         text = f"{student.name}: {inv.title} ({due} {currency}) {when} on {instalment.due_date.strftime('%d %b %Y')}."
-        emails = {e.strip() for e in (parent.email if parent else None, student.email) if e and e.strip()}
-        for email in sorted(emails):
-            enqueue(tasks, send_email, email, f"Fee reminder: {inv.title}", f"{text}\n\nPlease pay at the school office or online.\n\n{school}")
-        if with_sms and parent is not None and parent.phone and parent.phone.strip():
-            enqueue(tasks, send_sms, parent.phone.strip(), text)
+        mail = {"email_subject": f"Fee reminder: {inv.title}", "email_body": f"{text}\n\nPlease pay at the school office or online.\n\n{school}"}
+        title = f"Fee reminder: {inv.title}"
+        if parent is not None:
+            notify(db, tasks, [user("parent", parent.parent_id)], "fees", title, text, "/app/my-invoices", commit=False, **mail)
+        # students were emailed (never texted) before preferences existed, and only when the
+        # address differs from the parent's
+        same_email = parent is not None and (parent.email or "").strip().lower() == (student.email or "").strip().lower()
+        student_defaults = {"push"} if same_email else {"email", "push"}
+        notify(
+            db, tasks, [user("student", student.student_id)], "fees", title, text, "/app/my-invoices",
+            commit=False, defaults=student_defaults, **mail,
+        )  # fmt: skip
         link.last_reminded_on = today
         reminded += 1
     return reminded

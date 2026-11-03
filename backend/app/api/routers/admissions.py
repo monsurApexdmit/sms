@@ -24,6 +24,7 @@ from app.models import AdmissionApplication, AdmissionDocument, Enquiry, Enroll,
 from app.services.accounts import email_taken, insert_account, insert_student
 from app.services.files import delete_file, media_url, save_document
 from app.services.jobs import enqueue
+from app.services.notifications import Recipient, notify
 from app.services.notify import send_email
 from app.services.ratelimit import throttle
 from app.services.settings import get_setting, running_year, set_setting
@@ -284,7 +285,11 @@ def _notify_guardian(tasks: BackgroundTasks, db: Session, row: AdmissionApplicat
     if row.status_note:
         text += f"\n\n{row.status_note}"
     text += f"\n\nApplication reference: {row.reference}\n\n{school}"
-    enqueue(tasks, send_email, row.guardian_email, f"{school}: admission application {row.reference}", text)
+    # the guardian has no account yet: email only
+    notify(
+        db, tasks, [Recipient(email=row.guardian_email)], "admissions", f"{school}: admission application {row.reference}",
+        text, defaults={"email"},
+    )  # fmt: skip
 
 
 # --- public ---------------------------------------------------------------------------

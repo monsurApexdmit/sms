@@ -10,6 +10,9 @@ import { AuthProvider } from "./auth/AuthContext";
 import { ConfirmHost } from "./components/confirm";
 import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { registerServiceWorker } from "./lib/push";
+
+registerServiceWorker();
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: false } },

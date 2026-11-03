@@ -9,7 +9,7 @@ from app.core.deps import DB, Me, require_roles
 from app.models import Noticeboard, Parent, Student, Teacher
 from app.services.files import delete_file, media_url, save_site_image
 from app.services.jobs import enqueue
-from app.services.notify import send_sms as deliver_sms, sms_enabled
+from app.services.notifications import notify, user
 
 router = APIRouter(prefix="/notices", tags=["noticeboard"])
 admin_only = [Depends(require_roles("admin"))]
@@ -26,17 +26,17 @@ def notice_out(row: Noticeboard) -> NoticeOut:
 
 
 def _queue_notice_sms(db: Session, tasks: BackgroundTasks, row: Noticeboard) -> None:
-    """Legacy check_sms: text the notice title and date to every student, parent and teacher with a phone."""
-    if not sms_enabled(db):
-        return
+    """Legacy check_sms: tell every student, parent and teacher about the notice (by SMS unless
+    they chose other channels for notices; each phone number gets one text)."""
     ts = row.create_timestamp
     day = time.strftime("%Y-%m-%d", time.gmtime(int(ts))) if ts and ts.isdigit() else time.strftime("%Y-%m-%d")
     text = f"{row.notice_title} on {day}"
-    phones: set[str] = set()
-    for model in (Student, Parent, Teacher):
-        phones.update(p.strip() for p in db.scalars(select(model.phone)) if p and p.strip())
-    for phone in sorted(phones):
-        enqueue(tasks, deliver_sms, phone, text)
+    people = [
+        user(role, person_id)
+        for role, model in (("student", Student), ("parent", Parent), ("teacher", Teacher))
+        for person_id in db.scalars(select(getattr(model, f"{role}_id")))
+    ]
+    notify(db, tasks, people, "notices", row.notice_title or "New notice", text, "/app/notices", sms_text=text)
 
 
 @router.get("", response_model=Page)

@@ -13,6 +13,8 @@ SECRET_KEYS = {
     "payumoney_salt_id",
     "msg91_authentication_key",
     "purchase_code",
+    "whatsapp_token",
+    "vapid_private_key",
 }
 PUBLIC_KEYS = {
     "system_name", "system_title", "currency", "language", "text_align", "running_year", "address", "phone",

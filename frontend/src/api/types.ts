@@ -758,3 +758,18 @@ export interface Enquiry {
   application_id: number | null;
   created_at: string;
 }
+
+export interface AppNotification {
+  notification_id: number;
+  category: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  created_at: string;
+  read_at: string | null;
+}
+
+export interface NotificationPreferences {
+  items: { category: string; label: string; in_app: boolean; email: boolean; sms: boolean; push: boolean; whatsapp: boolean }[];
+  available: Record<"in_app" | "email" | "sms" | "push" | "whatsapp", boolean>;
+}

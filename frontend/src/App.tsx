@@ -57,6 +57,7 @@ const ParentsPage = page(() => import("./pages/People"), "ParentsPage");
 const StaffPage = page(() => import("./pages/People"), "StaffPage");
 const TeachersPage = page(() => import("./pages/People"), "TeachersPage");
 const ProfilePage = page(() => import("./pages/Profile"), "ProfilePage");
+const NotificationsPage = page(() => import("./pages/Notifications"), "NotificationsPage");
 const ExamTimetablePage = page(() => import("./pages/ReportCards"), "ExamTimetablePage");
 const ReportCardsPage = page(() => import("./pages/ReportCards"), "ReportCardsPage");
 const AuditLogPage = page(() => import("./pages/Settings"), "AuditLogPage");
@@ -145,6 +146,7 @@ const APP_PAGES: [string, ReactNode][] = [
   ["settings", <SystemSettingsPage />],
   ["audit-log", <AuditLogPage />],
   ["profile", <ProfilePage />],
+  ["notifications", <NotificationsPage />],
   ["certificates", <CertificatesPage />],
   ["my-records", <MyRecordsPage />],
 ];

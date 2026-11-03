@@ -19,6 +19,7 @@ NEW_TABLES |= {"payroll_run", "payslip", "salary_structure", "staff_attendance"}
 NEW_TABLES |= {"driver", "route_stop", "student_transport", "vehicle"}
 NEW_TABLES |= {"certificate_issue", "certificate_template", "student_health", "student_record"}
 NEW_TABLES |= {"admission_application", "admission_document", "enquiry"}
+NEW_TABLES |= {"notification", "notification_preference", "push_subscription"}
 
 
 def _table_of(diff) -> str | None:
