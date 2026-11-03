@@ -16,6 +16,7 @@ import {
   FileCogIcon,
   GlobeIcon,
   GraduationCapIcon,
+  HandshakeIcon,
   HistoryIcon,
   HouseIcon,
   IdCardIcon,
@@ -91,6 +92,9 @@ export const NAV: NavItem[] = [
   { label: "Transport & dormitory", path: "facilities", icon: BusIcon, roles: ["admin", "student", "parent", "teacher"], group: "Campus" },
   { label: "Noticeboard", path: "notices", icon: MegaphoneIcon, roles: ALL, group: "Campus" },
   { label: "Messages", path: "messages", icon: MessagesSquareIcon, roles: ALL, group: "Campus" },
+  { label: "Parent-teacher meetings", path: "meetings", icon: HandshakeIcon, roles: ["admin"], group: "Campus" },
+  { label: "My meeting slots", path: "my-meetings", icon: HandshakeIcon, roles: ["teacher"], group: "Campus" },
+  { label: "Book a meeting", path: "book-meeting", icon: HandshakeIcon, roles: ["parent"], group: "Campus" },
 
   { label: "Website", path: "website", icon: GlobeIcon, roles: ["admin"], group: "Settings" },
   { label: "System settings", path: "settings", icon: SettingsIcon, roles: ["admin"], group: "Settings" },

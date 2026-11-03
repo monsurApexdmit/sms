@@ -14,6 +14,7 @@ NEW_TABLES = {
 }
 NEW_TABLES |= {"fee_head", "fee_plan", "fee_plan_item", "fee_instalment", "fee_discount", "fee_invoice"}
 NEW_TABLES |= {"exam_schedule", "exam_weight", "report_remark"}
+NEW_TABLES |= {"meeting_booking", "meeting_session", "meeting_slot"}
 
 
 def _table_of(diff) -> str | None:

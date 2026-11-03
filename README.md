@@ -108,6 +108,10 @@ Students apply for their own leave, parents for their children, and teachers, li
 - Attendance is days present over working days (calendar holidays and weekly days off excluded) in the term the exam's papers fall in, or else the school year's dates; without dates, from the first to the last recorded attendance day.
 - Admins and the class's teachers (class teacher, section teacher, or a teacher of one of its subjects) write the remark.
 
+## Parent-teacher meetings
+
+Admins plan a meeting day (**Campus → Parent-teacher meetings**): date, time window, minutes per meeting, an optional class, and the teachers taking part (default: every teacher of the class). Slots are generated per teacher and the day is added to the academic calendar for parents. Parents book one slot per teacher per child, only with teachers of that child's class and at least 2 hours ahead, and can cancel until the meeting starts; parent and teacher get an email for each booking and cancellation. Teachers see their own slots, can block free ones, and record whether the meeting took place with a private note parents never see. The day, times and teachers can change only while nothing is booked. The database enforces one active booking per slot (`meeting_booking.active_slot_id` is unique), so two parents clicking at once cannot both get it.
+
 ## Docker
 
 ```bash
