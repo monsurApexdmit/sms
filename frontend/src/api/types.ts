@@ -365,3 +365,80 @@ export interface Receipt {
   roll: number | null;
   invoice: { invoice_id: number; title: string | null; amount: number; amount_paid: number; due: number } | null;
 }
+
+// --- report cards ---
+
+export interface ExamPaper {
+  exam_schedule_id: number;
+  exam_id: number;
+  class_id: number;
+  subject_id: number;
+  subject: string | null;
+  exam_date: string;
+  start_time: string;
+  end_time: string;
+  room: string | null;
+  /** ids of papers of the same class whose times overlap this one */
+  clashes: number[];
+}
+
+export interface CardStudent {
+  student_id: number;
+  name: string | null;
+  student_code: string | null;
+  class_id: number | null;
+  class_name: string | null;
+  section_id: number | null;
+  section_name: string | null;
+  roll: number | null;
+  image_url: string | null;
+}
+
+export interface AdmitCard {
+  exam: { exam_id: number; name: string | null; year: string | null };
+  student: CardStudent;
+  schedule: ExamPaper[];
+}
+
+export interface ExamWeights {
+  year: string;
+  exams: { exam_id: number; name: string | null; weight: number | null }[];
+  total: number;
+  warnings: string[];
+}
+
+/** Exam cards fill mark_obtained … comment; annual cards fill marks (per exam id) and weighted_percentage. */
+export interface ReportSubjectLine {
+  subject_id: number;
+  subject: string | null;
+  mark_obtained?: number | null;
+  full_marks?: number;
+  grade?: string | null;
+  grade_point?: number | null;
+  comment?: string | null;
+  marks?: Record<string, number | null>;
+  weighted_percentage?: number | null;
+}
+
+export interface ReportCard {
+  kind: "exam" | "annual";
+  year: string;
+  exam: { exam_id: number; name: string | null } | null;
+  student: CardStudent;
+  subjects: ReportSubjectLine[];
+  total?: number;
+  full_total?: number;
+  /** annual cards: the weighted exams */
+  exams: { exam_id: number; name: string | null; weight: number; percentage: number | null; gpa: number | null; result: string }[];
+  percentage: number | null;
+  /** GPA, or CGPA on annual cards */
+  gpa: number | null;
+  result: "Pass" | "Fail" | "Incomplete";
+  position_class: number;
+  position_section: number;
+  class_size: number;
+  section_size: number;
+  warnings: string[];
+  attendance: { present: number; absent: number; working_days: number; percent: number | null; from: string | null; to: string | null };
+  remark: string | null;
+}

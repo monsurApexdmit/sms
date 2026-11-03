@@ -14,6 +14,7 @@ from app.models import Enroll, Exam, Grade, Mark, Parent, QuestionPaper, SchoolC
 from app.services.access import STAFF, ensure_can_view_student, ensure_teaches_subject
 from app.services.jobs import enqueue
 from app.services.notify import send_sms, sms_enabled
+from app.services.results import grade_for, grade_point
 from app.services.settings import running_year
 
 router = APIRouter(tags=["exams"])
@@ -288,21 +289,7 @@ def marks_sms(exam_id: int, body: MarksSmsIn, tasks: BackgroundTasks, db: DB):
 
 # --- results ------------------------------------------------------------------
 
-
-def _grade_for(grades: list[Grade], mark: int | None) -> Grade | None:
-    if mark is None:
-        return None
-    for g in grades:
-        if (g.mark_from or 0) <= mark <= (g.mark_upto or 0):
-            return g
-    return None
-
-
-def _gp(grade: Grade | None) -> float:
-    try:
-        return float(grade.grade_point) if grade and grade.grade_point else 0.0
-    except ValueError:
-        return 0.0
+_grade_for, _gp = grade_for, grade_point  # shared with report cards (app/services/results.py)
 
 
 @router.get("/marksheet/{student_id}")

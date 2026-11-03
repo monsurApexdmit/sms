@@ -98,6 +98,16 @@ Students apply for their own leave, parents for their children, and teachers, li
 - **Daily jobs** (`python -m scripts.daily_jobs`; the `scheduler` compose service runs it every 24 hours, admins can also run it from Fee setup) set late fines on unpaid instalment invoices past their due date plus grace days (flat once, or per day late, always recalculated from the base amount so re-running is harmless), then email parents and students and text parents about invoices due within 3 days or overdue, at most once per invoice per day. "Today" is taken in `SCHOOL_TIMEZONE`.
 - **Receipts**: every payment has a printable receipt at `/app/receipts/<payment id>`, linked from Income & expenses and from an invoice's payment history. Students see their own, parents their children's.
 
+## Report cards
+
+**Exams → Exam timetable** holds each exam's papers per class (overlapping papers of a class are flagged) and prints admit cards. **Exams → Report cards** shows and prints report cards per exam or for the whole year ("Annual"); print them one at a time or a whole class/section at once with the browser's print → Save as PDF.
+
+- Grades come from the grade table by raw mark. Any subject with grade point 0 makes the exam a **Fail** with GPA 0; while marks are missing it is **Incomplete**; otherwise GPA is the mean grade point. Full marks per subject come from `mark.mark_total`, or 100.
+- Positions rank by total (annual: weighted percentage) over the whole class and within the section; ties share a position (1, 1, 3).
+- The annual result weighs each exam by **Exam weights** (admin, on the Report cards page); weights should add up to 100%. CGPA is the weighted GPA; any failed exam makes the year a Fail.
+- Attendance is days present over working days (calendar holidays and weekly days off excluded) in the term the exam's papers fall in, or else the school year's dates; without dates, from the first to the last recorded attendance day.
+- Admins and the class's teachers (class teacher, section teacher, or a teacher of one of its subjects) write the remark.
+
 ## Docker
 
 ```bash
