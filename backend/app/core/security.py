@@ -9,6 +9,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
 
 from app.core.config import get_settings
+from app.core.tenancy import current_slug
 
 _argon = PasswordHasher()
 ALGORITHM = "HS256"
@@ -53,6 +54,8 @@ def password_fingerprint(stored: str | None) -> str:
 def create_token(*, role: str, user_id: int, fp: str, kind: str, lifetime: timedelta) -> str:
     now = datetime.now(UTC)
     payload = {"sub": f"{role}:{user_id}", "fp": fp, "typ": kind, "iat": now, "exp": now + lifetime}
+    if (school := current_slug()) is not None:
+        payload["tid"] = school  # a token from one school is refused by every other school
     return jwt.encode(payload, get_settings().secret_key, algorithm=ALGORITHM)
 
 
@@ -61,7 +64,7 @@ def decode_token(token: str, kind: str) -> dict[str, Any] | None:
         payload = jwt.decode(token, get_settings().secret_key, algorithms=[ALGORITHM])
     except jwt.PyJWTError:
         return None
-    if payload.get("typ") != kind:
+    if payload.get("typ") != kind or payload.get("tid") != current_slug():
         return None
     return payload
 
@@ -71,7 +74,9 @@ def decode_token(token: str, kind: str) -> dict[str, Any] | None:
 
 def _media_sig(path: str, exp: int) -> str:
     key = get_settings().secret_key.encode()
-    return hmac.new(key, f"{path}|{exp}".encode(), hashlib.sha256).hexdigest()[:32]
+    school = current_slug()
+    message = f"{path}|{exp}" if school is None else f"{school}|{path}|{exp}"
+    return hmac.new(key, message.encode(), hashlib.sha256).hexdigest()[:32]
 
 
 def sign_media_path(path: str, seconds: int | None = None) -> str:

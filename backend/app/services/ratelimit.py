@@ -12,6 +12,7 @@ from collections import defaultdict, deque
 from fastapi import HTTPException, status
 
 from app.core.redis import get_redis
+from app.core.tenancy import current_slug
 
 _local: dict[str, deque[float]] = defaultdict(deque)
 
@@ -43,6 +44,8 @@ def _allow_redis(redis, key: str, limit: int, window: int, now: float) -> bool:
 
 def throttle(key: str, limit: int, window: int, message: str) -> None:
     """Record one hit for `key`; raise 429 when it already had `limit` hits in the last `window` seconds."""
+    if (school := current_slug()) is not None:
+        key = f"{school}:{key}"
     now = time.time()
     redis = get_redis()
     allowed = _allow_redis(redis, key, limit, window, now) if redis else _allow_local(key, limit, window, now)

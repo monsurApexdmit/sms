@@ -18,7 +18,8 @@ from datetime import date, timedelta
 from sqlalchemy import select
 
 from app.core.security import hash_password
-from app.db import SessionLocal
+from app.core.tenancy import multi_tenant, tenant_by_slug, use_tenant
+from app.db import new_session
 from app.models import (
     Accountant,
     Admin,
@@ -50,10 +51,22 @@ DEMO_ADMIN = "admin@demo.school"
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--yes", action="store_true", help="confirm writing demo rows")
-    if not parser.parse_args().yes:
+    parser.add_argument("--school", help="school slug, on a multi-school install (see scripts.tenants)")
+    args = parser.parse_args()
+    if not args.yes:
         sys.exit("Refusing to write demo data without --yes")
+    if multi_tenant():
+        tenant = tenant_by_slug(args.school or "", refresh=True)
+        if tenant is None:
+            sys.exit("Several schools are configured: pass --school <slug> (python -m scripts.tenants list)")
+        with use_tenant(tenant):
+            seed()
+    else:
+        seed()
 
-    db = SessionLocal()
+
+def seed() -> None:
+    db = new_session()
     if db.scalars(select(Admin).where(Admin.email == DEMO_ADMIN)).first():
         print("Demo data already present; nothing to do.")
         return

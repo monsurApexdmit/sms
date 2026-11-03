@@ -196,6 +196,22 @@ How a payment is recorded (same rules as PayPal): the server starts the payment 
 
 **Check against each sandbox before going live** (the code follows the public docs and is tested against simulated responses only): SSLCommerz — the validation API's `currency_type`/`currency_amount` vs `currency`/`amount` fields for BDT payments and the IPN form fields; bKash — the exact `transactionStatus` values and the error code returned when execute is called twice; Nagad — the JSON key order and encoding inside `sensitiveData`, the response signature check (some sandbox accounts sign differently), the `status` values of `verify/payment`, and how the callback URL query is appended.
 
+## Several schools
+
+One install can serve several schools, each with **its own database and uploads folder**, chosen by the host name the request comes in on (`greenfield.example.com` → Greenfield's database). Off by default: without `CONTROL_DATABASE_URL` everything works as a single school on `DATABASE_URL`.
+
+1. Create an empty database for the registry and set `CONTROL_DATABASE_URL` (its `tenant` table is created automatically).
+2. For each school: `python -m scripts.tenants create-db-sql <slug>` prints the SQL for a MySQL database and user; `python -m scripts.tenants import-sql <slug>` shows how to load `sqldatabase/sms.sql` into it; then
+   `python -m scripts.tenants add <slug> --name "…" --hosts school.example.com --database-url "mysql+pymysql://…"` and `python -m scripts.tenants migrate <slug>`.
+3. Point each school's DNS at the server. nginx passes the `Host` header to the API; unknown or disabled hosts get 404.
+
+Other commands: `list`, `set <slug> --hosts … / --database-url … / --timezone … / --frontend-url … / --upload-dir …`, `disable`/`enable <slug>`, `migrate-all`. Running API processes see changes within 30 seconds. The Docker image runs `migrate-all` on start.
+
+- **Per school:** database, uploads (default `UPLOAD_DIR/<slug>`), the address used in emailed links (default `https://<first host>`), and the time zone (default `SCHOOL_TIMEZONE`). Everything else comes from the environment and is shared.
+- **Isolation:** sign-in tokens and signed file links carry the school and are refused by every other school; rate limits are counted per school; queued emails/SMS/push run against the school that queued them; the daily fee jobs run for each active school in turn.
+- **Demo data:** `python -m scripts.seed_demo --yes --school <slug>`.
+- `TRUST_FORWARDED_HOST=true` makes the API route by `X-Forwarded-Host`; set it only when a proxy in front of nginx sets that header itself.
+
 ## Docker
 
 ```bash

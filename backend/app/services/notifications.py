@@ -24,7 +24,7 @@ from pywebpush import WebPushException, webpush
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
 
-from app.db import SessionLocal
+from app.db import new_session
 from app.models import Enroll, Notification, NotificationPreference, PushSubscription, Student
 from app.services import notify as delivery
 from app.services.accounts import ROLE_MODELS, id_column
@@ -153,7 +153,7 @@ def available_channels(db: Session) -> dict[str, bool]:
 
 def send_push(subscription_id: int, payload: str) -> None:
     """Deliver one web push. Subscriptions the push service reports as gone are deleted."""
-    with SessionLocal() as db:
+    with new_session() as db:
         sub = db.get(PushSubscription, subscription_id)
         keys = vapid_keys(db)
         if sub is None or keys is None:
@@ -182,7 +182,7 @@ def send_whatsapp(phone: str, text: str) -> None:
     """Send through the WhatsApp Cloud API. With `whatsapp_template` set, the approved template
     is used with the text as its single body parameter ({{1}}): Meta only allows free text to
     people who wrote to the school in the last 24 hours, so templates are needed for alerts."""
-    with SessionLocal() as db:
+    with new_session() as db:
         token = get_setting(db, "whatsapp_token").strip()
         number_id = get_setting(db, "whatsapp_phone_number_id").strip()
         template = get_setting(db, "whatsapp_template").strip()

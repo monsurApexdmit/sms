@@ -43,7 +43,8 @@ from app.api.routers import (
 from app.core.config import get_settings
 from app.core.monitoring import init_sentry, setup_logging
 from app.core.redis import get_redis
-from app.db import SessionLocal, engine
+from app.core.tenancy import TenantMiddleware, control_engine, multi_tenant
+from app.db import engine, on_new_sessionmaker
 from app.services import audit as audit_trail
 
 setup_logging()
@@ -53,7 +54,7 @@ if get_settings().secret_key.startswith("change-me"):
     # Development only: ENVIRONMENT=production refuses to start with this key.
     logging.getLogger("startup").warning("SECRET_KEY is the built-in default. Set a random value before deploying.")
 
-audit_trail.install(SessionLocal)
+on_new_sessionmaker(audit_trail.install)
 
 app = FastAPI(
     title="School Management API",
@@ -70,6 +71,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Several schools: route each request to its school's database by Host (no-op for one school).
+app.add_middleware(TenantMiddleware)
 
 api = APIRouter(prefix="/api")
 # One module per line: each feature adds its own line here.
@@ -125,7 +128,8 @@ READY_TIMEOUT = 3  # seconds per dependency
 
 
 def _check_database() -> None:
-    with engine.connect() as conn:
+    # several schools: the control database must answer (each school's database is checked on use)
+    with (control_engine() if multi_tenant() else engine).connect() as conn:
         conn.execute(text("SELECT 1"))
 
 

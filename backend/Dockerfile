@@ -16,4 +16,6 @@ USER appuser
 
 EXPOSE 8000
 # Applies pending migrations, then starts the API. The worker service overrides this command.
-CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips '*'"]
+# Several schools (CONTROL_DATABASE_URL set): migrates every active school; a school whose
+# migration fails is reported and the API still starts for the others.
+CMD ["sh", "-c", "if [ -n \"$CONTROL_DATABASE_URL\" ]; then python -m scripts.tenants migrate-all || echo 'WARNING: some schools were not migrated'; else alembic upgrade head; fi && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips '*'"]
