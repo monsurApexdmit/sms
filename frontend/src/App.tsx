@@ -23,6 +23,7 @@ const ForgotPasswordPage = page(() => import("./pages/Auth"), "ForgotPasswordPag
 const LoginPage = page(() => import("./pages/Auth"), "LoginPage");
 const ResetPasswordPage = page(() => import("./pages/Auth"), "ResetPasswordPage");
 const FacilitiesPage = page(() => import("./pages/Campus"), "FacilitiesPage");
+const HomeworkPage = page(() => import("./pages/Homework"), "HomeworkPage");
 const LibraryPage = page(() => import("./pages/Campus"), "LibraryPage");
 const NoticesPage = page(() => import("./pages/Campus"), "NoticesPage");
 const DashboardPage = page(() => import("./pages/Dashboard"), "DashboardPage");
@@ -88,6 +89,7 @@ const APP_PAGES: [string, ReactNode][] = [
   ["my-routine", <MyRoutinePage />],
   ["syllabus", <SyllabusPage />],
   ["study-material", <StudyMaterialPage />],
+  ["homework", <HomeworkPage />],
   ["calendar", <CalendarPage />],
   ["exams", <ExamsPage />],
   ["marks", <MarksPage />],

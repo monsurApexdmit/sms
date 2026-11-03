@@ -240,3 +240,48 @@ export interface SchoolYear {
   is_current: boolean;
   terms: { term_id: number; name: string; start_date: string | null; end_date: string | null }[];
 }
+
+export interface HomeworkSubmission {
+  submission_id: number;
+  student_id: number;
+  text: string | null;
+  file_url: string | null;
+  submitted_at: string;
+  is_late: boolean;
+  marks: number | null;
+  feedback: string | null;
+  graded_at: string | null;
+}
+
+export interface Homework {
+  homework_id: number;
+  class_id: number;
+  class_name: string | null;
+  section_id: number | null;
+  section_name: string | null;
+  subject_id: number;
+  subject_name: string | null;
+  teacher_id: number | null;
+  teacher_name: string | null;
+  title: string;
+  description: string | null;
+  file_url: string | null;
+  assigned_on: string;
+  due_date: string;
+  max_marks: number | null;
+  allow_late: boolean;
+  year: string;
+  /** staff view */
+  students: number | null;
+  submitted: number | null;
+  graded: number | null;
+  /** student / parent view */
+  submission: HomeworkSubmission | null;
+}
+
+export interface HomeworkRosterRow {
+  student_id: number;
+  name: string | null;
+  roll: number | null;
+  submission: HomeworkSubmission | null;
+}
