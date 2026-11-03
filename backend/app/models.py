@@ -7,21 +7,24 @@ Tables added by this system are at the end of the file and are created by the
 Alembic migrations in `migrations/`; the legacy app ignores them.
 """
 
-from datetime import date, datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Index, Integer, LargeBinary, Numeric, String, Text, UniqueConstraint
-
-
-from datetime import date, datetime, time
-
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, Integer, LargeBinary, String, Text, Time
-
-
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, Integer, LargeBinary, Numeric, String, Text, UniqueConstraint
-
-
-from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Index, Integer, LargeBinary, String, Text
+from sqlalchemy import (
+    Boolean,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    LargeBinary,
+    Numeric,
+    String,
+    Text,
+    Time,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
