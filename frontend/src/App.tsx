@@ -19,6 +19,7 @@ const AttendancePage = page(() => import("./pages/Attendance"), "AttendancePage"
 const CalendarPage = page(() => import("./pages/Calendar"), "CalendarPage");
 const SchoolYearsPage = page(() => import("./pages/Calendar"), "SchoolYearsPage");
 const AttendanceReportPage = page(() => import("./pages/Attendance"), "AttendanceReportPage");
+const LeavePage = page(() => import("./pages/Leave"), "LeavePage");
 const ForgotPasswordPage = page(() => import("./pages/Auth"), "ForgotPasswordPage");
 const LoginPage = page(() => import("./pages/Auth"), "LoginPage");
 const ResetPasswordPage = page(() => import("./pages/Auth"), "ResetPasswordPage");
@@ -99,6 +100,7 @@ const APP_PAGES: [string, ReactNode][] = [
   ["exam-sms", <ExamSmsPage />],
   ["attendance", <AttendancePage />],
   ["attendance-report", <AttendanceReportPage />],
+  ["leave", <LeavePage />],
   ["invoices", <InvoicesPage />],
   ["my-invoices", <MyInvoicesPage />],
   ["accounting", <AccountingPage />],

@@ -240,3 +240,25 @@ export interface SchoolYear {
   is_current: boolean;
   terms: { term_id: number; name: string; start_date: string | null; end_date: string | null }[];
 }
+
+export interface LeaveRequest {
+  leave_id: number;
+  kind: "sick" | "casual" | "family" | "other";
+  from_date: string;
+  to_date: string;
+  days: number;
+  reason: string | null;
+  status: "pending" | "approved" | "rejected" | "cancelled";
+  person_role: string;
+  person_name: string;
+  student_id: number | null;
+  class_name: string | null;
+  applicant_role: string;
+  applicant_name: string;
+  decided_by_name: string | null;
+  decided_at: string | null;
+  decision_note: string | null;
+  created_at: string;
+  can_cancel: boolean;
+  can_decide: boolean;
+}
