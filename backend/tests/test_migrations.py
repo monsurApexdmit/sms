@@ -15,11 +15,7 @@ NEW_TABLES = {
 NEW_TABLES |= {"fee_head", "fee_plan", "fee_plan_item", "fee_instalment", "fee_discount", "fee_invoice"}
 NEW_TABLES |= {"exam_schedule", "exam_weight", "report_remark"}
 NEW_TABLES |= {"meeting_booking", "meeting_session", "meeting_slot"}
-
-
-    "audit_log", "academic_year", "term", "calendar_event",
-    "staff_attendance", "salary_structure", "payroll_run", "payslip",
-}  # fmt: skip
+NEW_TABLES |= {"payroll_run", "payslip", "salary_structure", "staff_attendance"}
 NEW_TABLES |= {"driver", "route_stop", "student_transport", "vehicle"}
 
 

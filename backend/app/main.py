@@ -16,8 +16,8 @@ from app.api.routers import (
     fees,
     finance,
     homework,
-    leave,
     hr,
+    leave,
     library,
     meetings,
     messages,
@@ -58,18 +58,36 @@ app.add_middleware(
 )
 
 api = APIRouter(prefix="/api")
-for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar, homework, export):
-for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar, meetings):
-for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar, hr):
-    api.include_router(module.router)
-api.include_router(leave.router)
-api.include_router(report_cards.router)
-for router in accounts.routers:
+# One module per line: each feature adds its own line here.
+ROUTERS = (
+    auth.router,
+    students.router,
+    academic.router,
+    exams.router,
+    attendance.router,
+    finance.router,
+    library.router,
+    notices.router,
+    messages.router,
+    online_exams.router,
+    system.router,
+    audit.router,
+    years.router,
+    calendar.router,
+    homework.router,
+    export.router,
+    leave.router,
+    report_cards.router,
+    fees.router,
+    meetings.router,
+    hr.router,
+    transport.router,
+    *accounts.routers,
+    cms.public,
+    cms.admin,
+)
+for router in ROUTERS:
     api.include_router(router)
-api.include_router(cms.public)
-api.include_router(cms.admin)
-api.include_router(fees.router)
-api.include_router(transport.router)
 
 
 @api.get("/health", tags=["system"])
