@@ -14,7 +14,6 @@ import dayjs from "dayjs";
 import "dayjs/locale/bn";
 import { Fragment, createElement, type ReactNode } from "react";
 
-import { bn } from "./bn";
 import type { MessageKey } from "./en";
 
 export type { MessageKey } from "./en";
@@ -27,7 +26,10 @@ export const LANGUAGES: { code: Lang; label: string }[] = [
   { code: "bn", label: "বাংলা" },
 ];
 
-const DICTIONARIES: Record<Exclude<Lang, "en">, Record<MessageKey, string>> = { bn };
+/** Loaded on demand: English users never download a dictionary. */
+const DICTIONARIES: Record<Exclude<Lang, "en">, () => Promise<Record<MessageKey, string>>> = {
+  bn: () => import("./bn").then((m) => m.bn),
+};
 
 const USER_KEY = "sms.language";
 const SCHOOL_KEY = "sms.schoolLanguage";
@@ -73,7 +75,16 @@ export const lang: Lang = detect();
  */
 export const digits: Digits = read(DIGITS_KEY) === "beng" ? "beng" : "latn";
 
-const dictionary: Record<string, string> | null = lang === "en" ? null : DICTIONARIES[lang];
+let dictionary: Record<string, string> | null = null;
+
+/** Resolves once the active language's dictionary is loaded (at once for English). If it can't be loaded, English is shown. */
+export const ready: Promise<void> =
+  lang === "en"
+    ? Promise.resolve()
+    : DICTIONARIES[lang]().then(
+        (d) => void (dictionary = d),
+        () => undefined,
+      );
 
 if (typeof document !== "undefined") document.documentElement.lang = lang;
 // month and weekday names in Bangla; code that compares day names must use .locale("en")
@@ -94,9 +105,11 @@ function lookup(key: string): string {
   return dictionary?.[key] || key;
 }
 
+/** A placeholder value: numbers get the active digits but no grouping (they are often ids, rolls, years). */
 function show(value: string | number | null | undefined): string {
   if (value === null || value === undefined) return "";
-  return typeof value === "number" ? formatNumber(value) : value;
+  if (typeof value !== "number" || lang === "en") return String(value);
+  return new Intl.NumberFormat(intlLocale(), { useGrouping: false, maximumFractionDigits: 20 }).format(value);
 }
 
 /** Translated text with `{name}` placeholders filled in. */
@@ -114,7 +127,7 @@ export function tn(key: MessageKey, vars: Record<string, ReactNode>): ReactNode 
     const name = m[1]!;
     if (m.index! > last) parts.push(text.slice(last, m.index));
     const value = name in vars ? vars[name] : m[0];
-    parts.push(typeof value === "number" ? formatNumber(value) : value);
+    parts.push(typeof value === "number" ? show(value) : value);
     last = m.index! + m[0].length;
   }
   if (last < text.length) parts.push(text.slice(last));

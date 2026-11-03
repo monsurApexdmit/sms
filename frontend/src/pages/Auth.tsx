@@ -8,6 +8,7 @@ import { usePublicSettings } from "../api/hooks";
 import type { MfaChallenge, MfaConfirm, TokenResponse } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { Field } from "../components/field";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { CodeInput, RecoveryCodes, TotpSetup } from "../components/TwoFactor";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Button } from "../components/ui/button";
@@ -72,7 +73,10 @@ function AuthShell({ title, description, children }: { title: string; descriptio
           {settings.data?.address && <p className="text-primary-foreground/70 text-sm">{settings.data.address}</p>}
         </div>
       </aside>
-      <main className="flex items-center justify-center p-4 sm:p-8">
+      <main className="relative flex items-center justify-center p-4 sm:p-8">
+        <div className="absolute top-3 right-3">
+          <LanguageSwitcher />
+        </div>
         <div className="w-full max-w-sm space-y-6">
           <div className="flex flex-col items-center gap-2 text-center lg:hidden">
             <Logo className="bg-primary text-primary-foreground" />

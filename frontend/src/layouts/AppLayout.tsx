@@ -4,6 +4,7 @@ import { Link, Navigate, Outlet, useLocation, useNavigate } from "react-router-d
 import { useGet, usePublicSettings } from "../api/hooks";
 import { useAuth } from "../auth/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { NotificationBell } from "../components/NotificationBell";
 import { Badge } from "../components/ui/badge";
 import {
@@ -54,6 +55,7 @@ export function AppLayout() {
           <span className="truncate font-medium">{settings.data?.system_title || settings.data?.system_name}</span>
           <div className="ml-auto flex items-center gap-2">
             {settings.data?.running_year && <Badge variant="secondary">{tn("Session {running_year}", { running_year: settings.data.running_year })}</Badge>}
+            <LanguageSwitcher compact />
             <NotificationBell />
           </div>
         </header>

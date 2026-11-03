@@ -31,6 +31,7 @@ import { api } from "../../api/client";
 import { useAction, useGet, usePublicSettings } from "../../api/hooks";
 import { EmptyState } from "../../components/states";
 import { Field } from "../../components/field";
+import { LanguageSwitcher } from "../../components/LanguageSwitcher";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
@@ -257,6 +258,7 @@ export function PublicLayout() {
           </NavigationMenu>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <Button asChild size="sm" className="hidden sm:inline-flex">
               <Link to="/login">
                 <LogInIcon />

@@ -33,7 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Textarea } from "../components/ui/textarea";
 import { cn } from "../lib/utils";
 import { fromUnix } from "../utils";
-import { t as tr } from "../i18n";
+import { normalizeLanguage, t as tr } from "../i18n";
 
 type Dict = Record<string, string | null>;
 const MASK = "********";
@@ -211,7 +211,7 @@ export function SystemSettingsPage() {
           <SettingsCard
             title={tr("General")}
             description={tr("Basic information shown across the system")}
-            footer={saveBtn(["system_name", "system_title", "address", "phone", "system_email", "currency", "running_year", "disable_frontend", "weekly_off_days"])}
+            footer={saveBtn(["system_name", "system_title", "address", "phone", "system_email", "currency", "running_year", "disable_frontend", "weekly_off_days", "language"])}
           >
             <div className="grid gap-4 sm:grid-cols-2">
               {field("system_name", tr("School name"))}
@@ -233,6 +233,17 @@ export function SystemSettingsPage() {
                   value={(values.weekly_off_days ?? "").split(",").filter(Boolean)}
                   onChange={(v) => set("weekly_off_days", [...v].sort().join(","))}
                   placeholder={tr("None")}
+                />
+              </Field>
+              <Field label={tr("Default language")} description={tr("For everyone who has not picked a language in the menu")}>
+                <Combobox
+                  // the old app reads application/language/<value>.json, so these are its file names
+                  data={[
+                    { value: "english", label: "English" },
+                    { value: "bengali", label: "বাংলা" },
+                  ]}
+                  value={normalizeLanguage(values.language) === "bn" ? "bengali" : "english"}
+                  onChange={(v) => set("language", v ?? "english")}
                 />
               </Field>
               <Field label={tr("Public website")}>
