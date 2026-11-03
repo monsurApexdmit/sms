@@ -3,7 +3,7 @@
 0/NULL = not taken, 1 = present, 2 = absent."""
 
 import calendar
-from datetime import date
+from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -15,6 +15,7 @@ from app.models import Attendance, Enroll, Parent, Student
 from app.services.access import ensure_can_view_student
 from app.services.jobs import enqueue
 from app.services.notify import send_sms
+from app.services.school_calendar import holidays_between, weekly_off_days, working_days
 from app.services.settings import get_setting, running_year
 
 router = APIRouter(prefix="/attendance", tags=["attendance"])
@@ -33,6 +34,18 @@ def _month_range(month: str) -> tuple[int, int, int]:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "month must be YYYY-MM") from None
     start = calendar.timegm(date(y, m, 1).timetuple())
     return start, start + days * 86400, days
+
+
+def _month_calendar(db: Session, start: int, days: int) -> dict:
+    """Day numbers of the month that are holidays (with titles) or weekly days off, and the working-day count."""
+    first = datetime.fromtimestamp(start, timezone.utc).date()
+    last = date(first.year, first.month, days)
+    off = weekly_off_days(db)
+    return {
+        "holidays": {d.day: title for d, title in holidays_between(db, first, last).items()},
+        "off_days": [n for n in range(1, days + 1) if date(first.year, first.month, n).weekday() in off],
+        "working_days": working_days(db, first, last),
+    }
 
 
 class SheetRow(BaseModel):
@@ -143,6 +156,7 @@ def class_report(class_id: int, section_id: int, month: str, db: DB):
             grid[a.student_id][(ts - start) // 86400 + 1] = a.status or 0
     return {
         "days": days,
+        **_month_calendar(db, start, days),
         "rows": [
             {
                 "student_id": sid,
@@ -168,6 +182,7 @@ def student_report(student_id: int, month: str, user: Me, db: DB):
             out[(ts - start) // 86400 + 1] = a.status or 0
     return {
         "days": days,
+        **_month_calendar(db, start, days),
         "records": out,
         "present": sum(1 for v in out.values() if v == 1),
         "absent": sum(1 for v in out.values() if v == 2),

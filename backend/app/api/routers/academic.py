@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.api.crud import Page, crud_router, get_or_404, out_schema
 from app.core.deps import DB, CurrentUser, Me, forbid, require_roles
-from app.models import AcademicSyllabus, ClassRoutine, Document, Enroll, SchoolClass, Section, Subject
+from app.models import AcademicSyllabus, AcademicYear, ClassRoutine, Document, Enroll, SchoolClass, Section, Subject
 from app.services.access import STAFF, children_ids, current_enroll, ensure_can_view_student
 from app.services.files import delete_file, media_url, save_document
 from app.services.settings import running_year
@@ -80,9 +80,10 @@ for sub in (
 
 @router.get("/academic-years")
 def academic_years(db: DB, _: Me):
-    """Running year plus every year present in enrolments, and the next two for promotion."""
+    """Running year plus every year present in enrolments or set up as a school year, and the next two for promotion."""
     current = running_year(db)
     years = {y for y in db.scalars(select(Enroll.year).distinct()) if y}
+    years.update(db.scalars(select(AcademicYear.name)))
     years.add(current)
     if current[:4].isdigit():
         start = int(current[:4])

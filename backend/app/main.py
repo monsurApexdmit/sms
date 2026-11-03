@@ -9,6 +9,7 @@ from app.api.routers import (
     attendance,
     audit,
     auth,
+    calendar,
     cms,
     exams,
     finance,
@@ -18,6 +19,7 @@ from app.api.routers import (
     online_exams,
     students,
     system,
+    years,
 )
 from app.core.config import get_settings
 from app.db import SessionLocal
@@ -48,7 +50,7 @@ app.add_middleware(
 )
 
 api = APIRouter(prefix="/api")
-for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit):
+for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar):
     api.include_router(module.router)
 for router in accounts.routers:
     api.include_router(router)

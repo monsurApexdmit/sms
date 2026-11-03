@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { CalendarDaysIcon, CheckIcon, ClipboardCheckIcon, PrinterIcon, SaveIcon, UndoIcon, XIcon } from "lucide-react";
+import { CalendarDaysIcon, CheckIcon, ClipboardCheckIcon, PartyPopperIcon, PrinterIcon, SaveIcon, UndoIcon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,6 +13,7 @@ import { Field } from "../components/field";
 import { PageHeader } from "../components/PageHeader";
 import { ClassPicker, type Selection } from "../components/Pickers";
 import { Dash, EmptyState, TableState } from "../components/states";
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardFooter } from "../components/ui/card";
@@ -40,6 +41,16 @@ const STATUS = [
 ];
 
 const PRESENT_BADGE = "bg-success/15 text-success border-transparent";
+const OFF_CELL = "bg-muted text-muted-foreground";
+
+/** Holiday titles and weekly days off of a month, as returned with the attendance reports. */
+interface MonthCalendar {
+  holidays: Record<string, string>;
+  off_days: number[];
+  working_days: number;
+}
+
+const offTitle = (cal: MonthCalendar, day: number) => cal.holidays[String(day)] ?? (cal.off_days.includes(day) ? "Weekly day off" : undefined);
 const ABSENT_BADGE = "bg-destructive/10 text-destructive border-transparent";
 
 export function AttendancePage() {
@@ -47,6 +58,7 @@ export function AttendancePage() {
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
   const ready = sel.classId && sel.sectionId && date;
   const sheet = useGet<SheetRow[]>(ready ? "/attendance/sheet" : null, { class_id: sel.classId, section_id: sel.sectionId, date });
+  const day = useGet<{ holiday: string | null; weekly_off: boolean }>(date ? "/calendar/day" : null, { date });
   const [rows, setRows] = useState<SheetRow[]>([]);
   useEffect(() => setRows(sheet.data ?? []), [sheet.data]);
 
@@ -85,6 +97,13 @@ export function AttendancePage() {
           </Field>
         </CardContent>
       </Card>
+      {(day.data?.holiday || day.data?.weekly_off) && (
+        <Alert>
+          <PartyPopperIcon />
+          <AlertTitle>{day.data.holiday ? `Holiday: ${day.data.holiday}` : "Weekly day off"}</AlertTitle>
+          <AlertDescription>This day is not a school day in the academic calendar. You can still record attendance if classes were held.</AlertDescription>
+        </Alert>
+      )}
       {ready ? (
         <Card className="gap-0 overflow-hidden py-0">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
@@ -188,12 +207,16 @@ function Legend() {
         <span className="inline-flex size-5 rounded-sm border" />
         Not marked
       </span>
+      <span className="flex items-center gap-1.5">
+        <span className={cn("inline-flex size-5 items-center justify-center rounded-sm font-semibold", OFF_CELL)}>H</span>
+        Holiday / day off
+      </span>
     </div>
   );
 }
 
 function StudentMonth({ studentId, month }: { studentId: string; month: string }) {
-  const { data, isLoading } = useGet<{ days: number; records: Record<string, number>; present: number; absent: number }>(`/attendance/student/${studentId}`, { month });
+  const { data, isLoading } = useGet<MonthCalendar & { days: number; records: Record<string, number>; present: number; absent: number }>(`/attendance/student/${studentId}`, { month });
   if (isLoading) return <Skeleton className="h-80 w-full" />;
   if (!data) return null;
   const first = dayjs(`${month}-01`);
@@ -205,6 +228,7 @@ function StudentMonth({ studentId, month }: { studentId: string; month: string }
           <span className="font-semibold">{first.format("MMMM YYYY")}</span>
           <Badge className={PRESENT_BADGE}>Present {data.present}</Badge>
           <Badge className={ABSENT_BADGE}>Absent {data.absent}</Badge>
+          <Badge variant="secondary">Working days {data.working_days}</Badge>
         </div>
         <Legend />
       </CardContent>
@@ -220,11 +244,13 @@ function StudentMonth({ studentId, month }: { studentId: string; month: string }
           ))}
           {Array.from({ length: data.days }, (_, i) => {
             const s = data.records[String(i + 1)];
+            const off = offTitle(data, i + 1);
             const isToday = first.add(i, "day").format("YYYY-MM-DD") === today;
             return (
-              <div key={i} className={cn("flex aspect-square flex-col rounded-md border p-1 sm:aspect-auto sm:h-16 sm:p-2", cellClass(s), isToday && "ring-primary ring-2")}>
+              <div key={i} title={off} className={cn("flex aspect-square flex-col rounded-md border p-1 sm:aspect-auto sm:h-16 sm:p-2", off && !s && OFF_CELL, cellClass(s), isToday && "ring-primary ring-2")}>
                 <span className="text-muted-foreground text-[10px] sm:text-xs">{i + 1}</span>
-                <span className="m-auto text-sm font-bold">{cellText(s)}</span>
+                <span className="m-auto text-sm font-bold">{cellText(s) || (off ? "H" : "")}</span>
+                {data.holidays[String(i + 1)] && <span className="hidden truncate text-[10px] sm:block">{data.holidays[String(i + 1)]}</span>}
               </div>
             );
           })}
@@ -244,7 +270,7 @@ export function AttendanceReportPage() {
   const { childId, select } = useChildSelect();
   const [studentId, setStudentId] = useState<string | null>(null);
   const ready = staff && sel.classId && sel.sectionId && month;
-  const report = useGet<{ days: number; rows: ReportRow[] }>(ready ? "/attendance/report" : null, { class_id: sel.classId, section_id: sel.sectionId, month });
+  const report = useGet<MonthCalendar & { days: number; rows: ReportRow[] }>(ready ? "/attendance/report" : null, { class_id: sel.classId, section_id: sel.sectionId, month });
   const students = useList<Student>(staff && sel.classId ? "/students" : null, { class_id: sel.classId, section_id: sel.sectionId || undefined, limit: 1000 });
   const ownId = user.role === "student" ? String(user.id) : childId;
   const classes = useClasses();
@@ -314,8 +340,9 @@ export function AttendanceReportPage() {
       {ready && !studentId && (
         <>
           <PrintHeader title="Attendance sheet" lines={[`Class ${className ?? ""}`, `Section ${sectionName ?? ""}`, monthLabel]} />
-          <div className="no-print">
+          <div className="no-print flex flex-wrap items-center justify-between gap-3">
             <Legend />
+            {report.data && <Badge variant="secondary">Working days {report.data.working_days}</Badge>}
           </div>
           <Card className="gap-0 overflow-hidden py-0 print:rounded-none print:shadow-none">
             {report.isLoading ? (
@@ -331,8 +358,9 @@ export function AttendanceReportPage() {
                     <TableHead className="bg-muted sticky left-0 z-10 min-w-44 print:static">Student</TableHead>
                     {Array.from({ length: report.data.days }, (_, i) => {
                       const d = first.add(i, "day");
+                      const off = offTitle(report.data!, i + 1);
                       return (
-                        <TableHead key={i} className={cn("h-auto px-1 py-1 text-center", (d.day() === 5 || d.day() === 6) && "text-muted-foreground")}>
+                        <TableHead key={i} title={off} className={cn("h-auto px-1 py-1 text-center", off && OFF_CELL)}>
                           <div className="text-[10px] font-normal">{d.format("dd")[0]}</div>
                           <div>{i + 1}</div>
                         </TableHead>
@@ -352,9 +380,10 @@ export function AttendanceReportPage() {
                       </TableCell>
                       {Array.from({ length: report.data!.days }, (_, i) => {
                         const s = r.days[String(i + 1)];
+                        const off = offTitle(report.data!, i + 1);
                         return (
-                          <TableCell key={i} className={cn("min-w-7 px-1 text-center font-semibold", cellClass(s))}>
-                            {cellText(s)}
+                          <TableCell key={i} className={cn("min-w-7 px-1 text-center font-semibold", off && !s && OFF_CELL, cellClass(s))}>
+                            {cellText(s) || (off ? "H" : "")}
                           </TableCell>
                         );
                       })}

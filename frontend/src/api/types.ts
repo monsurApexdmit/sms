@@ -221,3 +221,22 @@ export interface AuditEntry {
   row_id: string;
   changes: Record<string, unknown>;
 }
+
+export interface CalendarEvent {
+  event_id: number;
+  title: string;
+  description: string | null;
+  start_date: string;
+  end_date: string;
+  kind: "holiday" | "exam" | "event" | "meeting" | "other";
+  audience: "all" | "staff" | "students" | "parents";
+}
+
+export interface SchoolYear {
+  academic_year_id: number;
+  name: string;
+  start_date: string | null;
+  end_date: string | null;
+  is_current: boolean;
+  terms: { term_id: number; name: string; start_date: string | null; end_date: string | null }[];
+}

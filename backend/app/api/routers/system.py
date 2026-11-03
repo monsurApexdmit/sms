@@ -3,6 +3,7 @@
 import calendar
 import json
 import mimetypes
+import re
 import time
 from datetime import date
 from typing import Any
@@ -42,6 +43,7 @@ from app.services.settings import (
     running_year,
     set_setting,
 )
+from app.services.years import set_current_year, valid_year_name
 
 router = APIRouter(tags=["system"])
 admin_only = [Depends(require_roles("admin"))]
@@ -54,7 +56,7 @@ EDITABLE = {
     "twilio_account_sid", "twilio_auth_token", "twilio_sender_phone_number",
     "msg91_authentication_key", "msg91_sender_ID", "msg91_route", "msg91_country_code",
     "payumoney_merchant_key", "payumoney_salt_id", "paypal", "stripe_keys",
-    "protocol", "smtp_host", "smtp_port", "smtp_user", "smtp_pass",
+    "protocol", "smtp_host", "smtp_port", "smtp_user", "smtp_pass", "weekly_off_days",
 }  # fmt: skip
 SMS_SERVICES = {"", "disabled", "clickatell", "twilio", "msg91"}
 
@@ -91,8 +93,13 @@ def update_settings(body: dict[str, Any], db: DB):
             value = _merge_stripe(db, value)
         if key == "active_sms_service" and (value or "") not in SMS_SERVICES:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Unknown SMS service")
-        if key == "running_year" and value and not (len(value) == 9 and value[4] == "-"):
-            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "running_year must look like 2024-2025")
+        if key == "running_year":
+            if not value or not valid_year_name(value):
+                raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "running_year must look like 2024-2025")
+            set_current_year(db, value)
+            continue
+        if key == "weekly_off_days" and value and not re.fullmatch(r"[0-6](,[0-6])*", value.replace(" ", "")):
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "weekly_off_days must be weekday numbers 0-6 (Monday = 0)")
         set_setting(db, key, value)
     db.commit()
     return all_settings(db)

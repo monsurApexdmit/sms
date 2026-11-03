@@ -16,6 +16,8 @@ const StudyMaterialPage = page(() => import("./pages/Academic"), "StudyMaterialP
 const SubjectsPage = page(() => import("./pages/Academic"), "SubjectsPage");
 const SyllabusPage = page(() => import("./pages/Academic"), "SyllabusPage");
 const AttendancePage = page(() => import("./pages/Attendance"), "AttendancePage");
+const CalendarPage = page(() => import("./pages/Calendar"), "CalendarPage");
+const SchoolYearsPage = page(() => import("./pages/Calendar"), "SchoolYearsPage");
 const AttendanceReportPage = page(() => import("./pages/Attendance"), "AttendanceReportPage");
 const ForgotPasswordPage = page(() => import("./pages/Auth"), "ForgotPasswordPage");
 const LoginPage = page(() => import("./pages/Auth"), "LoginPage");
@@ -79,12 +81,14 @@ const APP_PAGES: [string, ReactNode][] = [
   ["staff", <StaffPage />],
   ["promotion", <PromotionPage />],
   ["id-cards", <IdCardsPage />],
+  ["school-years", <SchoolYearsPage />],
   ["classes", <ClassesPage />],
   ["subjects", <SubjectsPage />],
   ["routine", <RoutinePage />],
   ["my-routine", <MyRoutinePage />],
   ["syllabus", <SyllabusPage />],
   ["study-material", <StudyMaterialPage />],
+  ["calendar", <CalendarPage />],
   ["exams", <ExamsPage />],
   ["marks", <MarksPage />],
   ["marksheet", <MarksheetPage />],

@@ -16,7 +16,7 @@ SECRET_KEYS = {
 }
 PUBLIC_KEYS = {
     "system_name", "system_title", "currency", "language", "text_align", "running_year", "address", "phone",
-    "system_email", "disable_frontend",
+    "system_email", "disable_frontend", "weekly_off_days",
 }  # fmt: skip
 MASK = "********"
 

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { api } from "../api/client";
 import { useAction, useGet, usePagedList, usePublicSettings } from "../api/hooks";
 import type { AuditEntry } from "../api/types";
-import { Combobox } from "../components/combobox";
+import { Combobox, MultiCombobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
 import { DatePicker } from "../components/date-picker";
@@ -97,6 +97,9 @@ function SecretInput({ id, value, onChange }: { id: string; value: string | null
   );
 }
 
+// API weekday numbers: Monday = 0
+const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((label, i) => ({ value: String(i), label }));
+
 const secretHint = (value: string | null | undefined) => (value === MASK ? "Saved; type to replace" : undefined);
 
 export function SystemSettingsPage() {
@@ -176,7 +179,7 @@ export function SystemSettingsPage() {
           <SettingsCard
             title="General"
             description="Basic information shown across the system"
-            footer={saveBtn(["system_name", "system_title", "address", "phone", "system_email", "currency", "running_year", "disable_frontend"])}
+            footer={saveBtn(["system_name", "system_title", "address", "phone", "system_email", "currency", "running_year", "disable_frontend", "weekly_off_days"])}
           >
             <div className="grid gap-4 sm:grid-cols-2">
               {field("system_name", "School name")}
@@ -190,6 +193,14 @@ export function SystemSettingsPage() {
                   data={(years.data?.years ?? []).map((y) => ({ value: y, label: y }))}
                   value={values.running_year ?? null}
                   onChange={(v) => set("running_year", v)}
+                />
+              </Field>
+              <Field label="Weekly days off" description="Not counted as school days in attendance">
+                <MultiCombobox
+                  data={WEEKDAYS}
+                  value={(values.weekly_off_days ?? "").split(",").filter(Boolean)}
+                  onChange={(v) => set("weekly_off_days", [...v].sort().join(","))}
+                  placeholder="None"
                 />
               </Field>
               <Field label="Public website">
