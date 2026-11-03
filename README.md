@@ -122,6 +122,16 @@ For each month, payroll uses the latest salary structure in effect. Working days
 
 **Campus → Transport** manages routes, stops, vehicles, drivers and which student rides where. A route is still a row of the legacy `transport` table, and a student's route is still `student.transport_id`, so the old app and the Transport & dormitory screen keep showing it; the new `student_transport` table adds the stop and pick-up/drop-off choice (it is ignored when the route was since changed on the student form). Route capacity is the seats of the route's active vehicles; assigning more students than that is allowed with a warning. Vehicle insurance/fitness and driving licences expiring within 30 days are listed on the admin dashboard (`GET /api/transport/expiring`). Students and parents see their route, stop, times, vehicle and driver phone. Deleting a route on the old screen leaves its stops in `route_stop`; they are not shown anywhere.
 
+## Student records and certificates
+
+Each student has a health profile and a timeline of health, discipline, counselling, achievement and other records (Students → the heart icon; students and parents use **Health & certificates**). Who sees what is enforced by the API:
+
+- Health profile: admins edit it; admins and teachers who teach a subject in the student's class read it; the student and their parent read it.
+- Records: admins see all. Teachers add records for students they teach, see the non-confidential ones plus confidential ones they wrote, and edit or delete only their own. Parents see non-confidential discipline and achievement records; students see only their non-confidential achievements. Counselling records are always confidential.
+- The audit log records changes to medical notes and to counselling/confidential record text without their values.
+
+Admins issue transfer, bonafide and character certificates from editable templates (**People → Certificates**; "Add default templates" creates the three standard ones). Templates use placeholders such as `{student_name}`, `{class}` and `{serial}`; a placeholder with no value on file prints as `________`. Serial numbers run per kind and calendar year (`TC-2026-0001`, `BC-…`, `CC-…`, `CERT-…`). The issued text is stored, so editing a template later does not change issued certificates. Printing uses the browser's "Save as PDF". Students and parents can print their own certificates until an admin cancels one. Anyone can check a printed serial at `GET /api/public/certificates/verify?serial=TC-2026-0001`, which returns only whether it is valid, its kind, issue date and the student's initials (rate-limited).
+
 ## Docker
 
 ```bash

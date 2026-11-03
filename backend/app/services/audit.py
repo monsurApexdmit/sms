@@ -3,7 +3,8 @@
 A flush hook records every insert, update and delete of the tables in AUDITED, with
 the changed values, into `audit_log` in the same transaction as the change. The
 signed-in user is taken from `session.info["actor"]`, which get_current_user sets.
-Passwords and secret settings are recorded as changed but never with their values.
+Passwords, secret settings, medical free text and the text of counselling or other
+confidential student records are recorded as changed but never with their values.
 """
 
 import json
@@ -24,6 +25,7 @@ AUDITED: tuple[type, ...] = (
     models.FeePlan, models.FeePlanItem, models.FeeInstalment, models.FeeDiscount, models.FeeInvoice,
     models.MeetingSession, models.MeetingSlot, models.MeetingBooking,
     models.StaffAttendance, models.SalaryStructure, models.PayrollRun, models.Payslip,
+    models.StudentHealth, models.StudentRecord, models.CertificateTemplate, models.CertificateIssue,
 )  # fmt: skip
 AUDITED += (models.ExamSchedule, models.ExamWeight, models.ReportRemark)  # report cards
 AUDITED += (models.Vehicle, models.Driver, models.RouteStop, models.StudentTransport)
@@ -32,11 +34,18 @@ SENSITIVE_COLUMNS = {"password", "authentication_key"}
 # Settings rows whose value is a credential (or a JSON blob holding one).
 SECRET_SETTINGS = settings_service.SECRET_KEYS | {"paypal", "stripe_keys", "payumoney_merchant_key", "recaptcha_secret_key"}
 HIDDEN = "[hidden]"
+# Free-text medical details, and the text of counselling or other confidential records.
+HEALTH_TEXT = {"allergies", "conditions", "medications", "notes"}
+RECORD_TEXT = {"title", "details", "action_taken"}
 
 
 def _hide(obj: Any, column: str) -> bool:
     if column in SENSITIVE_COLUMNS:
         return True
+    if isinstance(obj, models.StudentHealth):
+        return column in HEALTH_TEXT
+    if isinstance(obj, models.StudentRecord):
+        return column in RECORD_TEXT and (obj.kind == "counselling" or bool(obj.confidential))
     return isinstance(obj, models.Setting | models.FrontendGeneralSetting) and column == "description" and obj.type in SECRET_SETTINGS
 
 

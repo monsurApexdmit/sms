@@ -9,6 +9,7 @@ import {
   FileDownIcon,
   FileSpreadsheetIcon,
   GraduationCapIcon,
+  HeartPulseIcon,
   IdCardIcon,
   MailIcon,
   MapPinIcon,
@@ -757,6 +758,9 @@ export function StudentsPage() {
                   <div className="flex items-center justify-end gap-1">
                     <IconAction label="View profile" onClick={() => setViewing(s.student_id)}>
                       <EyeIcon />
+                    </IconAction>
+                    <IconAction label="Health, records & certificates" onClick={() => navigate(`/app/students/${s.student_id}/records`)}>
+                      <HeartPulseIcon />
                     </IconAction>
                     {admin && (
                       <>

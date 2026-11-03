@@ -23,6 +23,7 @@ from app.api.routers import (
     messages,
     notices,
     online_exams,
+    records,
     report_cards,
     students,
     system,
@@ -82,8 +83,10 @@ ROUTERS = (
     meetings.router,
     hr.router,
     transport.router,
+    records.router,
     *accounts.routers,
     cms.public,
+    records.public,
     cms.admin,
 )
 for router in ROUTERS:
