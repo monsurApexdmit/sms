@@ -39,6 +39,10 @@ const MessagesPage = page(() => import("./pages/Messages"), "MessagesPage");
 const AnswerScriptPage = page(() => import("./pages/OnlineExams"), "AnswerScriptPage");
 const MyOnlineExamsPage = page(() => import("./pages/OnlineExams"), "MyOnlineExamsPage");
 const OnlineExamDetailPage = page(() => import("./pages/OnlineExams"), "OnlineExamDetailPage");
+const CertificatePrintPage = page(() => import("./pages/StudentRecords"), "CertificatePrintPage");
+const CertificatesPage = page(() => import("./pages/StudentRecords"), "CertificatesPage");
+const MyRecordsPage = page(() => import("./pages/StudentRecords"), "MyRecordsPage");
+const StudentProfilePage = page(() => import("./pages/StudentRecords"), "StudentProfilePage");
 const OnlineExamsPage = page(() => import("./pages/OnlineExams"), "OnlineExamsPage");
 const TakeExamPage = page(() => import("./pages/OnlineExams"), "TakeExamPage");
 const ParentsPage = page(() => import("./pages/People"), "ParentsPage");
@@ -110,6 +114,8 @@ const APP_PAGES: [string, ReactNode][] = [
   ["settings", <SystemSettingsPage />],
   ["audit-log", <AuditLogPage />],
   ["profile", <ProfilePage />],
+  ["certificates", <CertificatesPage />],
+  ["my-records", <MyRecordsPage />],
 ];
 
 function PageFallback() {
@@ -160,6 +166,9 @@ export default function App() {
             <Route key={path} path={path} element={<Guard page={path}>{element}</Guard>} />
           ))}
           <Route path="online-exams/:id" element={<Guard page="online-exams"><OnlineExamDetailPage /></Guard>} />
+          <Route path="students/:id/records" element={<Guard page="students"><StudentProfilePage /></Guard>} />
+          <Route path="certificates/:id" element={<Guard page="certificates"><CertificatePrintPage /></Guard>} />
+          <Route path="my-records/certificates/:id" element={<Guard page="my-records"><CertificatePrintPage /></Guard>} />
           <Route path="online-exams/:id/script" element={<Guard page="online-exams"><AnswerScriptPage /></Guard>} />
           <Route path="take-exam/:id" element={<Guard page="my-online-exams"><TakeExamPage /></Guard>} />
           <Route path="my-online-exams/:id/script" element={<Guard page="my-online-exams"><AnswerScriptPage /></Guard>} />

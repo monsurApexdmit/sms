@@ -240,3 +240,78 @@ export interface SchoolYear {
   is_current: boolean;
   terms: { term_id: number; name: string; start_date: string | null; end_date: string | null }[];
 }
+
+export type RecordKind = "health" | "discipline" | "counselling" | "achievement" | "other";
+export type CertificateKind = "transfer" | "bonafide" | "character" | "custom";
+
+export interface StudentHealth {
+  blood_group: string | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  allergies: string | null;
+  conditions: string | null;
+  medications: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  doctor: string | null;
+  notes: string | null;
+  updated_by?: string | null;
+  updated_at?: string | null;
+}
+
+export interface StudentRecordEntry {
+  record_id: number;
+  student_id: number;
+  kind: RecordKind;
+  date: string;
+  title: string;
+  details: string | null;
+  action_taken: string | null;
+  confidential: boolean;
+  recorded_by: string;
+  created_at: string;
+  can_edit: boolean;
+}
+
+export interface Certificate {
+  certificate_id: number;
+  serial_no: string;
+  kind: CertificateKind;
+  template_id: number | null;
+  student_id: number;
+  student_name: string | null;
+  issued_on: string;
+  reason: string | null;
+  conduct: string | null;
+  rendered_body: string;
+  issued_by: string;
+  created_at: string;
+  cancelled: boolean;
+  cancel_reason: string | null;
+}
+
+export interface CertificateTemplate {
+  template_id: number;
+  kind: CertificateKind;
+  name: string;
+  body: string;
+  active: boolean;
+  unknown_placeholders: string[];
+}
+
+export interface StudentProfile {
+  student: {
+    student_id: number;
+    name: string | null;
+    class_name: string | null;
+    section_name: string | null;
+    roll: number | null;
+    parent_name: string | null;
+    image_url: string | null;
+  };
+  health: StudentHealth;
+  records: StudentRecordEntry[];
+  certificates: Certificate[];
+  can_edit_health: boolean;
+  can_add_records: boolean;
+}
