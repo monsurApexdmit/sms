@@ -31,7 +31,7 @@ import { toast } from "sonner";
 
 import { api, errorMessage } from "../api/client";
 import { useAction, useClasses, useGet, useList, usePublicSettings, useSections } from "../api/hooks";
-import type { Invoice, Payment, Student } from "../api/types";
+import type { IdCardInfo, Invoice, Payment, Student } from "../api/types";
 import { useUser } from "../auth/AuthContext";
 import { Combobox, type Option } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
@@ -960,7 +960,7 @@ function Barcode({ value }: { value: string }) {
   return <svg ref={ref} className={cn("h-[11mm] w-[44mm]", !ok && "hidden")} aria-label={`Barcode ${value}`} />;
 }
 
-function IdCard({ s, parentPhone, year }: { s: Student; parentPhone?: string | null; year?: string | null }) {
+function IdCard({ s, parentPhone, year, cardUid }: { s: Student; parentPhone?: string | null; year?: string | null; cardUid?: string }) {
   const settings = usePublicSettings().data;
   const rows: [string, ReactNode][] = [
     ["ID no.", s.student_code || s.student_id],
@@ -1002,7 +1002,7 @@ function IdCard({ s, parentPhone, year }: { s: Student; parentPhone?: string | n
         ))}
       </dl>
       <div className="mt-auto flex justify-center pb-[2mm]">
-        <Barcode value={s.student_code || String(s.student_id)} />
+        <Barcode value={cardUid || s.student_code || String(s.student_id)} />
       </div>
       <div className="bg-primary h-[1.5mm] shrink-0" />
     </div>
@@ -1022,6 +1022,11 @@ export function IdCardsPage() {
   const phones = useMemo(() => new Map((parents.data?.items ?? []).map((p) => [p.parent_id, p.phone])), [parents.data]);
   const students = single ? (one.data ? [one.data] : []) : (list.data?.items ?? []);
   const loading = single ? one.isLoading : list.isLoading;
+  // check-in cards (ID cards & devices): the barcode carries the active card code when there is one
+  const cards = useList<IdCardInfo>(single || sel.classId ? "/id-cards" : null, {
+    holder_role: "student", holder_id: single || undefined, class_id: single ? undefined : sel.classId, section_id: single ? undefined : sel.sectionId || undefined, limit: 2000,
+  });  // prettier-ignore
+  const cardUids = useMemo(() => new Map((cards.data?.items ?? []).map((c) => [c.holder_id, c.card_uid])), [cards.data]);
 
   return (
     <>
@@ -1060,7 +1065,7 @@ export function IdCardsPage() {
       ) : students.length ? (
         <div className="flex flex-wrap gap-4 print:block">
           {students.map((s) => (
-            <IdCard key={s.student_id} s={s} parentPhone={s.parent_id ? phones.get(s.parent_id) : null} year={s.year ?? settings.data?.running_year} />
+            <IdCard key={s.student_id} s={s} parentPhone={s.parent_id ? phones.get(s.parent_id) : null} year={s.year ?? settings.data?.running_year} cardUid={cardUids.get(s.student_id)} />
           ))}
         </div>
       ) : (

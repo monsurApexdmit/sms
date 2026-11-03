@@ -21,6 +21,9 @@ const CalendarPage = page(() => import("./pages/Calendar"), "CalendarPage");
 const SchoolYearsPage = page(() => import("./pages/Calendar"), "SchoolYearsPage");
 const AttendanceReportPage = page(() => import("./pages/Attendance"), "AttendanceReportPage");
 const LeavePage = page(() => import("./pages/Leave"), "LeavePage");
+const PeriodAttendancePage = page(() => import("./pages/AttendanceCapture"), "PeriodAttendancePage");
+const KioskPage = page(() => import("./pages/AttendanceCapture"), "KioskPage");
+const CardsDevicesPage = page(() => import("./pages/AttendanceCapture"), "CardsDevicesPage");
 const ForgotPasswordPage = page(() => import("./pages/Auth"), "ForgotPasswordPage");
 const LoginPage = page(() => import("./pages/Auth"), "LoginPage");
 const ResetPasswordPage = page(() => import("./pages/Auth"), "ResetPasswordPage");
@@ -124,6 +127,9 @@ const APP_PAGES: [string, ReactNode][] = [
   ["attendance", <AttendancePage />],
   ["attendance-report", <AttendanceReportPage />],
   ["leave", <LeavePage />],
+  ["period-attendance", <PeriodAttendancePage />],
+  ["kiosk", <KioskPage />],
+  ["cards-devices", <CardsDevicesPage />],
   ["invoices", <InvoicesPage />],
   ["my-invoices", <MyInvoicesPage />],
   ["accounting", <AccountingPage />],

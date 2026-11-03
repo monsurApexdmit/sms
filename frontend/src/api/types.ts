@@ -758,3 +758,66 @@ export interface Enquiry {
   application_id: number | null;
   created_at: string;
 }
+
+export type PeriodStatus = "present" | "absent" | "late" | "excused";
+
+export interface PeriodInfo {
+  class_routine_id: number;
+  class_id: number | null;
+  class_name: string | null;
+  section_id: number | null;
+  section_name: string | null;
+  subject_id: number | null;
+  subject_name: string | null;
+  start: string;
+  end: string;
+  marked: number;
+}
+
+export interface PeriodSheet {
+  period: PeriodInfo;
+  date: string;
+  rows: { student_id: number; name: string | null; roll: number | null; status: PeriodStatus | null; on_leave: boolean }[];
+}
+
+export interface ScanResult {
+  result: string;
+  message: string;
+  card_uid: string;
+  holder_role: string | null;
+  holder_id: number | null;
+  name: string | null;
+  image_url: string | null;
+  punched_at: string | null;
+}
+
+export interface IdCardInfo {
+  card_id: number;
+  holder_role: "student" | "teacher" | "librarian" | "accountant";
+  holder_id: number;
+  holder_name: string | null;
+  card_uid: string;
+  issued_on: string;
+  active: boolean;
+}
+
+export interface AttendanceDeviceInfo {
+  device_id: number;
+  name: string;
+  location: string | null;
+  active: boolean;
+  last_seen_at: string | null;
+  api_key?: string;
+}
+
+export interface AttendancePunchInfo {
+  punch_id: number;
+  card_uid: string;
+  holder_role: string | null;
+  holder_id: number | null;
+  name: string | null;
+  punched_at: string;
+  source: string;
+  result: string;
+  device_id: number | null;
+}
