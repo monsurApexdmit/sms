@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { api } from "../api/client";
 import { useAction, useGet, usePagedList, usePublicSettings } from "../api/hooks";
-import type { AuditEntry } from "../api/types";
+import type { AuditEntry, LocalGateway, LocalGatewaySettings } from "../api/types";
 import { Combobox, MultiCombobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
@@ -12,6 +12,7 @@ import { DatePicker } from "../components/date-picker";
 import { ExportButton } from "../components/ExportButton";
 import { Field } from "../components/field";
 import { FileButton } from "../components/file-button";
+import { GATEWAY_LABELS } from "../components/LocalGateways";
 import { PageHeader } from "../components/PageHeader";
 import { Pager } from "../components/Pager";
 import { Dash, TableState } from "../components/states";
@@ -352,6 +353,8 @@ export function SystemSettingsPage() {
               </Field>
             </div>
           </SettingsCard>
+
+          <LocalGatewayCards />
         </TabsContent>
 
         <TabsContent value="logo">
@@ -386,6 +389,91 @@ function SwitchRow({ id, label, checked, onChange }: { id: string; label: string
       <Switch id={id} checked={checked} onCheckedChange={onChange} />
       <Label htmlFor={id}>{label}</Label>
     </div>
+  );
+}
+
+// --- bKash / Nagad / SSLCommerz ---------------------------------------------------------
+
+const LOCAL_GATEWAYS: { key: LocalGateway; description: string; fields: [string, string, "text" | "secret" | "key"][] }[] = [
+  {
+    key: "bkash",
+    description: "bKash tokenized checkout. The server executes each payment and checks the amount with bKash before recording it.",
+    fields: [["app_key", "App key", "text"], ["app_secret", "App secret", "secret"], ["username", "Username", "text"], ["password", "Password", "secret"]],
+  },
+  {
+    key: "nagad",
+    description: "Nagad merchant checkout. Requests are signed with your merchant private key; each payment is verified with Nagad before recording.",
+    fields: [
+      ["merchant_id", "Merchant ID", "text"], ["merchant_number", "Merchant mobile number", "text"],
+      ["merchant_private_key", "Merchant private key", "secret"], ["nagad_public_key", "Nagad public key", "key"],
+    ],
+  },
+  {
+    key: "sslcommerz",
+    description: "SSLCommerz hosted checkout (cards, mobile banking, net banking). Payments are confirmed with the SSLCommerz validation API.",
+    fields: [["store_id", "Store ID", "text"], ["store_password", "Store password", "secret"]],
+  },
+];  // prettier-ignore
+
+function LocalGatewayCards() {
+  const { data } = useGet<LocalGatewaySettings>("/payment-gateways/settings");
+  const [values, setValues] = useState<Partial<Record<LocalGateway, Dict>>>({});
+  useEffect(() => {
+    if (data) setValues({ bkash: data.bkash, nagad: data.nagad, sslcommerz: data.sslcommerz });
+  }, [data]);
+  const save = useAction((gateway: LocalGateway) => api.put("/payment-gateways/settings", { [gateway]: values[gateway] }), {
+    success: "Payment gateway saved",
+    invalidate: [["/payment-gateways/settings"], ["/settings/public"]],
+  });
+  const set = (gateway: LocalGateway, key: string, value: string) => setValues((v) => ({ ...v, [gateway]: { ...v[gateway], [key]: value } }));
+
+  return (
+    <>
+      {data && !data.currency_is_bdt && (
+        <Alert>
+          <AlertTitle>BDT only</AlertTitle>
+          <AlertDescription>bKash, Nagad and SSLCommerz are offered to parents only when the currency in General settings is bdt.</AlertDescription>
+        </Alert>
+      )}
+      {LOCAL_GATEWAYS.map(({ key, description, fields }) => {
+        const cfg = values[key] ?? {};
+        return (
+          <SettingsCard
+            key={key}
+            title={GATEWAY_LABELS[key]}
+            description={description}
+            footer={<SaveButton loading={save.isPending && save.variables === key} onClick={() => save.mutate(key)} />}
+          >
+            <div className="flex flex-wrap items-end gap-6">
+              <SwitchRow id={`${key}-active`} label={`Enable ${GATEWAY_LABELS[key]}`} checked={cfg.active === "1"} onChange={(c) => set(key, "active", c ? "1" : "0")} />
+              <Field label="Mode" className="w-48">
+                <Combobox
+                  data={[
+                    { value: "sandbox", label: "Sandbox (testing)" },
+                    { value: "live", label: "Live" },
+                  ]}
+                  value={cfg.mode === "live" ? "live" : "sandbox"}
+                  onChange={(v) => set(key, "mode", v ?? "sandbox")}
+                />
+              </Field>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {fields.map(([name, label, kind]) => (
+                <Field key={name} label={label} htmlFor={`${key}-${name}`} description={kind === "secret" ? secretHint(cfg[name]) : undefined} className={kind === "key" ? "sm:col-span-2" : undefined}>
+                  {kind === "secret" ? (
+                    <SecretInput id={`${key}-${name}`} value={cfg[name]} onChange={(v) => set(key, name, v)} />
+                  ) : kind === "key" ? (
+                    <Textarea id={`${key}-${name}`} rows={3} className="font-mono text-xs" value={cfg[name] ?? ""} onChange={(e) => set(key, name, e.target.value)} />
+                  ) : (
+                    <Input id={`${key}-${name}`} value={cfg[name] ?? ""} onChange={(e) => set(key, name, e.target.value)} />
+                  )}
+                </Field>
+              ))}
+            </div>
+          </SettingsCard>
+        );
+      })}
+    </>
   );
 }
 

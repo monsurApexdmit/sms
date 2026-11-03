@@ -25,6 +25,8 @@ export interface PublicSettings {
   system_email: string;
   stripe_enabled: boolean;
   paypal_enabled: boolean;
+  /** bKash / Nagad / SSLCommerz switched on (only when the currency is BDT) */
+  local_gateways?: LocalGateway[];
   logo_url: string | null;
   disable_frontend: string;
 }
@@ -945,3 +947,8 @@ export interface NotificationPreferences {
   items: { category: string; label: string; in_app: boolean; email: boolean; sms: boolean; push: boolean; whatsapp: boolean }[];
   available: Record<"in_app" | "email" | "sms" | "push" | "whatsapp", boolean>;
 }
+
+export type LocalGateway = "bkash" | "nagad" | "sslcommerz";
+
+/** GET /payment-gateways/settings: secrets come back as "********" */
+export type LocalGatewaySettings = Record<LocalGateway, Record<string, string>> & { currency_is_bdt: boolean };

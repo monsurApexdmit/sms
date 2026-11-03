@@ -33,6 +33,7 @@ import { CrudPage, IconAction } from "../components/CrudPage";
 import { DatePicker } from "../components/date-picker";
 import { ExportButton } from "../components/ExportButton";
 import { Field } from "../components/field";
+import { GATEWAY_LABELS, LocalPayButtons, useLocalGatewayReturn } from "../components/LocalGateways";
 import { PageHeader } from "../components/PageHeader";
 import { Pager } from "../components/Pager";
 import { ClassPicker, type Selection } from "../components/Pickers";
@@ -55,7 +56,9 @@ import { fromUnix, money, toOptions } from "../utils";
 
 const METHODS = ["cash", "cheque", "card", "bank", "mobile"].map((m) => ({ value: m, label: m[0].toUpperCase() + m.slice(1) }));
 // legacy rows store 1/2/3 for cash/cheque/card
-const LEGACY_METHODS: Record<string, string> = { "1": "Cash", "2": "Cheque", "3": "Card", paypal: "PayPal", stripe: "Stripe" };
+const LEGACY_METHODS: Record<string, string> = {
+  "1": "Cash", "2": "Cheque", "3": "Card", paypal: "PayPal", stripe: "Stripe", ...GATEWAY_LABELS,
+};  // prettier-ignore
 export const methodLabel = (m: string | null | undefined) => (m ? LEGACY_METHODS[m] ?? METHODS.find((o) => o.value === m)?.label ?? m : "—");
 const today = () => dayjs().format("YYYY-MM-DD");
 const sum = <T,>(items: T[] | undefined, pick: (item: T) => unknown) => (items ?? []).reduce((acc, item) => acc + Number(pick(item) ?? 0), 0);
@@ -1080,6 +1083,7 @@ export function MyInvoicesPage() {
         strip();
       });
   }, [params, navigate, location.pathname, qc]);
+  useLocalGatewayReturn();
 
   const parent = user.role === "parent";
   const colSpan = parent ? 7 : 6;
@@ -1142,6 +1146,9 @@ export function MyInvoicesPage() {
                           <WalletIcon />
                           Pay with PayPal
                         </Button>
+                      )}
+                      {inv.status !== "paid" && (
+                        <LocalPayButtons invoiceId={inv.invoice_id} gateways={settings.data?.local_gateways} disabled={pay.isPending || paypal.isPending} />
                       )}
                     </div>
                   </TableCell>

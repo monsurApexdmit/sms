@@ -33,10 +33,12 @@ AUDITED += (models.Vehicle, models.Driver, models.RouteStop, models.StudentTrans
 AUDITED += (models.PeriodAttendance, models.IdCard, models.AttendanceDevice)  # not attendance_punch: it is itself a log
 # push_subscription is left out: its keys are secrets and it changes on every browser sign-up
 AUDITED += (models.NotificationPreference,)
+AUDITED += (models.GatewayTransaction,)
 
 SENSITIVE_COLUMNS = {"password", "authentication_key", "api_key_hash"}
 # Settings rows whose value is a credential (or a JSON blob holding one).
 SECRET_SETTINGS = settings_service.SECRET_KEYS | {"paypal", "stripe_keys", "payumoney_merchant_key", "recaptcha_secret_key"}
+SECRET_SETTINGS |= {"bkash", "nagad", "sslcommerz"}  # JSON blobs holding gateway credentials
 HIDDEN = "[hidden]"
 # Free-text medical details, and the text of counselling or other confidential records.
 HEALTH_TEXT = {"allergies", "conditions", "medications", "notes"}
