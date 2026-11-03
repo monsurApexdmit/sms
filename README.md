@@ -132,6 +132,10 @@ Each student has a health profile and a timeline of health, discipline, counsell
 
 Admins issue transfer, bonafide and character certificates from editable templates (**People → Certificates**; "Add default templates" creates the three standard ones). Templates use placeholders such as `{student_name}`, `{class}` and `{serial}`; a placeholder with no value on file prints as `________`. Serial numbers run per kind and calendar year (`TC-2026-0001`, `BC-…`, `CC-…`, `CERT-…`). The issued text is stored, so editing a template later does not change issued certificates. Printing uses the browser's "Save as PDF". Students and parents can print their own certificates until an admin cancels one. Anyone can check a printed serial at `GET /api/public/certificates/verify?serial=TC-2026-0001`, which returns only whether it is valid, its kind, issue date and the student's initials (rate-limited).
 
+## Admissions
+
+**People → Admissions** (admin; accountants can view). Online applications are off until an admin switches them on there and picks the admission year. While they are on, the public **Admission** page shows an application form (up to 5 documents: PDF, image or Word) next to the printable paper form; it is rate-limited per IP and uses the website's reCAPTCHA when a secret key is set. Applicants get a reference code and can look up the status with it and the phone number they gave (status only, no personal data). Staff review applications, record a decision (accepted/rejected emails the guardian when an email was given) and **enrol** accepted applicants: this creates the student account, links an existing parent with the given email or creates one, and enrols the student in the chosen section with the next free roll number. Paper forms and walk-ins are entered as office applications; enquiries (leads) have follow-up dates and can be turned into applications. The only public endpoints are `GET /api/public/admissions/options`, `POST /api/public/admissions` and `POST /api/public/admissions/status`.
+
 ## Docker
 
 ```bash

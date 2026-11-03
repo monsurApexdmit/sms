@@ -16,8 +16,10 @@ import {
   MegaphoneIcon,
   MenuIcon,
   NewspaperIcon,
+  PaperclipIcon,
   PhoneIcon,
   PrinterIcon,
+  SearchIcon,
   SendIcon,
   UsersIcon,
 } from "lucide-react";
@@ -1299,13 +1301,236 @@ const DOCUMENTS = [
   "Immunisation / medical record",
 ];
 
+interface AdmissionOptions {
+  open: boolean;
+  year: string;
+  classes: { class_id: number; name: string }[];
+}
+
+interface ApplicationValues {
+  student_name: string;
+  class_id: string;
+  date_of_birth: string;
+  gender: string;
+  previous_school: string;
+  guardian_name: string;
+  guardian_relation: string;
+  guardian_phone: string;
+  guardian_email: string;
+  address: string;
+  notes: string;
+}
+
+const EMPTY_APPLICATION: ApplicationValues = {
+  student_name: "", class_id: "", date_of_birth: "", gender: "", previous_school: "", guardian_name: "",
+  guardian_relation: "", guardian_phone: "", guardian_email: "", address: "", notes: "",
+};  // prettier-ignore
+const MAX_DOCUMENTS = 5;
+const DOCUMENT_ACCEPT = ".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx";
+
+function OnlineApplicationForm({ options, siteKey }: { options: AdmissionOptions; siteKey: string | null }) {
+  const form = useForm<ApplicationValues>({ defaultValues: EMPTY_APPLICATION });
+  const [docs, setDocs] = useState<{ file: File; label: string }[]>([]);
+  const [sent, setSent] = useState<string | null>(null);
+  const captcha = useRecaptcha(siteKey);
+  const [captchaError, setCaptchaError] = useState(false);
+  const send = useAction(async (body: FormData) => (await api.post<{ reference: string }>("/public/admissions", body)).data, {
+    onSuccess: (r) => setSent(r.reference),
+  });
+  const { errors } = form.formState;
+
+  const submit = form.handleSubmit((v) => {
+    if (siteKey && !captcha.token) {
+      setCaptchaError(true);
+      return;
+    }
+    const body = new FormData();
+    Object.entries(v).forEach(([k, value]) => value.trim() && body.append(k, value.trim()));
+    docs.forEach((d) => {
+      body.append("files", d.file);
+      body.append("labels", d.label.trim() || "Document");
+    });
+    if (siteKey && captcha.token) body.append("recaptcha_token", captcha.token);
+    send.mutate(body, { onSettled: captcha.reset });
+  });
+
+  if (sent)
+    return (
+      <div className="flex flex-col items-center gap-3 py-8 text-center">
+        <div className="bg-primary/10 text-primary flex size-12 items-center justify-center rounded-full">
+          <CheckIcon className="size-6" />
+        </div>
+        <p className="text-lg font-semibold">Application received</p>
+        <p className="text-muted-foreground max-w-md text-sm">
+          Your reference is <span className="text-foreground font-mono font-semibold">{sent}</span>. Keep it: with your phone number it lets you check the status below.
+        </p>
+      </div>
+    );
+
+  return (
+    <form onSubmit={submit} className="grid gap-6" noValidate>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Student's full name" htmlFor="adm-name" required error={errors.student_name?.message}>
+          <Input id="adm-name" aria-invalid={!!errors.student_name} {...form.register("student_name", { required: "Please enter the student's name" })} />
+        </Field>
+        <Field label={`Class applying for (${options.year})`} htmlFor="adm-class" required error={errors.class_id?.message}>
+          <select
+            id="adm-class"
+            className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+            aria-invalid={!!errors.class_id}
+            {...form.register("class_id", { required: "Please choose a class" })}
+          >
+            <option value="">Choose…</option>
+            {options.classes.map((c) => (
+              <option key={c.class_id} value={c.class_id}>{c.name}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Date of birth" htmlFor="adm-dob">
+          <Input id="adm-dob" type="date" {...form.register("date_of_birth")} />
+        </Field>
+        <Field label="Gender" htmlFor="adm-gender">
+          <select id="adm-gender" className="border-input bg-background h-9 rounded-md border px-3 text-sm" {...form.register("gender")}>
+            <option value="">—</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </Field>
+        <Field label="Previous school" htmlFor="adm-prev" className="sm:col-span-2">
+          <Input id="adm-prev" {...form.register("previous_school")} />
+        </Field>
+        <Field label="Parent / guardian name" htmlFor="adm-gname" required error={errors.guardian_name?.message}>
+          <Input id="adm-gname" autoComplete="name" aria-invalid={!!errors.guardian_name} {...form.register("guardian_name", { required: "Please enter a name" })} />
+        </Field>
+        <Field label="Relation to student" htmlFor="adm-rel">
+          <Input id="adm-rel" placeholder="Mother, father, uncle…" {...form.register("guardian_relation")} />
+        </Field>
+        <Field label="Phone" htmlFor="adm-phone" required error={errors.guardian_phone?.message}>
+          <Input
+            id="adm-phone"
+            type="tel"
+            autoComplete="tel"
+            aria-invalid={!!errors.guardian_phone}
+            {...form.register("guardian_phone", { required: "Please enter a phone number", minLength: { value: 5, message: "Phone number is too short" } })}
+          />
+        </Field>
+        <Field label="Email" htmlFor="adm-email" description="We send the reference and decisions here" error={errors.guardian_email?.message}>
+          <Input
+            id="adm-email"
+            type="email"
+            autoComplete="email"
+            aria-invalid={!!errors.guardian_email}
+            {...form.register("guardian_email", { pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email address" } })}
+          />
+        </Field>
+        <Field label="Home address" htmlFor="adm-address" className="sm:col-span-2">
+          <Textarea id="adm-address" rows={2} {...form.register("address")} />
+        </Field>
+        <Field label="Anything we should know?" htmlFor="adm-notes" className="sm:col-span-2">
+          <Textarea id="adm-notes" rows={3} {...form.register("notes")} />
+        </Field>
+      </div>
+
+      <div className="grid gap-2">
+        <p className="text-sm font-medium">Documents</p>
+        <p className="text-muted-foreground text-xs">Optional. Up to {MAX_DOCUMENTS} files: PDF, image or Word, each at most 10 MB.</p>
+        {docs.map((d, i) => (
+          <div key={i} className="flex flex-wrap items-center gap-2">
+            <Input
+              aria-label={`Label for ${d.file.name}`}
+              className="w-56"
+              value={d.label}
+              placeholder="e.g. Birth certificate"
+              onChange={(e) => setDocs((ds) => ds.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))}
+            />
+            <span className="text-muted-foreground truncate text-sm">{d.file.name}</span>
+            <Button type="button" variant="ghost" size="sm" onClick={() => setDocs((ds) => ds.filter((_, j) => j !== i))}>
+              Remove
+            </Button>
+          </div>
+        ))}
+        {docs.length < MAX_DOCUMENTS && (
+          <div>
+            <label className="border-input hover:bg-accent inline-flex h-8 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm">
+              <PaperclipIcon className="size-4" />
+              Attach a document
+              <input
+                type="file"
+                hidden
+                accept={DOCUMENT_ACCEPT}
+                onChange={(e) => {
+                  const file = e.currentTarget.files?.[0];
+                  if (file) setDocs((ds) => [...ds, { file, label: "" }]);
+                  e.currentTarget.value = "";
+                }}
+              />
+            </label>
+          </div>
+        )}
+      </div>
+
+      {siteKey && (
+        <div className="grid gap-1.5">
+          <div ref={captcha.ref} onClick={() => setCaptchaError(false)} />
+          {captcha.failed && <p className="text-destructive text-xs">The spam check could not be loaded. Check your connection and reload the page.</p>}
+          {captchaError && !captcha.token && <p className="text-destructive text-xs">Please confirm you are not a robot.</p>}
+        </div>
+      )}
+      <Button type="submit" size="lg" className="w-full sm:w-fit" loading={send.isPending}>
+        <SendIcon />
+        Submit application
+      </Button>
+    </form>
+  );
+}
+
+function AdmissionStatusCheck() {
+  const form = useForm<{ reference: string; phone: string }>({ defaultValues: { reference: "", phone: "" } });
+  const [result, setResult] = useState<{ reference: string; status_label: string; updated_at: string } | null>(null);
+  const check = useAction(async (body: { reference: string; phone: string }) => (await api.post("/public/admissions/status", body)).data, {
+    onSuccess: setResult,
+  });
+  return (
+    <form onSubmit={form.handleSubmit((v) => check.mutate({ reference: v.reference.trim(), phone: v.phone.trim() }))} className="grid gap-4">
+      <div className="grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <Field label="Reference" htmlFor="adm-ref">
+          <Input id="adm-ref" placeholder="A26-1F2E3D" {...form.register("reference", { required: true })} />
+        </Field>
+        <Field label="Phone used on the application" htmlFor="adm-ref-phone">
+          <Input id="adm-ref-phone" type="tel" {...form.register("phone", { required: true })} />
+        </Field>
+        <Button type="submit" variant="outline" loading={check.isPending}>
+          <SearchIcon />
+          Check status
+        </Button>
+      </div>
+      {result && (
+        <p className="text-sm">
+          Application <span className="font-mono font-semibold">{result.reference}</span>: <Badge>{result.status_label}</Badge>
+          <span className="text-muted-foreground ml-2">updated {dayjs(result.updated_at).format("DD MMM YYYY")}</span>
+        </p>
+      )}
+    </form>
+  );
+}
+
 export function PublicAdmissionPage() {
   const { data: site } = useSite();
+  const options = useGet<AdmissionOptions>("/public/admissions/options");
+  const online = options.data?.open ? options.data : null;
   const name = schoolName(site);
   const year = dayjs().year();
   return (
     <>
-      <PageHero title="Admission" subtitle="Print the admission form, fill it in by hand and hand it in at the school office together with the listed documents.">
+      <PageHero
+        title="Admission"
+        subtitle={
+          online
+            ? `Applications for ${online.year} are open. Apply online below, or print the form and hand it in at the school office.`
+            : "Print the admission form, fill it in by hand and hand it in at the school office together with the listed documents."
+        }
+      >
         <div className="mt-6 flex flex-wrap gap-3">
           <Button size="lg" variant={site?.theme === "ultimate" ? "secondary" : "default"} onClick={() => window.print()}>
             <PrinterIcon />
@@ -1324,7 +1549,29 @@ export function PublicAdmissionPage() {
         </div>
       </PageHero>
 
-      <Container className="mt-10 max-w-4xl print:mt-0 print:max-w-none print:px-0">
+      <Container className="no-print mt-10 max-w-4xl space-y-6">
+        {online && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Apply online</CardTitle>
+              <CardDescription>You get a reference number right away. The school office will contact you.</CardDescription>
+            </CardHeader>
+            <CardContent>{site ? <OnlineApplicationForm options={online} siteKey={site.recaptcha_site_key || null} /> : <Skeleton className="h-96 w-full" />}</CardContent>
+          </Card>
+        )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Check an application</CardTitle>
+            <CardDescription>Enter the reference you received and the phone number given on the application.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AdmissionStatusCheck />
+          </CardContent>
+        </Card>
+        {online && <h2 className="pt-4 text-xl font-semibold tracking-tight">Paper form</h2>}
+      </Container>
+
+      <Container className="mt-6 max-w-4xl print:mt-0 print:max-w-none print:px-0">
         <div className="bg-card space-y-8 rounded-xl border p-6 shadow-sm sm:p-10 print:rounded-none print:border-0 print:p-0 print:text-black print:shadow-none">
           <div className="flex items-start justify-between gap-6 border-b-2 border-current pb-6">
             <div className="flex items-center gap-4">

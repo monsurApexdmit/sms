@@ -26,6 +26,7 @@ AUDITED: tuple[type, ...] = (
     models.MeetingSession, models.MeetingSlot, models.MeetingBooking,
     models.StaffAttendance, models.SalaryStructure, models.PayrollRun, models.Payslip,
     models.StudentHealth, models.StudentRecord, models.CertificateTemplate, models.CertificateIssue,
+    models.AdmissionApplication, models.AdmissionDocument, models.Enquiry,
 )  # fmt: skip
 AUDITED += (models.ExamSchedule, models.ExamWeight, models.ReportRemark)  # report cards
 AUDITED += (models.Vehicle, models.Driver, models.RouteStop, models.StudentTransport)

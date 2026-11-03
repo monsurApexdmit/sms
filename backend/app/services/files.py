@@ -37,6 +37,7 @@ DIRS = {
     "site": "frontend",
     "homework": "homework",
     "homework_submission": "homework_submission",
+    "admission": "admission_document",
 }
 
 

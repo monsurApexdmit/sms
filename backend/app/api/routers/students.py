@@ -1,6 +1,5 @@
 import csv
 import io
-import secrets
 import time
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
@@ -27,7 +26,7 @@ from app.models import (
     Student,
 )
 from app.services.access import STAFF, children_ids, ensure_can_view_student
-from app.services.accounts import email_taken
+from app.services.accounts import email_taken, insert_student, new_code
 from app.services.files import safe_path, save_image, user_image_url
 from app.services.jobs import enqueue
 from app.services.notify import send_email
@@ -133,10 +132,6 @@ def _check_code(db: Session, code: str | None, exclude_id: int | None = None) ->
         raise HTTPException(status.HTTP_409_CONFLICT, "Student ID number is already used")
 
 
-def _new_code() -> str:
-    return secrets.token_hex(4)[:7]
-
-
 @router.get("", response_model=Page, dependencies=[Depends(require_roles(*STAFF))])
 def list_students(
     db: DB,
@@ -187,23 +182,10 @@ def create_student(body: StudentIn, tasks: BackgroundTasks, db: DB):
     if email_taken(db, body.email):
         raise HTTPException(status.HTTP_409_CONFLICT, "Email is already used by another account")
     _check_code(db, body.student_code)
-    data = body.model_dump(exclude=set(ENROLL_FIELDS))
-    data["password"] = hash_password(data["password"])
-    data["student_code"] = data["student_code"] or _new_code()
-    student = Student(**data)
-    db.add(student)
-    db.flush()
-    db.add(
-        Enroll(
-            student_id=student.student_id,
-            enroll_code=_new_code(),
-            class_id=body.class_id,
-            section_id=body.section_id,
-            roll=body.roll,
-            date_added=str(int(time.time())),
-            year=running_year(db),
-        )
-    )
+    student = insert_student(
+        db, body.model_dump(exclude=set(ENROLL_FIELDS)),
+        class_id=body.class_id, section_id=body.section_id, roll=body.roll, year=running_year(db),
+    )  # fmt: skip
     db.commit()
     school = get_setting(db, "system_name", "School")
     enqueue(
@@ -232,7 +214,7 @@ def update_student(student_id: int, body: StudentIn, db: DB):
     year = running_year(db)
     enroll = db.scalars(select(Enroll).where(Enroll.student_id == student_id, Enroll.year == year)).first()
     if enroll is None:
-        enroll = Enroll(student_id=student_id, enroll_code=_new_code(), year=year, date_added=str(int(time.time())))
+        enroll = Enroll(student_id=student_id, enroll_code=new_code(), year=year, date_added=str(int(time.time())))
         db.add(enroll)
     for key, value in enroll_data.items():
         setattr(enroll, key, value)
@@ -315,7 +297,7 @@ async def bulk_csv(
         if email.lower() in seen or email_taken(db, email):
             errors.append(f"Line {line}: email {email} already exists")
             continue
-        code = (row.get("Id") or "").strip() or _new_code()
+        code = (row.get("Id") or "").strip() or new_code()
         if db.execute(select(Student.student_id).where(Student.student_code == code)).first():
             errors.append(f"Line {line}: student ID {code} already exists")
             continue
@@ -335,7 +317,7 @@ async def bulk_csv(
         db.add(
             Enroll(
                 student_id=student.student_id,
-                enroll_code=_new_code(),
+                enroll_code=new_code(),
                 class_id=class_id,
                 section_id=section_id,
                 date_added=str(int(time.time())),
@@ -367,7 +349,7 @@ def promote(body: PromotionIn, db: DB):
                 student_id=item.student_id,
                 class_id=item.class_id,
                 section_id=section_id,
-                enroll_code=_new_code(),
+                enroll_code=new_code(),
                 date_added=str(int(time.time())),
                 year=body.to_year,
             )

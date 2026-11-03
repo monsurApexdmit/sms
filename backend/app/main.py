@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import (
     academic,
     accounts,
+    admissions,
     attendance,
     audit,
     auth,
@@ -87,6 +88,9 @@ ROUTERS = (
     *accounts.routers,
     cms.public,
     records.public,
+    admissions.public,
+    admissions.router,
+    admissions.enquiries,
     cms.admin,
 )
 for router in ROUTERS:

@@ -9,6 +9,7 @@ import { canAccess } from "./nav";
 const page = <M extends Record<string, unknown>>(load: () => Promise<M>, name: keyof M) =>
   lazy(async () => ({ default: (await load())[name] as ComponentType<any> }));
 
+const AdmissionsPage = page(() => import("./pages/Admissions"), "AdmissionsPage");
 const ClassesPage = page(() => import("./pages/Academic"), "ClassesPage");
 const MyRoutinePage = page(() => import("./pages/Academic"), "MyRoutinePage");
 const RoutinePage = page(() => import("./pages/Academic"), "RoutinePage");
@@ -100,6 +101,7 @@ const APP_PAGES: [string, ReactNode][] = [
   ["staff", <StaffPage />],
   ["promotion", <PromotionPage />],
   ["id-cards", <IdCardsPage />],
+  ["admissions", <AdmissionsPage />],
   ["school-years", <SchoolYearsPage />],
   ["classes", <ClassesPage />],
   ["subjects", <SubjectsPage />],

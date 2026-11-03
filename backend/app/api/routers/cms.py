@@ -157,6 +157,21 @@ def _recaptcha_ok(secret: str, token: str, ip: str) -> bool:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Could not verify reCAPTCHA. Please try again.") from None
 
 
+def verify_recaptcha(g: dict[str, str | None], token: str | None, ip: str) -> None:
+    """Public forms: require a valid reCAPTCHA token when the website has a secret key set."""
+    secret = (g.get("recaptcha_secret_key") or "").strip()
+    if not secret:
+        return
+    if not token:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Please complete the reCAPTCHA check")
+    if not _recaptcha_ok(secret, token, ip):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "reCAPTCHA verification failed")
+
+
+def website_settings(db: Session) -> dict[str, str | None]:
+    return _general(db)
+
+
 @public.post("/contact", status_code=202)
 def contact(body: ContactIn, request: Request, tasks: BackgroundTasks, db: DB):
     ip = request.client.host if request.client else "?"
@@ -165,12 +180,7 @@ def contact(body: ContactIn, request: Request, tasks: BackgroundTasks, db: DB):
     target = _contact_target(db, g)
     if not target:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "The contact form is not available")
-    secret = (g.get("recaptcha_secret_key") or "").strip()
-    if secret:
-        if not body.recaptcha_token:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Please complete the reCAPTCHA check")
-        if not _recaptcha_ok(secret, body.recaptcha_token, ip):
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "reCAPTCHA verification failed")
+    verify_recaptcha(g, body.recaptcha_token, ip)
     name = " ".join(body.name.split())  # no line breaks in the subject header
     text = (
         f"Message from the website contact form.\n\nName: {name}\nEmail: {body.email}\n"
