@@ -10,6 +10,7 @@ from app.db import Base
 
 BACKEND = Path(__file__).resolve().parents[1]
 NEW_TABLES = {"audit_log", "academic_year", "term", "calendar_event"}
+NEW_TABLES |= {"fee_head", "fee_plan", "fee_plan_item", "fee_instalment", "fee_discount", "fee_invoice"}
 
 
 def _table_of(diff) -> str | None:

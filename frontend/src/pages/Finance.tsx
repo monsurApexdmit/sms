@@ -20,7 +20,7 @@ import {
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Controller, useForm } from "react-hook-form";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { api, errorMessage } from "../api/client";
@@ -55,7 +55,7 @@ import { fromUnix, money, toOptions } from "../utils";
 const METHODS = ["cash", "cheque", "card", "bank", "mobile"].map((m) => ({ value: m, label: m[0].toUpperCase() + m.slice(1) }));
 // legacy rows store 1/2/3 for cash/cheque/card
 const LEGACY_METHODS: Record<string, string> = { "1": "Cash", "2": "Cheque", "3": "Card", paypal: "PayPal", stripe: "Stripe" };
-const methodLabel = (m: string | null | undefined) => (m ? LEGACY_METHODS[m] ?? METHODS.find((o) => o.value === m)?.label ?? m : "—");
+export const methodLabel = (m: string | null | undefined) => (m ? LEGACY_METHODS[m] ?? METHODS.find((o) => o.value === m)?.label ?? m : "—");
 const today = () => dayjs().format("YYYY-MM-DD");
 const sum = <T,>(items: T[] | undefined, pick: (item: T) => unknown) => (items ?? []).reduce((acc, item) => acc + Number(pick(item) ?? 0), 0);
 
@@ -411,6 +411,7 @@ function InvoiceDocument({ invoice, school, currency }: { invoice: InvoiceWithPa
                   <th className="px-3 py-2 font-medium">Date</th>
                   <th className="px-3 py-2 font-medium">Method</th>
                   <th className="px-3 py-2 text-right font-medium">Amount</th>
+                  <th className="no-print w-20 px-3 py-2" />
                 </tr>
               </thead>
               <tbody>
@@ -419,6 +420,11 @@ function InvoiceDocument({ invoice, school, currency }: { invoice: InvoiceWithPa
                     <td className="px-3 py-2">{fromUnix(p.timestamp)}</td>
                     <td className="px-3 py-2">{methodLabel(p.method)}</td>
                     <td className="px-3 py-2 text-right tabular-nums">{money(p.amount, currency)}</td>
+                    <td className="no-print px-3 py-2 text-right">
+                      <Link to={`/app/receipts/${p.payment_id}`} className="text-primary text-xs font-medium underline-offset-4 hover:underline">
+                        Receipt
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -832,7 +838,8 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
     );
   };
   const total = data?.amount_total ?? 0;
-  const colSpan = type === "expense" ? 6 : 5;
+  const navigate = useNavigate();
+  const colSpan = 6;
 
   return (
     <Card className="gap-0 overflow-hidden py-0">
@@ -856,7 +863,7 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
             <TableHead>{type === "income" ? "Student" : "Category"}</TableHead>
             <TableHead>Method</TableHead>
             <TableHead className="text-right">Amount</TableHead>
-            {type === "expense" && <TableHead className="w-24" />}
+            <TableHead className="w-24" />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -868,16 +875,20 @@ function PaymentsTable({ type, currency }: { type: "income" | "expense"; currenc
               <TableCell>{(type === "income" ? p.student_name : p.category_name) ?? <Dash />}</TableCell>
               <TableCell>{methodLabel(p.method)}</TableCell>
               <TableCell className={cn("text-right tabular-nums", type === "income" ? "text-success" : "text-destructive")}>{money(p.amount, currency)}</TableCell>
-              {type === "expense" && (
-                <TableCell>
-                  <div className="flex items-center justify-end gap-1">
-                    <IconAction label="Edit" onClick={() => openForm(p)}><PencilIcon /></IconAction>
-                    <IconAction label="Delete" destructive onClick={() => confirmAction({ title: "Delete expense?", onConfirm: () => remove.mutate(p.payment_id) })}>
-                      <Trash2Icon />
-                    </IconAction>
-                  </div>
-                </TableCell>
-              )}
+              <TableCell>
+                <div className="flex items-center justify-end gap-1">
+                  {type === "income" ? (
+                    <IconAction label="Receipt" onClick={() => navigate(`/app/receipts/${p.payment_id}`)}><ReceiptTextIcon /></IconAction>
+                  ) : (
+                    <>
+                      <IconAction label="Edit" onClick={() => openForm(p)}><PencilIcon /></IconAction>
+                      <IconAction label="Delete" destructive onClick={() => confirmAction({ title: "Delete expense?", onConfirm: () => remove.mutate(p.payment_id) })}>
+                        <Trash2Icon />
+                      </IconAction>
+                    </>
+                  )}
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

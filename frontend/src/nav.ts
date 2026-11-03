@@ -10,6 +10,7 @@ import {
   ClipboardCheckIcon,
   ClipboardListIcon,
   FileTextIcon,
+  FileCogIcon,
   GlobeIcon,
   GraduationCapIcon,
   HistoryIcon,
@@ -76,6 +77,7 @@ export const NAV: NavItem[] = [
   { label: "Invoices", path: "invoices", icon: WalletIcon, roles: ["admin", "accountant"], group: "Finance" },
   { label: "Payments", path: "my-invoices", icon: WalletIcon, roles: ["student", "parent"], group: "Finance" },
   { label: "Income & expenses", path: "accounting", icon: ChartColumnIcon, roles: ["admin", "accountant"], group: "Finance" },
+  { label: "Fee setup", path: "fee-setup", icon: FileCogIcon, roles: ["admin", "accountant"], group: "Finance" },
 
   { label: "Library", path: "library", icon: LibraryIcon, roles: ALL, group: "Campus" },
   { label: "Transport & dormitory", path: "facilities", icon: BusIcon, roles: ["admin", "student", "parent", "teacher"], group: "Campus" },

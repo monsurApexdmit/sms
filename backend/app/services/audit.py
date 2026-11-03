@@ -20,6 +20,7 @@ AUDITED: tuple[type, ...] = (
     models.Admin, models.Teacher, models.Student, models.Parent, models.Librarian, models.Accountant,
     models.Enroll, models.Exam, models.Grade, models.Mark, models.OnlineExamResult, models.Attendance,
     models.Invoice, models.Payment, models.Setting, models.FrontendGeneralSetting,
+    models.FeePlan, models.FeePlanItem, models.FeeInstalment, models.FeeDiscount, models.FeeInvoice,
 )  # fmt: skip
 
 SENSITIVE_COLUMNS = {"password", "authentication_key"}
