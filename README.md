@@ -90,6 +90,14 @@ Students apply for their own leave, parents for their children, and teachers, li
 - **Marks import**: on *Marks entry*, *Download template* gives a CSV of the section's students with their current marks (`student_id, roll, name, mark_obtained, comment`). Fill it in and use *Import CSV*. Every row is checked first (student in that section, whole-number mark within the same limits as the screen, no duplicates); if any row is wrong nothing is saved and the errors are listed. A blank mark clears it; without a `comment` column existing comments are kept.
 - **Student import**: *Students → Bulk import* (unchanged).
 
+## Fees
+
+**Finance → Fee setup** (admin, accountant) holds fee heads (Tuition, Bus…), one or more fee plans per class and year with instalments (shares of the plan total that add up to 100%) and an optional late fine, and per-student discounts or scholarships (percent off each instalment, or an amount off the whole plan spread over its instalments).
+
+- **Generate invoices** on an instalment creates an ordinary invoice for every student enrolled in that class and year, after discounts, so cash, Stripe and PayPal payments work as before. Running it again skips students already billed. Amounts are whole currency units (the legacy `invoice.amount` column is an integer).
+- **Daily jobs** (`python -m scripts.daily_jobs`; the `scheduler` compose service runs it every 24 hours, admins can also run it from Fee setup) set late fines on unpaid instalment invoices past their due date plus grace days (flat once, or per day late, always recalculated from the base amount so re-running is harmless), then email parents and students and text parents about invoices due within 3 days or overdue, at most once per invoice per day. "Today" is taken in `SCHOOL_TIMEZONE`.
+- **Receipts**: every payment has a printable receipt at `/app/receipts/<payment id>`, linked from Income & expenses and from an invoice's payment history. Students see their own, parents their children's.
+
 ## Docker
 
 ```bash

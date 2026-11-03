@@ -13,6 +13,7 @@ from app.api.routers import (
     cms,
     exams,
     export,
+    fees,
     finance,
     homework,
     leave,
@@ -60,6 +61,7 @@ for router in accounts.routers:
     api.include_router(router)
 api.include_router(cms.public)
 api.include_router(cms.admin)
+api.include_router(fees.router)
 
 
 @api.get("/health", tags=["system"])

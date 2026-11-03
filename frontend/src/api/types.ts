@@ -307,3 +307,61 @@ export interface LeaveRequest {
   can_cancel: boolean;
   can_decide: boolean;
 }
+
+export interface FeeHead {
+  fee_head_id: number;
+  name: string;
+  description: string | null;
+}
+
+export interface FeeInstalment {
+  fee_instalment_id: number;
+  name: string;
+  due_date: string;
+  share_percent: number;
+  amount: number;
+  invoices: number;
+}
+
+export interface FeePlan {
+  fee_plan_id: number;
+  name: string;
+  class_id: number;
+  class_name: string | null;
+  year: string;
+  late_fine_type: "none" | "flat" | "per_day";
+  late_fine_amount: number;
+  grace_days: number;
+  total: number;
+  items: { fee_head_id: number; head: string | null; amount: number }[];
+  instalments: FeeInstalment[];
+}
+
+export interface FeeDiscount {
+  fee_discount_id: number;
+  student_id: number;
+  student_name: string | null;
+  fee_plan_id: number | null;
+  plan_name: string | null;
+  year: string;
+  kind: "percent" | "amount";
+  value: number;
+  reason: string | null;
+}
+
+export interface Receipt {
+  school: { system_name: string; address: string; phone: string; system_email: string };
+  currency: string;
+  payment_id: number;
+  title: string | null;
+  amount: number;
+  method: string | null;
+  timestamp: string | null;
+  description: string | null;
+  year: string | null;
+  student: { student_id: number; name: string | null; student_code: string | null } | null;
+  class_name: string | null;
+  section_name: string | null;
+  roll: number | null;
+  invoice: { invoice_id: number; title: string | null; amount: number; amount_paid: number; due: number } | null;
+}

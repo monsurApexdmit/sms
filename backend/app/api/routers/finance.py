@@ -13,8 +13,11 @@ from sqlalchemy.orm import Session
 from app.api.crud import Page, crud_router, get_or_404, out_schema
 from app.core.config import get_settings
 from app.core.deps import DB, CurrentUser, Me, forbid, not_found, require_roles
-from app.models import ExpenseCategory, Invoice, Payment, Student
+from app.models import ExpenseCategory, FeeInvoice, Invoice, Payment, Student
 from app.services.access import children_ids
+from app.services.invoices import fmt as _fmt
+from app.services.invoices import num as _num
+from app.services.invoices import refresh_status as _refresh_status
 from app.services.paypal import (
     PayPalClient,
     PayPalError,
@@ -41,17 +44,6 @@ router.include_router(
         read_roles=FIN, write_roles=FIN, order_by=ExpenseCategory.name, label="Expense category",
     )  # fmt: skip
 )
-
-
-def _num(value) -> float:
-    try:
-        return float(value or 0)
-    except (TypeError, ValueError):
-        return 0.0
-
-
-def _fmt(value: float) -> str:
-    return f"{value:.2f}".rstrip("0").rstrip(".")
 
 
 def _ts(d: date | None) -> int:
@@ -108,12 +100,6 @@ def _invoice_out(db: Session, rows: list[Invoice]) -> list[InvoiceOut]:
         else {}
     )
     return [InvoiceOut(**InvoiceBase.model_validate(r).model_dump(), student_name=names.get(r.student_id)) for r in rows]
-
-
-def _refresh_status(inv: Invoice) -> None:
-    due = max(_num(inv.amount) - _num(inv.amount_paid), 0)
-    inv.due = _fmt(due)
-    inv.status = "paid" if due <= 0 else "unpaid"
 
 
 def _record_payment(
@@ -266,6 +252,10 @@ def create_mass_invoice(body: MassInvoiceIn, db: DB):
 def update_invoice(invoice_id: int, body: InvoiceUpdate, db: DB):
     inv = get_or_404(db, Invoice, invoice_id, "Invoice")
     inv.title, inv.description, inv.amount = body.title, body.description, body.amount
+    link = db.scalars(select(FeeInvoice).where(FeeInvoice.invoice_id == invoice_id)).first()
+    if link is not None:
+        # a manual amount change becomes the new base; late fines are added on top of it
+        link.base_amount = max(body.amount - link.fine_amount, 0)
     _refresh_status(inv)
     db.commit()
     return _invoice_out(db, [inv])[0]
@@ -275,6 +265,7 @@ def update_invoice(invoice_id: int, body: InvoiceUpdate, db: DB):
 def delete_invoice(invoice_id: int, db: DB):
     inv = get_or_404(db, Invoice, invoice_id, "Invoice")
     db.query(Payment).filter(Payment.invoice_id == invoice_id).delete()
+    db.query(FeeInvoice).filter(FeeInvoice.invoice_id == invoice_id).delete()
     db.delete(inv)
     db.commit()
 

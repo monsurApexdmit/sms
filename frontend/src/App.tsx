@@ -37,6 +37,8 @@ const TabulationPage = page(() => import("./pages/Exams"), "TabulationPage");
 const AccountingPage = page(() => import("./pages/Finance"), "AccountingPage");
 const InvoicesPage = page(() => import("./pages/Finance"), "InvoicesPage");
 const MyInvoicesPage = page(() => import("./pages/Finance"), "MyInvoicesPage");
+const FeeSetupPage = page(() => import("./pages/Fees"), "FeeSetupPage");
+const ReceiptPage = page(() => import("./pages/Fees"), "ReceiptPage");
 const MessagesPage = page(() => import("./pages/Messages"), "MessagesPage");
 const AnswerScriptPage = page(() => import("./pages/OnlineExams"), "AnswerScriptPage");
 const MyOnlineExamsPage = page(() => import("./pages/OnlineExams"), "MyOnlineExamsPage");
@@ -106,6 +108,7 @@ const APP_PAGES: [string, ReactNode][] = [
   ["invoices", <InvoicesPage />],
   ["my-invoices", <MyInvoicesPage />],
   ["accounting", <AccountingPage />],
+  ["fee-setup", <FeeSetupPage />],
   ["library", <LibraryPage />],
   ["facilities", <FacilitiesPage />],
   ["notices", <NoticesPage />],
@@ -167,6 +170,8 @@ export default function App() {
           <Route path="online-exams/:id/script" element={<Guard page="online-exams"><AnswerScriptPage /></Guard>} />
           <Route path="take-exam/:id" element={<Guard page="my-online-exams"><TakeExamPage /></Guard>} />
           <Route path="my-online-exams/:id/script" element={<Guard page="my-online-exams"><AnswerScriptPage /></Guard>} />
+          {/* staff, students and parents: the API decides which receipts each may see */}
+          <Route path="receipts/:paymentId" element={<ReceiptPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="*" element={<NotFound />} />

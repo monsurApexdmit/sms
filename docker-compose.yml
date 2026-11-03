@@ -41,6 +41,12 @@ services:
     <<: *backend
     command: ["rq", "worker", "--with-scheduler", "--url", "redis://redis:6379/0", "notifications"]
 
+  # Daily fee jobs: late fines, then due reminders (backend/scripts/daily_jobs.py).
+  # The first run waits a minute so the api service can apply migrations.
+  scheduler:
+    <<: *backend
+    command: ["sh", "-c", "sleep 60; while true; do python -m scripts.daily_jobs; sleep 86400; done"]
+
   redis:
     image: redis:7.4-alpine
     command: ["redis-server", "--appendonly", "yes"]
