@@ -212,6 +212,16 @@ Other commands: `list`, `set <slug> --hosts … / --database-url … / --timezon
 - **Demo data:** `python -m scripts.seed_demo --yes --school <slug>`.
 - `TRUST_FORWARDED_HOST=true` makes the API route by `X-Forwarded-Host`; set it only when a proxy in front of nginx sets that header itself.
 
+## Languages
+
+The interface is available in **English and Bangla**. Everyone can pick a language from the menu in the app header, on the sign-in page or on the public website; the choice is kept in that browser. Until someone picks one, the school default applies: *System settings → General → Default language* (the legacy `language` setting, stored as `english` / `bengali` so the old app follows it too).
+
+- **Numbers** use Latin digits by default (easier to read in marks and money); people who prefer Bangla digits can switch in the same menu. **Dates** show Bangla month and weekday names but always Latin digits.
+- **Server texts** (in-app notifications, emails and SMS for absences, leave decisions, graded homework, fee reminders, meetings, admissions and notices) follow the school default language: `backend/app/services/messages.py`. API error messages stay in English.
+- **How it works:** every interface string goes through `t()` from `frontend/src/i18n` (`tn()` when the text contains elements, `tp()` for counts). The English text is the key, so English output is exactly the source text. `npm run i18n` regenerates the typed English catalog (`src/i18n/en.ts`) and files new keys, untranslated, into `src/i18n/bn/<page>.ts`; `npm run i18n -- --check` (also a test) fails when the catalog is stale, a translation is missing, or text is hard-coded in JSX.
+- **Adding a language:** add it to `LANGUAGES` and `DICTIONARIES` in `src/i18n/index.ts` and to `LANGS` in `scripts/i18n-lib.mjs`, run `npm run i18n` and translate the generated files; add its column to `CATALOG` in `messages.py` and its legacy setting value to `normalize()`.
+- The Bangla translation was written for this release and should be reviewed by a native speaker; fix wording directly in `src/i18n/bn/*.ts`.
+
 ## Docker
 
 ```bash
@@ -316,6 +326,6 @@ Set a date to switch it off once staff have moved to the new app, then set `PASS
 
 - PayUMoney: the service was shut down and merged into PayU, so the old integration (which also confirmed payments in the browser) has nothing to talk to. Stripe and PayPal are implemented.
 - In-browser database backup/restore, the updater, and the installer. Scheduled database backups (see "Backups") and Docker images replace them.
-- The admin screen for editing translation phrases. The interface is English only.
+- The admin screen for editing translation phrases. Translations live in the source instead (see "Languages"); the interface is in English and Bangla.
 
 ID cards with barcodes are printed from *People → ID cards*; the barcode is the person's active check-in card code (see "Period attendance and check-in").

@@ -28,6 +28,7 @@ from app.models import (
     Student,
 )
 from app.services.invoices import fmt, num, refresh_status
+from app.services.messages import msg, school_language, short_date
 from app.services.notifications import notify, user
 from app.services.settings import get_setting
 
@@ -152,6 +153,7 @@ def send_due_reminders(db: Session, tasks: BackgroundTasks, today: date, days_be
     reminded. The caller commits."""
     school = get_setting(db, "system_name", "School")
     currency = get_setting(db, "currency").upper()
+    lang = school_language(db)
     reminded = 0
     for link, inv, instalment, _plan in _open_fee_invoices(db):
         if instalment.due_date > today + timedelta(days=days_before) or link.last_reminded_on == today:
@@ -161,10 +163,10 @@ def send_due_reminders(db: Session, tasks: BackgroundTasks, today: date, days_be
             continue
         parent = db.get(Parent, student.parent_id) if student.parent_id else None
         due = fmt(num(inv.due) if inv.due not in (None, "") else num(inv.amount) - num(inv.amount_paid))
-        when = "was due" if instalment.due_date < today else "is due"
-        text = f"{student.name}: {inv.title} ({due} {currency}) {when} on {instalment.due_date.strftime('%d %b %Y')}."
-        mail = {"email_subject": f"Fee reminder: {inv.title}", "email_body": f"{text}\n\nPlease pay at the school office or online.\n\n{school}"}
-        title = f"Fee reminder: {inv.title}"
+        when = "fees.reminder.was_due" if instalment.due_date < today else "fees.reminder.is_due"
+        text = msg(lang, when, name=student.name, title=inv.title, amount=due, currency=currency, date=short_date(lang, instalment.due_date))
+        title = msg(lang, "fees.reminder.title", title=inv.title)
+        mail = {"email_subject": title, "email_body": msg(lang, "fees.reminder.body", text=text, school=school)}
         if parent is not None:
             notify(db, tasks, [user("parent", parent.parent_id)], "fees", title, text, "/app/my-invoices", commit=False, **mail)
         # students were emailed (never texted) before preferences existed, and only when the

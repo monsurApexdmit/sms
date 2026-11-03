@@ -9,6 +9,7 @@ from app.core.deps import DB, Me, require_roles
 from app.models import Noticeboard, Parent, Student, Teacher
 from app.services.files import delete_file, media_url, save_site_image
 from app.services.jobs import enqueue
+from app.services.messages import msg, school_language
 from app.services.notifications import notify, user
 
 router = APIRouter(prefix="/notices", tags=["noticeboard"])
@@ -30,13 +31,14 @@ def _queue_notice_sms(db: Session, tasks: BackgroundTasks, row: Noticeboard) -> 
     they chose other channels for notices; each phone number gets one text)."""
     ts = row.create_timestamp
     day = time.strftime("%Y-%m-%d", time.gmtime(int(ts))) if ts and ts.isdigit() else time.strftime("%Y-%m-%d")
-    text = f"{row.notice_title} on {day}"
+    lang = school_language(db)
+    text = msg(lang, "notices.text", title=row.notice_title, date=day)
     people = [
         user(role, person_id)
         for role, model in (("student", Student), ("parent", Parent), ("teacher", Teacher))
         for person_id in db.scalars(select(getattr(model, f"{role}_id")))
     ]
-    notify(db, tasks, people, "notices", row.notice_title or "New notice", text, "/app/notices", sms_text=text)
+    notify(db, tasks, people, "notices", row.notice_title or msg(lang, "notices.default_title"), text, "/app/notices", sms_text=text)
 
 
 @router.get("", response_model=Page)

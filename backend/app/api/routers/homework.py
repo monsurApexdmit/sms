@@ -16,6 +16,7 @@ from app.core.deps import DB, CurrentUser, Me, forbid, require_roles
 from app.models import Enroll, Homework, HomeworkSubmission, SchoolClass, Section, Student, Subject, Teacher
 from app.services.access import children_ids, current_enroll, ensure_teaches_subject
 from app.services.files import delete_file, media_url, save_document
+from app.services.messages import msg, school_language
 from app.services.notifications import notify, user as account
 from app.services.settings import running_year
 
@@ -390,11 +391,12 @@ def grade(submission_id: int, body: GradeIn, tasks: BackgroundTasks, db: DB, use
 
     student = db.get(Student, row.student_id) if first_grade else None
     if student is not None:
-        score = f"{row.marks:g}" + (f" / {hw.max_marks:g}" if hw.max_marks else "") if row.marks is not None else "no marks"
-        text = f"{student.name}'s homework \"{hw.title}\" has been graded: {score}." + (
-            f"\n\nFeedback:\n{row.feedback}" if row.feedback else ""
+        lang = school_language(db)
+        score = f"{row.marks:g}" + (f" / {hw.max_marks:g}" if hw.max_marks else "") if row.marks is not None else msg(lang, "homework.no_marks")
+        text = msg(lang, "homework.graded.text", name=student.name, title=hw.title, score=score) + (
+            msg(lang, "homework.graded.feedback", feedback=row.feedback) if row.feedback else ""
         )
-        title = f"Homework graded: {hw.title}"
+        title = msg(lang, "homework.graded.title", title=hw.title)
         if student.parent_id:
             notify(db, tasks, [account("parent", student.parent_id)], "homework", title, text, "/app/homework")
         # the student sees it in the app (and by push); emails went to parents only
