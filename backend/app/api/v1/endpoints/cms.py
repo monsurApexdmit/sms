@@ -10,7 +10,6 @@ from typing import Any
 
 import httpx
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Request, UploadFile, status
-from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -25,6 +24,7 @@ from app.models import (
     Noticeboard,
     Teacher,
 )
+from app.schemas.cms import ContactIn, EventIn, SlideIn
 from app.services.files import delete_file, media_url, save_site_image, user_image_url
 from app.services.jobs import enqueue
 from app.services.notify import send_email
@@ -129,14 +129,6 @@ def site(db: DB):
 # --- contact form ---
 
 CONTACT_LIMIT, CONTACT_WINDOW = 5, 600
-
-
-class ContactIn(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
-    email: EmailStr = Field(max_length=254)
-    phone: str | None = Field(default=None, max_length=50)
-    message: str = Field(min_length=1, max_length=5000)
-    recaptcha_token: str | None = Field(default=None, max_length=4000)
 
 
 def _contact_target(db: Session, g: dict[str, str | None]) -> str:
@@ -314,12 +306,6 @@ async def upload_site_image(key: str, db: DB, file: UploadFile = File(...)):
     return get_site_settings(db)
 
 
-class SlideIn(BaseModel):
-    title: str = ""
-    description: str = ""
-    image: str
-
-
 @admin.put("/slider")
 def update_slider(slides: list[SlideIn], db: DB):
     _set_general(db, "slider_images", json.dumps([s.model_dump() for s in slides]))
@@ -379,12 +365,6 @@ def delete_news(news_id: int, db: DB):
 
 
 # events
-
-
-class EventIn(BaseModel):
-    title: str = Field(min_length=1)
-    date: date
-    status: int = Field(default=1, ge=0, le=1)
 
 
 @admin.get("/events")

@@ -6,76 +6,23 @@ from typing import Literal
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile, status
-from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
-from app.api.crud import Page, get_or_404
+from app.api.crud import get_or_404
+from app.api.deps import DB, CurrentUser, forbid, require_roles
 from app.core.config import get_settings
-from app.api.deps import DB, CurrentUser, Me, forbid, require_roles
 from app.models import Enroll, Homework, HomeworkSubmission, SchoolClass, Section, Student, Subject, Teacher
+from app.schemas.homework import GradeIn, HomeworkOut, HomeworkPage, RosterRow, SubmissionOut
 from app.services.access import children_ids, current_enroll, ensure_teaches_subject
 from app.services.files import delete_file, media_url, save_document
-from app.services.notifications import notify, user as account
+from app.services.notifications import notify
+from app.services.notifications import user as account
 from app.services.settings import running_year
 
 router = APIRouter(prefix="/homework", tags=["homework"])
 staff_dep = require_roles("admin", "teacher")
 ALL_ROLES = require_roles("admin", "teacher", "student", "parent")
-
-
-class SubmissionOut(BaseModel):
-    submission_id: int
-    student_id: int
-    text: str | None
-    file_url: str | None
-    submitted_at: datetime
-    is_late: bool
-    marks: float | None
-    feedback: str | None
-    graded_at: datetime | None
-
-
-class HomeworkOut(BaseModel):
-    homework_id: int
-    class_id: int
-    class_name: str | None
-    section_id: int | None
-    section_name: str | None
-    subject_id: int
-    subject_name: str | None
-    teacher_id: int | None
-    teacher_name: str | None
-    title: str
-    description: str | None
-    file_url: str | None
-    assigned_on: date
-    due_date: date
-    max_marks: float | None
-    allow_late: bool
-    year: str
-    # staff view
-    students: int | None = None
-    submitted: int | None = None
-    graded: int | None = None
-    # student / parent view
-    submission: SubmissionOut | None = None
-
-
-class HomeworkPage(Page):
-    items: list[HomeworkOut]
-
-
-class RosterRow(BaseModel):
-    student_id: int
-    name: str | None
-    roll: int | None
-    submission: SubmissionOut | None
-
-
-class GradeIn(BaseModel):
-    marks: float | None = Field(default=None, ge=0)
-    feedback: str | None = Field(default=None, max_length=5000)
 
 
 def school_today() -> date:

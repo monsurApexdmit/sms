@@ -8,12 +8,12 @@ import secrets
 import time
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import DB, CurrentUser, Me, forbid, not_found, require_roles
 from app.models import GroupMessage, GroupMessageThread, Message, MessageThread
+from app.schemas.messages import Contact, GroupIn, GroupOut, MessageOut, ThreadOut
 from app.services.accounts import ROLE_MODELS, get_account, id_column, parse_ref, ref_name
 from app.services.files import media_url, save_document
 
@@ -28,46 +28,6 @@ CAN_MESSAGE = {
     "librarian": ("admin",),
     "accountant": ("admin",),
 }
-
-
-class Contact(BaseModel):
-    ref: str
-    role: str
-    name: str
-
-
-class MessageOut(BaseModel):
-    message_id: int
-    sender: str | None
-    sender_name: str
-    message: str | None
-    timestamp: str | None
-    read_status: int | None = None
-    attachment_name: str | None = None
-    attachment_url: str | None = None
-    mine: bool
-
-
-class ThreadOut(BaseModel):
-    code: str
-    other: str
-    other_name: str
-    last_message: str | None
-    last_timestamp: str | None
-    unread: int
-
-
-class GroupIn(BaseModel):
-    group_name: str = Field(min_length=1, max_length=200)
-    members: list[str] = Field(default_factory=list)  # "role_id"
-
-
-class GroupOut(BaseModel):
-    code: str
-    group_name: str | None
-    members: list[str]
-    member_names: list[str]
-    last_timestamp: str | None
 
 
 def _now() -> str:

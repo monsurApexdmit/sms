@@ -4,18 +4,16 @@ periods only change it through the explicit "fill daily attendance" action."""
 
 import hmac
 from datetime import date, datetime, timedelta
-from typing import Literal
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
-from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.api.crud import Page, get_or_404
+from app.api.crud import get_or_404
+from app.api.deps import DB, CurrentUser, forbid, not_found, require_roles
 from app.api.v1.endpoints.attendance import _sheet as daily_sheet
 from app.core.config import get_settings
-from app.api.deps import DB, CurrentUser, forbid, not_found, require_roles
 from app.models import (
     Attendance,
     AttendanceDevice,
@@ -29,6 +27,23 @@ from app.models import (
     Student,
     Subject,
 )
+from app.schemas.attendance_capture import (
+    BulkCards,
+    CaptureSettings,
+    CardIn,
+    DeviceIn,
+    FillDaily,
+    HolderRole,
+    PeriodOut,
+    PeriodRow,
+    PeriodSave,
+    PeriodSheet,
+    PunchBatch,
+    PunchIn,
+    ScanIn,
+    ScanOut,
+)
+from app.schemas.common import Page
 from app.services.accounts import get_account
 from app.services.attendance_capture import (
     HHMM,
@@ -50,7 +65,6 @@ router = APIRouter(tags=["attendance capture"])
 staff = [Depends(require_roles("admin", "teacher"))]
 admin_only = [Depends(require_roles("admin"))]
 KIOSK_ROLES = ("admin", "teacher", "librarian", "accountant")
-PeriodStatus = Literal["present", "absent", "late", "excused"]
 
 
 def _now() -> datetime:
@@ -58,44 +72,6 @@ def _now() -> datetime:
 
 
 # --- per-period attendance ------------------------------------------------------------
-
-
-class PeriodOut(BaseModel):
-    class_routine_id: int
-    class_id: int | None
-    class_name: str | None
-    section_id: int | None
-    section_name: str | None
-    subject_id: int | None
-    subject_name: str | None
-    start: str
-    end: str
-    marked: int
-
-
-class PeriodRow(BaseModel):
-    student_id: int
-    name: str | None
-    roll: int | None
-    status: str | None
-    on_leave: bool
-
-
-class PeriodSheet(BaseModel):
-    period: PeriodOut
-    date: date
-    rows: list[PeriodRow]
-
-
-class PeriodItem(BaseModel):
-    student_id: int
-    status: PeriodStatus
-
-
-class PeriodSave(BaseModel):
-    class_routine_id: int
-    date: date
-    items: list[PeriodItem] = Field(max_length=500)
 
 
 def _clock(hour: int | None, minute: int | None) -> str:
@@ -310,13 +286,6 @@ def period_summary(
     }
 
 
-class FillDaily(BaseModel):
-    class_id: int
-    section_id: int
-    date: date
-    overwrite: bool = False
-
-
 @router.post("/period-attendance/fill-daily")
 def fill_daily(body: FillDaily, db: DB, user: CurrentUser = Depends(require_roles("admin", "teacher"))):
     """Fill the official DAILY attendance from the day's periods: present if present or late in at
@@ -357,19 +326,6 @@ def fill_daily(body: FillDaily, db: DB, user: CurrentUser = Depends(require_role
 
 
 # --- ID cards ------------------------------------------------------------------------------
-
-HolderRole = Literal["student", "teacher", "librarian", "accountant"]
-
-
-class CardIn(BaseModel):
-    holder_role: HolderRole
-    holder_id: int
-    card_uid: str | None = Field(default=None, max_length=100, description="RFID UID or printed code; generated when empty")
-
-
-class BulkCards(BaseModel):
-    class_id: int
-    section_id: int | None = None
 
 
 def _card_out(db: Session, c: IdCard) -> dict:
@@ -469,32 +425,11 @@ def delete_card(card_id: int, db: DB):
 # --- kiosk ---------------------------------------------------------------------------------
 
 
-class ScanIn(BaseModel):
-    card_uid: str = Field(min_length=1, max_length=100)
-    source: Literal["qr", "rfid", "manual"] = "qr"
-
-
-class ScanOut(BaseModel):
-    result: str
-    message: str
-    card_uid: str
-    holder_role: str | None
-    holder_id: int | None
-    name: str | None
-    image_url: str | None
-    punched_at: datetime | None
-
-
 @router.post("/attendance-kiosk/scan", response_model=ScanOut)
 def kiosk_scan(body: ScanIn, db: DB, user: CurrentUser = Depends(require_roles(*KIOSK_ROLES))):
     out = record_scan(db, body.card_uid, school_now(), body.source, recorded_by=user.ref)
     db.commit()
     return ScanOut(**out.__dict__)
-
-
-class CaptureSettings(BaseModel):
-    late_after: str | None = Field(default=None, description='"HH:MM" school time; empty = nobody is marked late')
-    duplicate_minutes: int = Field(default=10, ge=0, le=240)
 
 
 @router.get("/attendance-capture/settings", response_model=CaptureSettings, dependencies=[Depends(require_roles(*KIOSK_ROLES))])
@@ -551,12 +486,6 @@ def list_punches(
 
 
 # --- devices -------------------------------------------------------------------------------
-
-
-class DeviceIn(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
-    location: str | None = Field(default=None, max_length=200)
-    active: bool = True
 
 
 def _device_out(d: AttendanceDevice, key: str | None = None) -> dict:
@@ -616,15 +545,6 @@ def current_device(db: DB, x_device_key: str | None = Header(default=None)) -> A
     if device is None or not hmac.compare_digest(device.api_key_hash, digest) or not device.active:
         raise unauthorized
     return device
-
-
-class PunchIn(BaseModel):
-    card_uid: str = Field(min_length=1, max_length=100)
-    timestamp: datetime | None = Field(default=None, description="When the card was read; naive = school time. Default: now")
-
-
-class PunchBatch(BaseModel):
-    punches: list[PunchIn] = Field(min_length=1, max_length=500)
 
 
 @router.post("/attendance-devices/punch")

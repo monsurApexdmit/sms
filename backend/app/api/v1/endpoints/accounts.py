@@ -4,49 +4,21 @@ Students live in students.py because they also carry enrolment data."""
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
-from pydantic import BaseModel, EmailStr, Field, create_model
+from pydantic import create_model
 from sqlalchemy import func, or_, select
 
-from app.api.crud import Page, get_or_404, out_schema
+from app.api.crud import get_or_404
 from app.api.deps import DB, CurrentUser, Me, require_roles
 from app.core.security import hash_password
 from app.models import Accountant, Admin, Librarian, Parent, Student, Teacher
+from app.schemas.accounts import AccountIn, AdminIn, ParentIn, TeacherIn
+from app.schemas.common import Page, out_schema
 from app.services.accounts import email_taken, insert_account
 from app.services.files import safe_path, save_image, user_image_url
 
 SECRET = ("password", "authentication_key")
 # Personal fields only admins see; other roles get a directory-style record.
 PRIVATE = ("birthday", "sex", "religion", "blood_group", "address", "phone", "profession")
-
-
-class AccountIn(BaseModel):
-    name: str = Field(min_length=1, max_length=200)
-    email: EmailStr
-    password: str | None = Field(default=None, min_length=8, max_length=200)
-
-
-class AdminIn(AccountIn):
-    phone: str | None = None
-    address: str | None = None
-
-
-class TeacherIn(AccountIn):
-    phone: str | None = None
-    address: str | None = None
-    birthday: str | None = None
-    sex: str | None = None
-    religion: str | None = None
-    blood_group: str | None = None
-    designation: str | None = None
-    about: str | None = None
-    social_links: str | None = None
-    show_on_website: int | None = 0
-
-
-class ParentIn(AccountIn):
-    phone: str | None = None
-    address: str | None = None
-    profession: str | None = None
 
 
 def account_router(

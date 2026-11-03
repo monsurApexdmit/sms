@@ -1,16 +1,16 @@
 import csv
 import io
 from collections import defaultdict
-from typing import Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Response, UploadFile, status
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.crud import crud_router, get_or_404
 from app.api.deps import DB, CurrentUser, Me, require_roles
 from app.models import Enroll, Exam, Grade, Mark, Parent, QuestionPaper, SchoolClass, Section, Student, Subject
+from app.schemas.exams import ExamIn, GradeIn, ImportResult, MarkRow, MarksSave, MarksSmsIn, MarkUpdate, QuestionPaperIn
 from app.services.access import STAFF, ensure_can_view_student, ensure_teaches_subject
 from app.services.jobs import enqueue
 from app.services.notify import send_sms, sms_enabled
@@ -19,29 +19,6 @@ from app.services.settings import running_year
 
 router = APIRouter(tags=["exams"])
 ALL = (*STAFF, "student", "parent")
-
-
-class ExamIn(BaseModel):
-    name: str = Field(min_length=1, max_length=200)
-    date: str | None = None
-    comment: str | None = None
-    year: str | None = None
-
-
-class GradeIn(BaseModel):
-    name: str = Field(min_length=1, max_length=20)
-    grade_point: str
-    mark_from: int = Field(ge=0)
-    mark_upto: int = Field(ge=0)
-    comment: str | None = None
-
-
-class QuestionPaperIn(BaseModel):
-    title: str = Field(min_length=1)
-    question_paper: str | None = None
-    class_id: int | None = None
-    exam_id: int | None = None
-    teacher_id: int | None = None
 
 
 for sub in (
@@ -63,29 +40,6 @@ for sub in (
 
 
 # --- marks entry --------------------------------------------------------------
-
-
-class MarkRow(BaseModel):
-    mark_id: int
-    student_id: int
-    student_name: str | None
-    roll: int | None
-    mark_obtained: int | None
-    comment: str | None
-
-
-class MarkUpdate(BaseModel):
-    mark_id: int
-    mark_obtained: int | None = Field(default=None, ge=0, le=1000)
-    comment: str | None = Field(default=None, max_length=500)
-
-
-class MarksSave(BaseModel):
-    exam_id: int
-    class_id: int
-    section_id: int
-    subject_id: int
-    items: list[MarkUpdate]
 
 
 def _mark_sheet(db: Session, exam_id: int, class_id: int, section_id: int, subject_id: int) -> list[MarkRow]:
@@ -151,10 +105,6 @@ def save_marks(body: MarksSave, db: DB, user: CurrentUser = Depends(require_role
 # --- marks import (CSV) ---------------------------------------------------------
 
 IMPORT_COLUMNS = ("student_id", "roll", "name", "mark_obtained", "comment")
-
-
-class ImportResult(BaseModel):
-    updated: int
 
 
 @router.get("/marks/import-template")
@@ -244,12 +194,6 @@ async def import_marks(
     body = MarksSave(exam_id=exam_id, class_id=class_id, section_id=section_id, subject_id=subject_id, items=list(items.values()))
     save_marks(body, db, user)
     return ImportResult(updated=len(items))
-
-
-class MarksSmsIn(BaseModel):
-    class_id: int
-    section_id: int | None = None
-    receiver: Literal["student", "parent"]
 
 
 @router.post("/exams/{exam_id}/marks-sms", dependencies=[Depends(require_roles("admin"))])

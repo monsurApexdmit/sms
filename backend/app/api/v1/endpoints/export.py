@@ -6,8 +6,8 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, or_, select
 
-from app.api.v1.endpoints import attendance, audit, exams, finance, students
 from app.api.deps import DB, CurrentUser, Me, require_roles
+from app.api.v1.endpoints import attendance, audit, exams, finance, students
 from app.models import Exam, Parent, SchoolClass, Section, Subject, Teacher
 from app.services.access import STAFF, ensure_teaches_subject
 from app.services.export import MAX_ROWS, check_size, number, unix_date, xlsx_response

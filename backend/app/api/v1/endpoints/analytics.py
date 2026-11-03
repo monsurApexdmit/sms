@@ -7,8 +7,8 @@ from dataclasses import asdict
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.crud import Page
 from app.api.deps import DB, CurrentUser, Me, forbid, require_roles
+from app.schemas.analytics import AtRiskPage, DefaulterPage
 from app.services import analytics as svc
 from app.services.export import xlsx_response
 from app.services.fees import school_today
@@ -17,15 +17,6 @@ from app.services.settings import running_year
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 TEACHING = [Depends(require_roles("admin", "teacher"))]
 FIN = [Depends(require_roles("admin", "accountant"))]
-
-
-class AtRiskPage(Page):
-    counts: dict[str, int]
-    params: dict
-
-
-class DefaulterPage(Page):
-    amount: float
 
 
 def _scope(db: Session, user: CurrentUser, class_id: int | None) -> set[int] | None:
@@ -161,4 +152,3 @@ def exams(user: Me, db: DB, exam_id: int | None = None, class_id: int | None = N
 def workload(user: Me, db: DB):
     """Every teacher's workload for admins; a teacher sees only their own."""
     return svc.workload(db, running_year(db), None if user.role == "admin" else [user.id])
-

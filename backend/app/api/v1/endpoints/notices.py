@@ -4,21 +4,16 @@ from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.api.crud import Page, get_or_404, out_schema
+from app.api.crud import get_or_404
 from app.api.deps import DB, Me, require_roles
 from app.models import Noticeboard, Parent, Student, Teacher
+from app.schemas.common import Page
+from app.schemas.notices import NoticeBase, NoticeOut
 from app.services.files import delete_file, media_url, save_site_image
-from app.services.jobs import enqueue
 from app.services.notifications import notify, user
 
 router = APIRouter(prefix="/notices", tags=["noticeboard"])
 admin_only = [Depends(require_roles("admin"))]
-
-NoticeBase = out_schema(Noticeboard)
-
-
-class NoticeOut(NoticeBase):  # type: ignore[misc,valid-type]
-    image_url: str | None = None
 
 
 def notice_out(row: Noticeboard) -> NoticeOut:

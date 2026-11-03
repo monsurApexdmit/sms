@@ -19,15 +19,15 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.crud import get_or_404
+from app.api.deps import DB, CurrentUser, Me, not_found, require_roles
 from app.api.v1.endpoints.finance import _ensure_invoice_access, _outstanding, _record_payment, payers
 from app.core.config import get_settings
-from app.api.deps import DB, CurrentUser, Me, not_found, require_roles
 from app.models import GatewayTransaction, Invoice, Payment
+from app.schemas.gateways import REF, ConfirmIn, GatewaySettingsIn
 from app.services import local_gateways as gw
 from app.services.accounts import get_account
 from app.services.ratelimit import throttle
@@ -36,8 +36,6 @@ from app.services.settings import set_setting
 log = logging.getLogger("payments")
 router = APIRouter(tags=["payment gateways"])
 admin_only = [Depends(require_roles("admin"))]
-
-REF =r"^[A-Za-z0-9_-]{1,100}$"
 
 
 def _now() -> datetime:
@@ -65,12 +63,6 @@ def _credentials(db: Session, gateway: str) -> dict[str, str]:
 
 
 # --- settings -------------------------------------------------------------------------
-
-
-class GatewaySettingsIn(BaseModel):
-    bkash: dict[str, Any] | None = None
-    nagad: dict[str, Any] | None = None
-    sslcommerz: dict[str, Any] | None = None
 
 
 def _all_settings(db: Session) -> dict:
@@ -235,10 +227,6 @@ def _settle_sslcommerz(db: Session, cfg: dict[str, str], tx: GatewayTransaction,
         db, tx, amount=v.get("currency_amount") or v.get("amount"), currency=v.get("currency_type") or v.get("currency"),
         trx_id=v.get("bank_tran_id"), gateway_ref=val_id,
     )  # fmt: skip
-
-
-class ConfirmIn(BaseModel):
-    ref: str = Field(pattern=REF)
 
 
 def _confirm_target(db: Session, user: CurrentUser, gateway: str, ref: str) -> GatewayTransaction:

@@ -1,56 +1,24 @@
 """Academic calendar: holidays, exams, events and meetings."""
 
 from datetime import date
-from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import select
 
 from app.api.crud import get_or_404
 from app.api.deps import DB, Me, require_roles
 from app.models import CalendarEvent
+from app.schemas.calendar import EventIn, EventOut, Kind
 from app.services.school_calendar import day_info, weekly_off_days
 
 router = APIRouter(prefix="/calendar", tags=["calendar"])
 admin_only = [Depends(require_roles("admin"))]
 
-Kind = Literal["holiday", "exam", "event", "meeting", "other"]
-Audience = Literal["all", "staff", "students", "parents"]
 # which audiences each role sees (admins see everything)
 VISIBLE: dict[str, tuple[str, ...]] = {
     "teacher": ("all", "staff"), "accountant": ("all", "staff"), "librarian": ("all", "staff"),
     "student": ("all", "students"), "parent": ("all", "parents"),
 }  # fmt: skip
-
-
-class EventIn(BaseModel):
-    title: str = Field(min_length=1, max_length=200)
-    description: str | None = Field(default=None, max_length=5000)
-    start_date: date
-    end_date: date | None = None
-    kind: Kind = "event"
-    audience: Audience = "all"
-
-    @model_validator(mode="after")
-    def check_dates(self):
-        if self.end_date is None:
-            self.end_date = self.start_date
-        if self.end_date < self.start_date:
-            raise ValueError("end_date must not be before start_date")
-        if (self.end_date - self.start_date).days > 366:
-            raise ValueError("An event can last at most a year")
-        return self
-
-
-class EventOut(BaseModel):
-    event_id: int
-    title: str
-    description: str | None
-    start_date: date
-    end_date: date
-    kind: str
-    audience: str
 
 
 @router.get("", response_model=list[EventOut])

@@ -11,11 +11,11 @@ from rq import Queue
 from sqlalchemy import create_engine, inspect, select
 from sqlalchemy.orm import Session
 
-from app.db import session as db_module
 from app.core import tenancy
 from app.core.config import base_settings, get_settings
 from app.core.security import sign_media_path, verify_media_signature
 from app.core.tenancy import TenantRow, control_engine, control_session, reload_registry, tenant_by_slug, use_tenant
+from app.db import session as db_module
 from app.db.base import Base
 from app.db.session import new_session
 from app.main import app

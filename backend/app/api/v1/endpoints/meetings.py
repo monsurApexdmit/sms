@@ -1,18 +1,16 @@
 """Parent-teacher meetings: sessions with per-teacher slots that parents book for a child."""
 
-from datetime import date, datetime, time, timedelta, timezone
-from typing import Literal
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.crud import get_or_404
-from app.core.config import get_settings
 from app.api.deps import DB, CurrentUser, Me, forbid, require_roles
+from app.core.config import get_settings
 from app.models import (
     CalendarEvent,
     MeetingBooking,
@@ -24,6 +22,7 @@ from app.models import (
     Subject,
     Teacher,
 )
+from app.schemas.meetings import BlockIn, BookingIn, OutcomeIn, SessionIn, SessionOut, _slot_times
 from app.services.access import children_ids, current_enroll
 from app.services.notifications import notify, user
 from app.services.settings import get_setting
@@ -42,72 +41,7 @@ def _now() -> datetime:
     return datetime.now(ZoneInfo(get_settings().school_timezone)).replace(tzinfo=None)
 
 
-# --- schemas ----------------------------------------------------------------------
-
-
-class SessionIn(BaseModel):
-    title: str = Field(min_length=1, max_length=200)
-    date: date
-    start_time: time
-    end_time: time
-    slot_minutes: int = Field(ge=5, le=120)
-    location: str | None = Field(default=None, max_length=300)
-    class_id: int | None = None
-    # empty: every teacher of class_id
-    teacher_ids: list[int] = Field(default_factory=list, max_length=200)
-
-    @model_validator(mode="after")
-    def check(self):
-        if self.end_time <= self.start_time:
-            raise ValueError("end_time must be after start_time")
-        if not self.teacher_ids and self.class_id is None:
-            raise ValueError("Choose the teachers, or a class to invite all its teachers")
-        if not _slot_times(self.start_time, self.end_time, self.slot_minutes):
-            raise ValueError("The time window is shorter than one slot")
-        return self
-
-
-class SessionOut(BaseModel):
-    session_id: int
-    title: str
-    date: date
-    start_time: time
-    end_time: time
-    slot_minutes: int
-    location: str | None
-    class_id: int | None
-    class_name: str | None
-    teacher_ids: list[int]
-    slots: int
-    booked: int
-
-
-class BookingIn(BaseModel):
-    slot_id: int
-    student_id: int
-    note: str | None = Field(default=None, max_length=1000)
-
-
-class OutcomeIn(BaseModel):
-    status: Literal["booked", "done", "no_show"]
-    teacher_note: str | None = Field(default=None, max_length=2000)
-
-
-class BlockIn(BaseModel):
-    blocked: bool
-
-
 # --- helpers ----------------------------------------------------------------------
-
-
-def _slot_times(start: time, end: time, minutes: int) -> list[tuple[time, time]]:
-    day = date(2000, 1, 1)
-    at, stop, step = datetime.combine(day, start), datetime.combine(day, end), timedelta(minutes=minutes)
-    out = []
-    while at + step <= stop:
-        out.append((at.time(), (at + step).time()))
-        at += step
-    return out
 
 
 def _class_teachers(db: Session, class_id: int) -> set[int]:
@@ -506,4 +440,3 @@ def session_teacher_options(db: DB, class_id: int | None = None):
     of_class = _class_teachers(db, class_id) if class_id else set()
     rows = db.scalars(select(Teacher).order_by(Teacher.name))
     return [{"teacher_id": t.teacher_id, "name": t.name, "teaches_class": t.teacher_id in of_class} for t in rows]
-

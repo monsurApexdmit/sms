@@ -15,16 +15,25 @@ Data sent to the API, per feature (never names, contact details, health or couns
 import json
 import os
 from datetime import datetime, timezone
-from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import func, select
 
-from app.api.v1.endpoints.online_exams import QuestionIn, _staff_exam
-from app.api.v1.endpoints.report_cards import _cards, _exam_and_year
 from app.api.deps import DB, Me, forbid, not_found, require_roles
+from app.api.v1.endpoints.online_exams import _staff_exam
+from app.api.v1.endpoints.report_cards import _cards, _exam_and_year
 from app.models import Exam, Mark, SchoolClass, Student, Subject
+from app.schemas.ai import (
+    AiSettingsIn,
+    DraftQuestion,
+    DraftQuestions,
+    QuestionDraftIn,
+    RemarkDraftIn,
+    RemarkOptions,
+    Summary,
+    SummaryIn,
+)
+from app.schemas.online_exams import QuestionIn
 from app.services import ai
 from app.services.access import children_ids, current_enroll
 from app.services.analytics import RiskParams, at_risk
@@ -74,21 +83,6 @@ def get_ai_settings(db: DB):
     return _settings_out(db)
 
 
-class AiSettingsIn(BaseModel):
-    ai_enabled: bool | None = None
-    anthropic_api_key: str | None = Field(default=None, max_length=300)
-    ai_model: str | None = None
-    ai_monthly_cap: int | None = Field(default=None, ge=0, le=1_000_000)
-    ai_daily_user_cap: int | None = Field(default=None, ge=0, le=10_000)
-
-    @field_validator("ai_model")
-    @classmethod
-    def known_model(cls, v: str | None) -> str | None:
-        if v is not None and v not in ai.MODELS:
-            raise ValueError(f"Model must be one of {', '.join(ai.MODELS)}")
-        return v
-
-
 @router.put("/settings", dependencies=admin_only)
 def save_ai_settings(body: AiSettingsIn, db: DB):
     for key, value in body.model_dump(exclude_unset=True).items():
@@ -107,26 +101,6 @@ def ai_usage(db: DB, months: int = 6):
 
 
 # --- report-card remarks -------------------------------------------------------------------
-
-
-class RemarkDraftIn(BaseModel):
-    student_id: int
-    exam_id: int | None = None
-    year: str | None = None
-    tone: Literal["encouraging", "formal", "brief"] = "encouraging"
-    notes: str | None = Field(default=None, max_length=500)
-
-
-class RemarkOptions(BaseModel):
-    options: list[str] = Field(min_length=1, max_length=5)
-
-    @field_validator("options")
-    @classmethod
-    def clean(cls, v: list[str]) -> list[str]:
-        out = [o.strip() for o in v if o and o.strip()]
-        if not out or any(len(o) > 2000 for o in out):
-            raise ValueError("unusable remarks")
-        return out
 
 
 REMARK_SCHEMA = {
@@ -208,29 +182,6 @@ def draft_report_remark(body: RemarkDraftIn, user: Me, db: DB):
 # --- question drafts -----------------------------------------------------------------------
 
 
-QuestionType = Literal["multiple_choice", "true_false", "fill_in_the_blanks"]
-
-
-class QuestionDraftIn(BaseModel):
-    online_exam_id: int
-    topic: str = Field(min_length=3, max_length=2000)
-    count: int = Field(default=5, ge=1, le=10)
-    types: list[QuestionType] = Field(default_factory=lambda: ["multiple_choice"], min_length=1)
-    difficulty: Literal["easy", "medium", "hard"] = "medium"
-    mark: float = Field(default=1, gt=0, le=100)
-
-
-class DraftQuestion(BaseModel):
-    type: QuestionType
-    question_title: str
-    options: list[str]
-    correct_answers: list[str]
-
-
-class DraftQuestions(BaseModel):
-    questions: list[DraftQuestion]
-
-
 QUESTION_SCHEMA = {
     "type": "object",
     "properties": {
@@ -308,15 +259,6 @@ def draft_questions(body: QuestionDraftIn, user: Me, db: DB):
 
 
 # --- progress summaries --------------------------------------------------------------------
-
-
-class SummaryIn(BaseModel):
-    student_id: int
-
-
-class Summary(BaseModel):
-    summary: str = Field(min_length=1, max_length=3000)
-    suggestions: list[str] = Field(default_factory=list, max_length=5)
 
 
 SUMMARY_SCHEMA = {

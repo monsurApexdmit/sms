@@ -12,14 +12,12 @@ Who sees what:
 """
 
 from datetime import date, datetime, timezone
-from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 
-from app.api.crud import Page, get_or_404
+from app.api.crud import get_or_404
 from app.api.deps import DB, CurrentUser, Me, forbid, require_roles
 from app.models import (
     CertificateIssue,
@@ -31,6 +29,20 @@ from app.models import (
     StudentHealth,
     StudentRecord,
     Subject,
+)
+from app.schemas.common import Page
+from app.schemas.records import (
+    CancelIn,
+    CertificateOut,
+    CertKind,
+    HealthIn,
+    HealthOut,
+    IssueIn,
+    RecordIn,
+    RecordOut,
+    TemplateIn,
+    TemplateOut,
+    VerifyOut,
 )
 from app.services.access import children_ids, current_enroll
 from app.services.certificates import (
@@ -50,8 +62,6 @@ public = APIRouter(prefix="/public/certificates", tags=["public website"])
 admin_only = [Depends(require_roles("admin"))]
 readers = [Depends(require_roles("admin", "teacher", "student", "parent"))]
 
-RecordKind = Literal["health", "discipline", "counselling", "achievement", "other"]
-CertKind = Literal["transfer", "bonafide", "character", "custom"]
 PARENT_KINDS = ("discipline", "achievement")
 STUDENT_KINDS = ("achievement",)
 
@@ -89,24 +99,6 @@ def _ensure_can_read(db: DB, user: CurrentUser, student_id: int) -> None:
 # --- health ---------------------------------------------------------------------------
 
 
-class HealthIn(BaseModel):
-    blood_group: str | None = Field(default=None, max_length=10)
-    height_cm: float | None = Field(default=None, gt=0, lt=300)
-    weight_kg: float | None = Field(default=None, gt=0, lt=500)
-    allergies: str | None = Field(default=None, max_length=5000)
-    conditions: str | None = Field(default=None, max_length=5000)
-    medications: str | None = Field(default=None, max_length=5000)
-    emergency_contact_name: str | None = Field(default=None, max_length=200)
-    emergency_contact_phone: str | None = Field(default=None, max_length=50)
-    doctor: str | None = Field(default=None, max_length=200)
-    notes: str | None = Field(default=None, max_length=5000)
-
-
-class HealthOut(HealthIn):
-    updated_by: str | None = None
-    updated_at: datetime | None = None
-
-
 def _health_out(db: DB, student: Student) -> HealthOut:
     row = db.scalars(select(StudentHealth).where(StudentHealth.student_id == student.student_id)).first()
     if row is None:
@@ -129,29 +121,6 @@ def save_health(student_id: int, body: HealthIn, user: Me, db: DB):
 
 
 # --- records --------------------------------------------------------------------------
-
-
-class RecordIn(BaseModel):
-    kind: RecordKind
-    date: date
-    title: str = Field(min_length=1, max_length=200)
-    details: str | None = Field(default=None, max_length=10000)
-    action_taken: str | None = Field(default=None, max_length=5000)
-    confidential: bool = False
-
-
-class RecordOut(BaseModel):
-    record_id: int
-    student_id: int
-    kind: str
-    date: date
-    title: str
-    details: str | None
-    action_taken: str | None
-    confidential: bool
-    recorded_by: str
-    created_at: datetime
-    can_edit: bool = False
 
 
 def _visible_records(db: DB, user: CurrentUser, student_id: int):
@@ -219,47 +188,6 @@ def delete_record(record_id: int, user: Me, db: DB):
 
 
 # --- certificates ---------------------------------------------------------------------
-
-
-class TemplateIn(BaseModel):
-    kind: CertKind
-    name: str = Field(min_length=1, max_length=200)
-    body: str = Field(min_length=1, max_length=20000)
-    active: bool = True
-
-
-class TemplateOut(TemplateIn):
-    template_id: int
-    unknown_placeholders: list[str] = []
-
-
-class IssueIn(BaseModel):
-    template_id: int
-    student_id: int
-    issued_on: date | None = None
-    reason: str | None = Field(default=None, max_length=1000)
-    conduct: str | None = Field(default=None, max_length=200)
-
-
-class CancelIn(BaseModel):
-    reason: str = Field(min_length=1, max_length=1000)
-
-
-class CertificateOut(BaseModel):
-    certificate_id: int
-    serial_no: str
-    kind: str
-    template_id: int | None
-    student_id: int
-    student_name: str | None = None
-    issued_on: date
-    reason: str | None
-    conduct: str | None
-    rendered_body: str
-    issued_by: str
-    created_at: datetime
-    cancelled: bool
-    cancel_reason: str | None
 
 
 def _template_out(row: CertificateTemplate) -> TemplateOut:
@@ -417,13 +345,6 @@ def cancel_certificate(certificate_id: int, body: CancelIn, db: DB):
     return _cert_out(db, [row])[0]
 
 
-class VerifyOut(BaseModel):
-    valid: bool
-    kind: str | None = None
-    issued_on: date | None = None
-    student_initials: str | None = None
-
-
 @public.get("/verify", response_model=VerifyOut)
 def verify_certificate(request: Request, db: DB, serial: str = Query(min_length=1, max_length=32)):
     """Public check of a printed serial. Says nothing about cancelled or unknown serials beyond `valid: false`."""
@@ -469,4 +390,3 @@ def student_profile(student_id: int, user: Me, db: DB):
         "can_edit_health": user.role == "admin",
         "can_add_records": user.role == "admin" or user.role == "teacher",
     }
-

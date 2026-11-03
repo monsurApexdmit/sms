@@ -4,12 +4,12 @@ settings for the push and WhatsApp channels."""
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, status
-from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import case, delete, func, select, update
 
-from app.api.crud import Page
 from app.api.deps import DB, Me, not_found, require_roles
 from app.models import Notification, NotificationPreference, PushSubscription
+from app.schemas.common import Page
+from app.schemas.notifications import ChannelSettingsIn, NotificationOut, PreferencesIn, SubscribeIn, UnsubscribeIn
 from app.services.notifications import CATEGORIES, available_channels, channels_for, generate_vapid_keys, notify, user, vapid_keys
 from app.services.settings import MASK, SECRET_KEYS, get_setting, set_setting
 
@@ -29,16 +29,6 @@ CHANNEL_SETTINGS = (
 
 def _now() -> datetime:
     return datetime.now(timezone.utc).replace(tzinfo=None)
-
-
-class NotificationOut(BaseModel):
-    notification_id: int
-    category: str
-    title: str
-    body: str | None
-    link: str | None
-    created_at: datetime
-    read_at: datetime | None
 
 
 def _out(row: Notification) -> NotificationOut:
@@ -101,26 +91,6 @@ def mark_all_read(me: Me, db: DB):
 # --- preferences ----------------------------------------------------------------------
 
 
-class PreferenceItem(BaseModel):
-    category: str
-    in_app: bool = True
-    email: bool = False
-    sms: bool = False
-    push: bool = True
-    whatsapp: bool = False
-
-    @field_validator("category")
-    @classmethod
-    def known(cls, v: str) -> str:
-        if v not in CATEGORIES:
-            raise ValueError("Unknown category")
-        return v
-
-
-class PreferencesIn(BaseModel):
-    items: list[PreferenceItem] = Field(max_length=len(CATEGORIES))
-
-
 def _preferences(db: DB, me: Me) -> dict:
     items = []
     for category in CATEGORIES:
@@ -155,27 +125,6 @@ def save_preferences(body: PreferencesIn, me: Me, db: DB):
 
 
 # --- web push ---------------------------------------------------------------------------
-
-
-class PushKeys(BaseModel):
-    p256dh: str = Field(min_length=1, max_length=200)
-    auth: str = Field(min_length=1, max_length=100)
-
-
-class SubscribeIn(BaseModel):
-    endpoint: str = Field(min_length=1, max_length=500)
-    keys: PushKeys
-
-    @field_validator("endpoint")
-    @classmethod
-    def https(cls, v: str) -> str:
-        if not v.startswith("https://"):
-            raise ValueError("endpoint must be an https URL")
-        return v
-
-
-class UnsubscribeIn(BaseModel):
-    endpoint: str = Field(min_length=1, max_length=500)
 
 
 @router.get("/push/public-key")
@@ -229,14 +178,6 @@ def _channel_settings(db: DB) -> dict:
 @router.get("/settings", dependencies=admin_only)
 def get_channel_settings(db: DB):
     return _channel_settings(db)
-
-
-class ChannelSettingsIn(BaseModel):
-    whatsapp_token: str | None = Field(default=None, max_length=1000)
-    whatsapp_phone_number_id: str | None = Field(default=None, max_length=50)
-    whatsapp_template: str | None = Field(default=None, max_length=100)
-    whatsapp_template_language: str | None = Field(default=None, max_length=20)
-    vapid_subject: str | None = Field(default=None, max_length=200)
 
 
 @router.put("/settings", dependencies=admin_only)

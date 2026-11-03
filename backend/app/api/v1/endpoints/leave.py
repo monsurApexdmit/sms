@@ -7,13 +7,14 @@ from datetime import date, datetime, timezone
 from typing import Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
-from app.api.crud import Page, get_or_404
+from app.api.crud import get_or_404
 from app.api.deps import DB, CurrentUser, Me, forbid, require_roles
 from app.models import Enroll, LeaveRequest, SchoolClass, Section, Student, Subject
+from app.schemas.common import Page
+from app.schemas.leave import MAX_SPAN_DAYS, DecisionIn, LeaveIn, LeaveOut
 from app.services.access import children_ids, current_enroll
 from app.services.accounts import get_account, ref_name
 from app.services.notifications import notify, parent_or_student, user
@@ -23,59 +24,9 @@ from app.services.settings import running_year
 
 ALL = ("admin", "teacher", "accountant", "librarian", "student", "parent")
 STAFF_ROLES = ("teacher", "accountant", "librarian")
-MAX_SPAN_DAYS = 60
 OPEN = ("pending", "approved")
 
 router = APIRouter(prefix="/leave", tags=["leave"], dependencies=[Depends(require_roles(*ALL))])
-
-Kind = Literal["sick", "casual", "family", "other"]
-
-
-class LeaveIn(BaseModel):
-    # students apply for themselves and staff for themselves; parents name a child;
-    # admins name a student or a member of staff
-    student_id: int | None = None
-    staff_role: Literal["teacher", "accountant", "librarian"] | None = None
-    staff_id: int | None = None
-    kind: Kind = "other"
-    from_date: date
-    to_date: date
-    reason: str = Field(min_length=1, max_length=2000)
-
-    @model_validator(mode="after")
-    def check_dates(self):
-        if self.to_date < self.from_date:
-            raise ValueError("to_date must not be before from_date")
-        if (self.to_date - self.from_date).days >= MAX_SPAN_DAYS:
-            raise ValueError(f"Leave can cover at most {MAX_SPAN_DAYS} days; split longer leave into several requests")
-        return self
-
-
-class DecisionIn(BaseModel):
-    approve: bool
-    note: str | None = Field(default=None, max_length=2000)
-
-
-class LeaveOut(BaseModel):
-    leave_id: int
-    kind: str
-    from_date: date
-    to_date: date
-    days: int
-    reason: str | None
-    status: str
-    person_role: str
-    person_name: str
-    student_id: int | None
-    class_name: str | None
-    applicant_role: str
-    applicant_name: str
-    decided_by_name: str | None
-    decided_at: datetime | None
-    decision_note: str | None
-    created_at: datetime
-    can_cancel: bool
-    can_decide: bool
 
 
 # --- rules ------------------------------------------------------------------------

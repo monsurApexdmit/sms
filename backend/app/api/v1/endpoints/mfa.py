@@ -12,13 +12,14 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import select
 
-from app.api.v1.endpoints.auth import TokenOut, _issue
 from app.api.deps import DB, Me, bearer, require_roles
+from app.api.v1.endpoints.auth import _issue
 from app.core.security import decode_token, password_fingerprint, verify_password
 from app.models import UserTotp
+from app.schemas.auth import TokenOut
+from app.schemas.mfa import CodeIn, ConfirmOut, DisableIn, EnrolledUserOut, SetupOut, StatusOut, VerifyIn
 from app.services import mfa
 from app.services.accounts import get_account
 from app.services.ratelimit import throttle
@@ -32,47 +33,6 @@ def _throttle(action: str, role: str, user_id: int) -> None:
     """At most MAX_ATTEMPTS code checks per account and action in WINDOW seconds (5 guesses of a
     6-digit code: brute force is hopeless), counted whether or not the code was right."""
     throttle(f"mfa-{action}:{role}:{user_id}", MAX_ATTEMPTS, WINDOW, "Too many attempts. Try again in a few minutes.")
-
-
-class StatusOut(BaseModel):
-    enabled: bool
-    pending: bool
-    confirmed_at: str | None
-    recovery_codes_left: int
-    required: bool
-
-
-class SetupOut(BaseModel):
-    secret: str
-    otpauth_uri: str
-    qr: str  # SVG data URI
-
-
-class CodeIn(BaseModel):
-    code: str = Field(min_length=6, max_length=10)
-
-
-class ConfirmOut(BaseModel):
-    recovery_codes: list[str]
-    # set when setup was forced at sign-in: the user is now signed in
-    session: TokenOut | None = None
-
-
-class VerifyIn(BaseModel):
-    mfa_token: str = Field(min_length=1, max_length=2000)
-    code: str | None = Field(default=None, max_length=10)
-    recovery_code: str | None = Field(default=None, max_length=20)
-
-    @model_validator(mode="after")
-    def one_of(self):
-        if not (self.code or self.recovery_code):
-            raise ValueError("Enter the code from your authenticator app or a recovery code")
-        return self
-
-
-class DisableIn(BaseModel):
-    password: str = Field(min_length=1, max_length=200)
-    code: str = Field(min_length=6, max_length=20, description="Authenticator code or a recovery code")
 
 
 @dataclass(frozen=True)
@@ -194,14 +154,6 @@ def disable(body: DisableIn, user: Me, db: DB):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "That code is not right")
     db.delete(row)
     db.commit()
-
-
-class EnrolledUserOut(BaseModel):
-    role: str
-    user_id: int
-    name: str | None
-    email: str | None
-    confirmed_at: str | None
 
 
 @router.get("/users", response_model=list[EnrolledUserOut], dependencies=[Depends(require_roles("admin"))])

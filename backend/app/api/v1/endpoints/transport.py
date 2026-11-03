@@ -8,23 +8,39 @@ from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.api.crud import Page, crud_router, get_or_404
-from app.core.config import get_settings
+from app.api.crud import crud_router, get_or_404
 from app.api.deps import DB, Me, require_roles
+from app.core.config import get_settings
 from app.models import Driver, Enroll, Parent, RouteStop, SchoolClass, Section, Student, StudentTransport, Transport, Vehicle
+from app.schemas.common import Page
+from app.schemas.transport import (
+    AssignIn,
+    AssignmentRow,
+    AssignResult,
+    BulkAssignIn,
+    Capacity,
+    DriverIn,
+    ExpiryItem,
+    MyTransport,
+    MyVehicle,
+    Roster,
+    RosterStop,
+    RouteOut,
+    StopIn,
+    StopOrder,
+    StopOut,
+    VehicleIn,
+    VehicleOut,
+)
 from app.services.access import children_ids, ensure_can_view_student
 from app.services.settings import running_year
 
 router = APIRouter(prefix="/transport", tags=["transport"])
 admin_only = [Depends(require_roles("admin"))]
 readers = [Depends(require_roles("admin", "teacher"))]
-
-HHMM = r"^([01]\d|2[0-3]):[0-5]\d$"
-MONEY = r"^\d{1,8}(\.\d{1,2})?$"
 
 
 def _today() -> date:
@@ -38,15 +54,6 @@ def _route(db: Session, route_id: int) -> Transport:
 # --- drivers ----------------------------------------------------------------------
 
 
-class DriverIn(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
-    phone: str | None = Field(default=None, max_length=50)
-    licence_no: str | None = Field(default=None, max_length=50)
-    licence_expiry: date | None = None
-    address: str | None = Field(default=None, max_length=1000)
-    active: bool = True
-
-
 router.include_router(
     crud_router(
         path="/drivers", model=Driver, schema_in=DriverIn, read_roles=("admin", "teacher"), write_roles=("admin",),
@@ -56,34 +63,6 @@ router.include_router(
 
 
 # --- vehicles ---------------------------------------------------------------------
-
-
-class VehicleIn(BaseModel):
-    registration_no: str = Field(min_length=1, max_length=50)
-    model: str | None = Field(default=None, max_length=100)
-    capacity: int = Field(default=0, ge=0, le=500)
-    route_id: int | None = None
-    driver_id: int | None = None
-    insurance_expiry: date | None = None
-    fitness_expiry: date | None = None
-    notes: str | None = Field(default=None, max_length=2000)
-    active: bool = True
-
-
-class VehicleOut(BaseModel):
-    vehicle_id: int
-    registration_no: str
-    model: str | None
-    capacity: int
-    route_id: int | None
-    route_name: str | None = None
-    driver_id: int | None
-    driver_name: str | None = None
-    driver_phone: str | None = None
-    insurance_expiry: date | None
-    fitness_expiry: date | None
-    notes: str | None
-    active: bool
 
 
 def _vehicles_out(db: Session, rows: list[Vehicle]) -> list[VehicleOut]:
@@ -150,42 +129,6 @@ def delete_vehicle(vehicle_id: int, db: DB):
 
 
 # --- routes and stops --------------------------------------------------------------
-
-
-class StopIn(BaseModel):
-    name: str = Field(min_length=1, max_length=200)
-    pickup_time: str | None = Field(default=None, pattern=HHMM)
-    drop_time: str | None = Field(default=None, pattern=HHMM)
-    fare: str | None = Field(default=None, pattern=MONEY)
-
-
-class StopOut(BaseModel):
-    stop_id: int
-    route_id: int
-    name: str
-    sequence: int
-    pickup_time: str | None
-    drop_time: str | None
-    fare: str | None
-
-
-class StopOrder(BaseModel):
-    stop_ids: list[int] = Field(max_length=500)
-
-
-class Capacity(BaseModel):
-    assigned: int
-    capacity: int
-    over_capacity: bool
-
-
-class RouteOut(Capacity):
-    transport_id: int
-    route_name: str | None
-    route_fare: str | None
-    description: str | None
-    stops: list[StopOut]
-    vehicles: list[VehicleOut]
 
 
 def _stops(db: Session, route_id: int) -> list[RouteStop]:
@@ -257,46 +200,6 @@ def reorder_stops(route_id: int, body: StopOrder, db: DB):
 
 
 # --- assignments ------------------------------------------------------------------
-
-
-class AssignIn(BaseModel):
-    route_id: int
-    stop_id: int | None = None
-    pickup: bool = True
-    drop: bool = True
-    since: date | None = None
-
-
-class BulkAssignIn(AssignIn):
-    student_ids: list[int] | None = Field(default=None, max_length=1000)
-    class_id: int | None = None
-    section_id: int | None = None
-
-    @model_validator(mode="after")
-    def check_target(self):
-        if not self.student_ids and not self.class_id:
-            raise ValueError("Give student_ids or a class_id")
-        return self
-
-
-class AssignmentRow(BaseModel):
-    student_id: int
-    name: str | None
-    roll: int | None = None
-    class_name: str | None = None
-    section_name: str | None = None
-    route_id: int | None
-    route_name: str | None = None
-    stop_id: int | None = None
-    stop_name: str | None = None
-    pickup: bool = True
-    drop: bool = True
-    parent_phone: str | None = None
-
-
-class AssignResult(BaseModel):
-    assigned: int
-    capacity: Capacity
 
 
 def _assign(db: Session, student: Student, body: AssignIn) -> None:
@@ -405,18 +308,6 @@ def unassign_student(student_id: int, db: DB):
 # --- roster -----------------------------------------------------------------------
 
 
-class RosterStop(BaseModel):
-    stop: StopOut | None
-    students: list[AssignmentRow]
-
-
-class Roster(Capacity):
-    transport_id: int
-    route_name: str | None
-    vehicles: list[VehicleOut]
-    stops: list[RosterStop]
-
-
 @router.get("/routes/{route_id}/roster", response_model=Roster, dependencies=readers)
 def route_roster(route_id: int, db: DB):
     """Students on the route grouped by stop in route order; students without a stop come last."""
@@ -440,14 +331,6 @@ def route_roster(route_id: int, db: DB):
 # --- expiring documents -------------------------------------------------------------
 
 
-class ExpiryItem(BaseModel):
-    kind: str  # insurance | fitness | licence
-    label: str
-    item_id: int
-    expires_on: date
-    days_left: int
-
-
 @router.get("/expiring", response_model=list[ExpiryItem], dependencies=admin_only)
 def expiring_documents(db: DB, days: int = Query(30, ge=0, le=365)):
     """Vehicle insurance/fitness and driver licences that expire within `days` days or have already expired."""
@@ -466,27 +349,6 @@ def expiring_documents(db: DB, days: int = Query(30, ge=0, le=365)):
 
 
 # --- my transport -------------------------------------------------------------------
-
-
-class MyVehicle(BaseModel):
-    registration_no: str
-    model: str | None
-    driver_name: str | None
-    driver_phone: str | None
-
-
-class MyTransport(BaseModel):
-    student_id: int
-    student_name: str | None
-    route_id: int | None
-    route_name: str | None
-    route_description: str | None
-    stop: StopOut | None
-    pickup: bool
-    drop: bool
-    fare: str | None
-    since: date | None
-    vehicles: list[MyVehicle]
 
 
 @router.get("/mine", response_model=MyTransport)

@@ -6,12 +6,12 @@ import calendar
 from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import DB, Me, require_roles
 from app.models import Attendance, Enroll, Student
+from app.schemas.attendance import SheetRow, SheetSave
 from app.services.access import ensure_can_view_student
 from app.services.leave import students_on_leave
 from app.services.notifications import notify, user
@@ -46,27 +46,6 @@ def _month_calendar(db: Session, start: int, days: int) -> dict:
         "off_days": [n for n in range(1, days + 1) if date(first.year, first.month, n).weekday() in off],
         "working_days": working_days(db, first, last),
     }
-
-
-class SheetRow(BaseModel):
-    attendance_id: int
-    student_id: int
-    name: str | None
-    roll: int | None
-    status: int | None
-    on_leave: bool = False
-
-
-class SheetItem(BaseModel):
-    attendance_id: int
-    status: int = Field(ge=0, le=2)
-
-
-class SheetSave(BaseModel):
-    class_id: int
-    section_id: int
-    date: date
-    items: list[SheetItem]
 
 
 def _sheet(db: Session, class_id: int, section_id: int, d: date) -> list[SheetRow]:

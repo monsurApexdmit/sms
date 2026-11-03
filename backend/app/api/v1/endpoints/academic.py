@@ -2,13 +2,14 @@ import secrets
 import time
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from pydantic import BaseModel, Field
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
-from app.api.crud import Page, crud_router, get_or_404, out_schema
+from app.api.crud import crud_router, get_or_404
 from app.api.deps import DB, CurrentUser, Me, forbid, require_roles
 from app.models import AcademicSyllabus, AcademicYear, ClassRoutine, Document, Enroll, SchoolClass, Section, Subject
+from app.schemas.academic import ClassIn, DocumentBase, DocumentOut, RoutineIn, SectionIn, SubjectIn, SyllabusBase, SyllabusOut
+from app.schemas.common import Page, out_schema
 from app.services.access import STAFF, children_ids, current_enroll, ensure_can_view_student
 from app.services.files import delete_file, media_url, save_document
 from app.services.settings import running_year
@@ -18,38 +19,6 @@ router = APIRouter(tags=["academic"])
 
 
 # --- classes / sections / subjects --------------------------------------------
-
-
-class ClassIn(BaseModel):
-    name: str = Field(min_length=1, max_length=11)
-    name_numeric: str | None = Field(default=None, max_length=3)
-    teacher_id: int | None = None
-
-
-class SectionIn(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
-    nick_name: str | None = None
-    class_id: int
-    teacher_id: int | None = None
-
-
-class SubjectIn(BaseModel):
-    name: str = Field(min_length=1, max_length=200)
-    class_id: int
-    teacher_id: int | None = None
-    year: str | None = None
-
-
-class RoutineIn(BaseModel):
-    class_id: int
-    section_id: int
-    subject_id: int
-    day: str = Field(pattern=r"^(saturday|sunday|monday|tuesday|wednesday|thursday|friday)$")
-    time_start: int = Field(ge=0, le=23)
-    time_start_min: int = Field(ge=0, le=59)
-    time_end: int = Field(ge=0, le=23)
-    time_end_min: int = Field(ge=0, le=59)
-    year: str | None = None
 
 
 def _year_default(db: Session) -> dict:
@@ -127,12 +96,6 @@ def _resolve_student(db: Session, user: CurrentUser, student_id: int | None) -> 
 
 # --- syllabus -----------------------------------------------------------------
 
-SyllabusBase = out_schema(AcademicSyllabus)
-
-
-class SyllabusOut(SyllabusBase):  # type: ignore[misc,valid-type]
-    download_url: str | None = None
-
 
 def _syllabus_out(row: AcademicSyllabus) -> SyllabusOut:
     return SyllabusOut(**SyllabusBase.model_validate(row).model_dump(), download_url=media_url("syllabus", row.file_name))
@@ -199,12 +162,6 @@ def delete_syllabus(syllabus_id: int, db: DB, user: CurrentUser = Depends(requir
 
 
 # --- study material -----------------------------------------------------------
-
-DocumentBase = out_schema(Document)
-
-
-class DocumentOut(DocumentBase):  # type: ignore[misc,valid-type]
-    download_url: str | None = None
 
 
 def _document_out(row: Document) -> DocumentOut:

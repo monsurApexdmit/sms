@@ -1,10 +1,9 @@
 from datetime import timedelta
 
 from fastapi import APIRouter, BackgroundTasks, Cookie, File, HTTPException, Request, Response, UploadFile, status
-from pydantic import BaseModel, EmailStr, Field
 
-from app.core.config import get_settings
 from app.api.deps import DB, Me
+from app.core.config import get_settings
 from app.core.security import (
     create_token,
     decode_token,
@@ -13,6 +12,7 @@ from app.core.security import (
     password_fingerprint,
     verify_password,
 )
+from app.schemas.auth import ForgotIn, LoginIn, MfaChallengeOut, PasswordChangeIn, ProfileIn, ResetIn, TokenOut, UserOut
 from app.services import mfa
 from app.services.accounts import email_taken, find_by_email, get_account
 from app.services.files import save_image, user_image_url
@@ -23,56 +23,6 @@ from app.services.ratelimit import throttle
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 REFRESH_COOKIE = "sms_refresh"
-
-
-class LoginIn(BaseModel):
-    # Plain string on purpose: legacy rows may hold addresses a strict validator rejects.
-    email: str = Field(min_length=1, max_length=254)
-    password: str = Field(min_length=1, max_length=200)
-
-
-class UserOut(BaseModel):
-    role: str
-    id: int
-    name: str
-    email: str
-    image_url: str | None = None
-
-
-class TokenOut(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    user: UserOut
-
-
-class MfaChallengeOut(BaseModel):
-    """Password accepted, second step needed (see app/api/v1/endpoints/mfa.py)."""
-
-    # True: send a code to /auth/mfa/verify. False with enroll_required: set up 2FA first.
-    mfa_required: bool
-    enroll_required: bool = False
-    mfa_token: str
-
-
-class ForgotIn(BaseModel):
-    email: str = Field(min_length=1, max_length=254)
-
-
-class ResetIn(BaseModel):
-    token: str
-    new_password: str = Field(min_length=8, max_length=200)
-
-
-class ProfileIn(BaseModel):
-    name: str = Field(min_length=1, max_length=200)
-    email: EmailStr
-    phone: str | None = None
-    address: str | None = None
-
-
-class PasswordChangeIn(BaseModel):
-    current_password: str
-    new_password: str = Field(min_length=8, max_length=200)
 
 
 # --- brute-force guard --------------------------------------------------------

@@ -2,20 +2,18 @@
 The pay rules are documented in app/services/payroll.py."""
 
 import calendar
-import datetime as dt
 import time
 from datetime import date, datetime, timezone
-from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.api.crud import get_or_404
-from app.api.v1.endpoints.finance import _fmt
 from app.api.deps import DB, CurrentUser, Me, forbid, require_roles
+from app.api.v1.endpoints.finance import _fmt
 from app.models import ExpenseCategory, Payment, PayrollRun, Payslip, SalaryStructure, StaffAttendance
+from app.schemas.hr import MONTH, PayIn, PayrollSettings, RunIn, SheetSave, StaffRole, StructureIn
 from app.services.payroll import (
     STAFF_ROLES,
     STATUSES,
@@ -37,11 +35,6 @@ PAYROLL = ("admin", "accountant")
 payroll_roles = [Depends(require_roles(*PAYROLL))]
 staff_only = [Depends(require_roles(*STAFF_ROLES))]
 
-StaffRole = Literal["teacher", "librarian", "accountant"]
-Status = Literal["present", "absent", "late", "half_day", "leave"]
-TIME = r"^([01]\d|2[0-3]):[0-5]\d$"
-MONTH = r"^\d{4}-(0[1-9]|1[0-2])$"
-
 
 def _now() -> datetime:
     return datetime.now(timezone.utc).replace(tzinfo=None)
@@ -60,20 +53,6 @@ def list_staff(db: DB):
 
 
 # --- staff attendance -------------------------------------------------------------
-
-
-class SheetItem(BaseModel):
-    staff_role: StaffRole
-    staff_id: int
-    status: Status | None = None  # None removes the day's record
-    check_in: str | None = Field(default=None, pattern=TIME)
-    check_out: str | None = Field(default=None, pattern=TIME)
-    note: str | None = Field(default=None, max_length=500)
-
-
-class SheetSave(BaseModel):
-    date: dt.date
-    items: list[SheetItem]
 
 
 def _sheet(db: Session, d: date) -> dict:
@@ -156,10 +135,6 @@ def my_attendance(user: Me, db: DB, month: str = Query(pattern=MONTH)):
 # --- settings ---------------------------------------------------------------------
 
 
-class PayrollSettings(BaseModel):
-    deduct_absence: bool
-
-
 @router.get("/settings", response_model=PayrollSettings, dependencies=payroll_roles)
 def get_payroll_settings(db: DB):
     return PayrollSettings(deduct_absence=deduct_absence(db))
@@ -173,20 +148,6 @@ def update_payroll_settings(body: PayrollSettings, db: DB):
 
 
 # --- salary structures --------------------------------------------------------------
-
-
-class PayItem(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
-    amount: float = Field(ge=0, le=10_000_000)
-
-
-class StructureIn(BaseModel):
-    staff_role: StaffRole
-    staff_id: int
-    basic: float = Field(ge=0, le=10_000_000)
-    allowances: list[PayItem] = Field(default_factory=list, max_length=30)
-    deductions: list[PayItem] = Field(default_factory=list, max_length=30)
-    effective_from: date
 
 
 def _structure_out(r: SalaryStructure, names: dict[tuple[str, int], str]) -> dict:
@@ -241,15 +202,6 @@ def delete_structure(structure_id: int, db: DB):
 
 
 # --- payroll --------------------------------------------------------------------------
-
-
-class RunIn(BaseModel):
-    month: str = Field(pattern=MONTH)
-
-
-class PayIn(BaseModel):
-    method: str = Field(default="bank", max_length=50)
-    date: dt.date | None = None
 
 
 def _payslip_out(p: Payslip, run: PayrollRun) -> dict:

@@ -1,29 +1,17 @@
 import json
 from datetime import date, datetime, time, timedelta, timezone
-from typing import Any
 
 from fastapi import APIRouter, Depends, Query
-from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.api.crud import Page
 from app.api.deps import DB, require_roles
 from app.models import AuditLog
+from app.schemas.audit import AuditOut
+from app.schemas.common import Page
 from app.services.accounts import get_account
 
 router = APIRouter(prefix="/audit-log", tags=["audit"], dependencies=[Depends(require_roles("admin"))])
-
-
-class AuditOut(BaseModel):
-    audit_id: int
-    created_at: datetime
-    actor: str | None
-    actor_name: str | None
-    action: str
-    table_name: str
-    row_id: str
-    changes: dict[str, Any]
 
 
 def _actor_name(db: Session, actor: str) -> str | None:
