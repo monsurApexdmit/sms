@@ -24,7 +24,7 @@ from pywebpush import WebPushException, webpush
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
 
-from app.db import new_session
+from app.db.session import new_session
 from app.models import Enroll, Notification, NotificationPreference, PushSubscription, Student
 from app.services import notify as delivery
 from app.services.accounts import ROLE_MODELS, id_column

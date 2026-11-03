@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import select
 
 from app.core.security import hash_password
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import Librarian, Parent, SchoolClass, Section, StaffAttendance, Student, Subject, Teacher
 from app.services import notify
 from tests.conftest import PASSWORD, YEAR, login

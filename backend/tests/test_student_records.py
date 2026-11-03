@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from app.core.security import hash_password
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import AuditLog, SchoolClass, Student, Subject, Teacher
 from tests.conftest import PASSWORD, YEAR, login
 

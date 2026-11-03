@@ -3,7 +3,7 @@ from datetime import timedelta
 import pytest
 
 from app.api.routers.homework import school_today
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import Enroll, Homework, SchoolClass, Section, Student
 from tests.conftest import PASSWORD, YEAR, login
 

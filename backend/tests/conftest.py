@@ -12,7 +12,8 @@ import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
 from app.core.security import hash_password  # noqa: E402
-from app.db import Base, SessionLocal, engine  # noqa: E402
+from app.db.base import Base  # noqa: E402
+from app.db.session import SessionLocal, engine  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import (  # noqa: E402
     Admin,

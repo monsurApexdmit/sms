@@ -4,7 +4,7 @@ import pytest
 from fastapi import BackgroundTasks
 from sqlalchemy import select
 
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import FeeInvoice, Invoice, Parent, Setting
 from app.services import fees, notify
 from tests.conftest import YEAR

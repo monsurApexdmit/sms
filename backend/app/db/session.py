@@ -10,14 +10,10 @@ import threading
 from collections.abc import Callable, Iterator
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import base_settings
 from app.core.tenancy import Tenant, current_tenant
-
-
-class Base(DeclarativeBase):
-    pass
 
 
 engine = create_engine(base_settings().database_url, pool_pre_ping=True, pool_recycle=3600)

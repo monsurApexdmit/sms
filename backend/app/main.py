@@ -44,7 +44,7 @@ from app.core.config import get_settings
 from app.core.monitoring import init_sentry, setup_logging
 from app.core.redis import get_redis
 from app.core.tenancy import TenantMiddleware, control_engine, multi_tenant
-from app.db import engine, on_new_sessionmaker
+from app.db.session import engine, on_new_sessionmaker
 from app.services import audit as audit_trail
 
 setup_logging()

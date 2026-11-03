@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from app.api.routers import meetings
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import CalendarEvent, MeetingBooking, MeetingSlot, Teacher
 from app.services import notifications
 

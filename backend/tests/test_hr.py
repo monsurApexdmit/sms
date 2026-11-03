@@ -3,7 +3,7 @@ from datetime import date
 from sqlalchemy import func, select
 
 from app.core.security import hash_password
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import Accountant, ExpenseCategory, Payment, StaffAttendance
 from app.services.payroll import clear_staff_leave, record_staff_leave
 from tests.conftest import PASSWORD, login

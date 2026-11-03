@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from sqlalchemy import select
 
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import AuditLog, GatewayTransaction, Invoice, Payment
 from app.services import local_gateways as gw
 from app.services.settings import MASK

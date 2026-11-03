@@ -27,7 +27,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db import Base
+from app.db.base import Base
 
 Txt = Mapped[str | None]
 Int = Mapped[int | None]

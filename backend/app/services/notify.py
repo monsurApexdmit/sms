@@ -10,7 +10,7 @@ import httpx
 
 from sqlalchemy.orm import Session
 
-from app.db import new_session
+from app.db.session import new_session
 from app.services.settings import get_setting
 
 log = logging.getLogger("notify")

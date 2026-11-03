@@ -7,7 +7,7 @@ from openpyxl import load_workbook
 
 from app.api.routers import analytics as analytics_router
 from app.core.security import hash_password
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import (
     Accountant,
     Attendance,

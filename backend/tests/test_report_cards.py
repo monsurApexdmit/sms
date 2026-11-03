@@ -5,7 +5,7 @@ import pytest
 from sqlalchemy import update
 
 from app.core.security import hash_password
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import AcademicYear, Attendance, Enroll, Exam, Grade, Mark, Section, Student, Teacher
 from app.services.results import rank
 from tests.conftest import PASSWORD, YEAR, login

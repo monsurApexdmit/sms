@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import AcademicYear, Attendance
 from app.services.settings import running_year
 from tests.conftest import YEAR

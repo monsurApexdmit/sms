@@ -15,7 +15,7 @@ from sqlalchemy import create_engine, pool
 
 import app.models  # noqa: F401  (registers every table on Base.metadata)
 from app.core.config import get_settings
-from app.db import Base
+from app.db.base import Base
 
 target_metadata = Base.metadata
 

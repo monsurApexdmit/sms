@@ -2,7 +2,7 @@ import re
 
 from sqlalchemy import select
 
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.main import app
 from app.models import Admin
 
@@ -135,7 +135,7 @@ def test_emails_unique_across_roles(client, as_role):
 
 
 def test_non_admins_get_directory_view_of_teachers(client, as_role):
-    from app.db import SessionLocal
+    from app.db.session import SessionLocal
     from app.models import Teacher
 
     with SessionLocal() as db:

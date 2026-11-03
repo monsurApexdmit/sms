@@ -3,7 +3,7 @@ import time
 from datetime import date
 
 from app.api.routers.online_exams import grade, is_correct
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import OnlineExam, QuestionBank
 
 

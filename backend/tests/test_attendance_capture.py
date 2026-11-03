@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 from app.api.routers import attendance_capture as capture_router
 from app.api.routers.attendance import day_ts
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import Attendance, ClassRoutine, LeaveRequest, PeriodAttendance, StaffAttendance
 from app.services import attendance_capture as capture
 from tests.conftest import YEAR

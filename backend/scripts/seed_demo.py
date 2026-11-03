@@ -19,7 +19,7 @@ from sqlalchemy import select
 
 from app.core.security import hash_password
 from app.core.tenancy import multi_tenant, tenant_by_slug, use_tenant
-from app.db import new_session
+from app.db.session import new_session
 from app.models import (
     Accountant,
     Admin,

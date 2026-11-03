@@ -14,7 +14,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.deps import DB, require_roles
-from app.db import Base
+from app.db.base import Base
 
 
 class Page(BaseModel):

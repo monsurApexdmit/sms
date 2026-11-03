@@ -4,7 +4,7 @@ import pytest
 from openpyxl import load_workbook
 from sqlalchemy import select
 
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import Enroll, Mark, Section, Student
 from app.services import export
 from tests.conftest import YEAR

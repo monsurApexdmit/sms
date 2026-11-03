@@ -6,7 +6,7 @@ from rq import Queue
 from sqlalchemy import select
 
 from app.core.config import Settings
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import AuditLog
 from app.services import jobs, notify, ratelimit
 

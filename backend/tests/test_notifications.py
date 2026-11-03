@@ -7,7 +7,7 @@ from pywebpush import WebPushException
 from sqlalchemy import select
 
 from app.api.routers.homework import school_today
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import Notification, Parent, PushSubscription, Setting, Student
 from app.services import notifications as svc
 from app.services import notify as delivery

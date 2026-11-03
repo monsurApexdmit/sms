@@ -6,7 +6,7 @@ from alembic.config import Config
 from alembic.migration import MigrationContext
 from sqlalchemy import create_engine, inspect, text
 
-from app.db import Base
+from app.db.base import Base
 
 BACKEND = Path(__file__).resolve().parents[1]
 NEW_TABLES = {

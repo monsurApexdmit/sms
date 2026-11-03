@@ -15,7 +15,7 @@ from fastapi import BackgroundTasks
 
 from app.core.monitoring import init_sentry, setup_logging
 from app.core.tenancy import all_tenants, multi_tenant, use_tenant
-from app.db import new_session, on_new_sessionmaker
+from app.db.session import new_session, on_new_sessionmaker
 from app.services import audit as audit_trail
 from app.services.fees import run_daily_jobs
 

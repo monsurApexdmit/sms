@@ -10,7 +10,7 @@ import pytest
 from sqlalchemy import select
 
 from app.api.routers.students import BULK_COLUMNS
-from app.db import SessionLocal
+from app.db.session import SessionLocal
 from app.models import ClassRoutine, Invoice, OnlineExam, Parent, Payment, QuestionBank, Setting, Student, Teacher
 from app.services import jobs, notify
 from app.services.settings import MASK
