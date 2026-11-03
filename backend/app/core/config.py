@@ -1,3 +1,4 @@
+from contextvars import ContextVar
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -45,6 +46,13 @@ class Settings(BaseSettings):
 
     stripe_webhook_secret: str = ""
 
+    # Several schools on one install (app/core/tenancy.py): the registry of schools lives
+    # in this control database and each request is routed to a school by its Host header.
+    # Empty = one school, using DATABASE_URL and UPLOAD_DIR above.
+    control_database_url: str = ""
+    # Use X-Forwarded-Host instead of Host. Only behind a proxy that sets it itself.
+    trust_forwarded_host: bool = False
+
     @model_validator(mode="after")
     def check_production(self) -> "Settings":
         if self.environment != "production":
@@ -61,6 +69,19 @@ class Settings(BaseSettings):
         return self
 
 
+# Set while a request or job runs for one school of a multi-school install: a copy of
+# the settings with that school's database, uploads, address and time zone.
+_school_settings: ContextVar[Settings | None] = ContextVar("school_settings", default=None)
+
+
 @lru_cache
-def get_settings() -> Settings:
+def base_settings() -> Settings:
+    """Settings from the environment, the same for every school."""
     return Settings()
+
+
+def get_settings() -> Settings:
+    return _school_settings.get() or base_settings()
+
+
+get_settings.cache_clear = base_settings.cache_clear  # type: ignore[attr-defined]

@@ -10,7 +10,7 @@ import httpx
 
 from sqlalchemy.orm import Session
 
-from app.db import SessionLocal
+from app.db import new_session
 from app.services.settings import get_setting
 
 log = logging.getLogger("notify")
@@ -21,7 +21,7 @@ def sms_enabled(db: Session) -> bool:
 
 
 def send_email(to: str, subject: str, body: str) -> None:
-    with SessionLocal() as db:
+    with new_session() as db:
         host = get_setting(db, "smtp_host")
         port = int(get_setting(db, "smtp_port", "0") or 0)
         user = get_setting(db, "smtp_user")
@@ -50,7 +50,7 @@ def send_email(to: str, subject: str, body: str) -> None:
 
 
 def send_sms(phone: str, text: str) -> None:
-    with SessionLocal() as db:
+    with new_session() as db:
         service = get_setting(db, "active_sms_service", "disabled")
         cfg = {
             key: get_setting(db, key)

@@ -35,7 +35,8 @@ from app.api.routers import (
     years,
 )
 from app.core.config import get_settings
-from app.db import SessionLocal
+from app.core.tenancy import TenantMiddleware
+from app.db import on_new_sessionmaker
 from app.services import audit as audit_trail
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -44,7 +45,7 @@ if get_settings().secret_key.startswith("change-me"):
     # Development only: ENVIRONMENT=production refuses to start with this key.
     logging.getLogger("startup").warning("SECRET_KEY is the built-in default. Set a random value before deploying.")
 
-audit_trail.install(SessionLocal)
+on_new_sessionmaker(audit_trail.install)
 
 app = FastAPI(
     title="School Management API",
@@ -61,6 +62,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Several schools: route each request to its school's database by Host (no-op for one school).
+app.add_middleware(TenantMiddleware)
 
 api = APIRouter(prefix="/api")
 # One module per line: each feature adds its own line here.

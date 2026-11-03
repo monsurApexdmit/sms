@@ -165,6 +165,22 @@ Absence alerts, leave decisions, graded homework, fee reminders, meeting booking
 - **WhatsApp**: Meta WhatsApp Cloud API. In Meta's WhatsApp Manager create a phone number and a permanent system-user token, then enter the phone number ID and token under **Delivery channels**. Meta only allows free-form text to people who messaged the school in the last 24 hours, so for alerts create and get approved a *Utility* template whose body has one variable (`{{1}}`) and enter its name (and language, default `en`); the notification text fills the variable. Numbers are taken from each account's phone field and must include the country code.
 - **Installable app (PWA)**: `frontend/public/manifest.webmanifest`, icons in `frontend/public/icons`, service worker `frontend/public/sw.js`. The worker caches only the app shell and the hashed `/assets/` files; `/api/` responses are never cached. Bump `VERSION` in `sw.js` to drop old caches. nginx serves `sw.js` and the manifest uncached.
 
+## Several schools
+
+One install can serve several schools, each with **its own database and uploads folder**, chosen by the host name the request comes in on (`greenfield.example.com` → Greenfield's database). Off by default: without `CONTROL_DATABASE_URL` everything works as a single school on `DATABASE_URL`.
+
+1. Create an empty database for the registry and set `CONTROL_DATABASE_URL` (its `tenant` table is created automatically).
+2. For each school: `python -m scripts.tenants create-db-sql <slug>` prints the SQL for a MySQL database and user; `python -m scripts.tenants import-sql <slug>` shows how to load `sqldatabase/sms.sql` into it; then
+   `python -m scripts.tenants add <slug> --name "…" --hosts school.example.com --database-url "mysql+pymysql://…"` and `python -m scripts.tenants migrate <slug>`.
+3. Point each school's DNS at the server. nginx passes the `Host` header to the API; unknown or disabled hosts get 404.
+
+Other commands: `list`, `set <slug> --hosts … / --database-url … / --timezone … / --frontend-url … / --upload-dir …`, `disable`/`enable <slug>`, `migrate-all`. Running API processes see changes within 30 seconds. The Docker image runs `migrate-all` on start.
+
+- **Per school:** database, uploads (default `UPLOAD_DIR/<slug>`), the address used in emailed links (default `https://<first host>`), and the time zone (default `SCHOOL_TIMEZONE`). Everything else comes from the environment and is shared.
+- **Isolation:** sign-in tokens and signed file links carry the school and are refused by every other school; rate limits are counted per school; queued emails/SMS/push run against the school that queued them; the daily fee jobs run for each active school in turn.
+- **Demo data:** `python -m scripts.seed_demo --yes --school <slug>`.
+- `TRUST_FORWARDED_HOST=true` makes the API route by `X-Forwarded-Host`; set it only when a proxy in front of nginx sets that header itself.
+
 ## Docker
 
 ```bash

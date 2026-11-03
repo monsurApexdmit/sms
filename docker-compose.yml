@@ -22,6 +22,11 @@ x-backend: &backend
     COOKIE_SECURE: ${COOKIE_SECURE:-true}
     STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
     SCHOOL_TIMEZONE: ${SCHOOL_TIMEZONE:-UTC}
+    # Several schools: the database listing them (README "Several schools"). Empty = one school.
+    # The api, worker and scheduler then serve/run for every school; DATABASE_URL is unused.
+    CONTROL_DATABASE_URL: ${CONTROL_DATABASE_URL:-}
+    # Only when another proxy in front of nginx sets X-Forwarded-Host itself.
+    TRUST_FORWARDED_HOST: ${TRUST_FORWARDED_HOST:-false}
   extra_hosts:
     - "host.docker.internal:host-gateway"
   volumes:
