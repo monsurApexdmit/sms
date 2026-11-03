@@ -1,5 +1,6 @@
 import {
   AwardIcon,
+  BookCheckIcon,
   BookOpenIcon,
   BuildingIcon,
   BusIcon,
@@ -59,6 +60,7 @@ export const NAV: NavItem[] = [
   { label: "My routine", path: "my-routine", icon: CalendarDaysIcon, roles: ["teacher", "student", "parent"], group: "Academic" },
   { label: "Syllabus", path: "syllabus", icon: FileTextIcon, roles: ["admin", "teacher", "student", "parent"], group: "Academic" },
   { label: "Study material", path: "study-material", icon: NotebookPenIcon, roles: ["admin", "teacher", "student", "parent"], group: "Academic" },
+  { label: "Homework", path: "homework", icon: BookCheckIcon, roles: ["admin", "teacher", "student", "parent"], group: "Academic" },
   { label: "Academic calendar", path: "calendar", icon: CalendarRangeIcon, roles: ALL, group: "Academic" },
 
   { label: "Exams & grades", path: "exams", icon: ClipboardListIcon, roles: ["admin"], group: "Exams" },
