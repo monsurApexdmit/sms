@@ -12,6 +12,7 @@ from app.api.routers import (
     calendar,
     cms,
     exams,
+    export,
     finance,
     library,
     messages,
@@ -50,7 +51,7 @@ app.add_middleware(
 )
 
 api = APIRouter(prefix="/api")
-for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar):
+for module in (auth, students, academic, exams, attendance, finance, library, notices, messages, online_exams, system, audit, years, calendar, export):
     api.include_router(module.router)
 for router in accounts.routers:
     api.include_router(router)

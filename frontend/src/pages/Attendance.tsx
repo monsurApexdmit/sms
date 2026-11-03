@@ -9,6 +9,7 @@ import type { Student } from "../api/types";
 import { useUser } from "../auth/AuthContext";
 import { Combobox } from "../components/combobox";
 import { DatePicker } from "../components/date-picker";
+import { ExportButton } from "../components/ExportButton";
 import { Field } from "../components/field";
 import { PageHeader } from "../components/PageHeader";
 import { ClassPicker, type Selection } from "../components/Pickers";
@@ -292,6 +293,9 @@ export function AttendanceReportPage() {
         actions={
           <>
             {select}
+            {ready && !studentId && (
+              <ExportButton size="default" path="/export/attendance.xlsx" params={{ class_id: sel.classId, section_id: sel.sectionId, month }} />
+            )}
             {canPrint && (
               <Button variant="outline" onClick={() => window.print()}>
                 <PrinterIcon />

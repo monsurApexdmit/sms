@@ -1,8 +1,10 @@
+import csv
+import io
 from collections import defaultdict
 from typing import Literal
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Response, UploadFile, status
+from pydantic import BaseModel, Field, ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -143,6 +145,104 @@ def save_marks(body: MarksSave, db: DB, user: CurrentUser = Depends(require_role
             mark.comment = item.comment
     db.commit()
     return _mark_sheet(db, body.exam_id, body.class_id, body.section_id, body.subject_id)
+
+
+# --- marks import (CSV) ---------------------------------------------------------
+
+IMPORT_COLUMNS = ("student_id", "roll", "name", "mark_obtained", "comment")
+
+
+class ImportResult(BaseModel):
+    updated: int
+
+
+@router.get("/marks/import-template")
+def marks_import_template(
+    exam_id: int, class_id: int, section_id: int, subject_id: int, db: DB,
+    user: CurrentUser = Depends(require_roles("admin", "teacher")),
+):  # fmt: skip
+    """CSV of the section's students with their current marks, ready to fill in and import."""
+    ensure_teaches_subject(db, user, subject_id)
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="\r\n")
+    writer.writerow(IMPORT_COLUMNS)
+    for m in _mark_sheet(db, exam_id, class_id, section_id, subject_id):
+        mark = "" if m.mark_obtained is None else m.mark_obtained
+        writer.writerow([m.student_id, m.roll or "", m.student_name or "", mark, m.comment or ""])
+    return Response(
+        buf.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="marks.csv"'},
+    )
+
+
+def _import_error(errors: list[str]) -> HTTPException:
+    return HTTPException(
+        status.HTTP_422_UNPROCESSABLE_ENTITY,
+        {"message": "Nothing was imported. Fix these rows and try again.", "errors": errors},
+    )
+
+
+@router.post("/marks/import", response_model=ImportResult)
+async def import_marks(
+    db: DB,
+    exam_id: int = Form(...),
+    class_id: int = Form(...),
+    section_id: int = Form(...),
+    subject_id: int = Form(...),
+    file: UploadFile = File(...),
+    user: CurrentUser = Depends(require_roles("admin", "teacher")),
+):
+    """Columns student_id and mark_obtained are required, comment is optional; others are ignored.
+    A blank mark clears it. Every row is checked first, and nothing is saved if any row is wrong."""
+    ensure_teaches_subject(db, user, subject_id)
+    raw = (await file.read(2 * 1024 * 1024)).decode("utf-8-sig", errors="replace")
+    reader = csv.DictReader(io.StringIO(raw))
+    columns = {(c or "").strip() for c in reader.fieldnames or []}
+    if not {"student_id", "mark_obtained"} <= columns:
+        raise _import_error(["The file needs the columns student_id and mark_obtained (download the template)"])
+    has_comment = "comment" in columns
+    sheet = {m.student_id: m for m in _mark_sheet(db, exam_id, class_id, section_id, subject_id)}
+    items: dict[int, MarkUpdate] = {}
+    errors: list[str] = []
+    for line, row in enumerate(reader, start=2):
+        row = {(k or "").strip(): (v or "").strip() for k, v in row.items() if k is not None and isinstance(v, str)}
+        if not any(row.values()):
+            continue
+        sid_raw, mark_raw = row.get("student_id", ""), row.get("mark_obtained", "")
+        current = sheet.get(int(sid_raw)) if sid_raw.isdigit() else None
+        if not sid_raw.isdigit():
+            errors.append(f"Line {line}: student_id {sid_raw!r} is not a number")
+        elif current is None:
+            errors.append(f"Line {line}: student {sid_raw} is not enrolled in this class section")
+        elif current.student_id in items:
+            errors.append(f"Line {line}: student {sid_raw} appears more than once")
+        if current is None or current.student_id in items:
+            continue
+        try:
+            mark = None if mark_raw == "" else float(mark_raw)
+        except ValueError:
+            errors.append(f"Line {line}: mark {mark_raw!r} is not a number")
+            continue
+        if mark is not None and not mark.is_integer():
+            errors.append(f"Line {line}: mark {mark_raw} must be a whole number")
+            continue
+        try:
+            items[current.student_id] = MarkUpdate(
+                mark_id=current.mark_id,
+                mark_obtained=None if mark is None else int(mark),
+                comment=(row.get("comment") or None) if has_comment else current.comment,
+            )
+        except ValidationError as exc:
+            first = exc.errors()[0]
+            errors.append(f"Line {line}: {first['loc'][0]} {first['msg'].lower()}")
+    if errors:
+        raise _import_error(errors)
+    if not items:
+        raise _import_error(["The file has no rows"])
+    body = MarksSave(exam_id=exam_id, class_id=class_id, section_id=section_id, subject_id=subject_id, items=list(items.values()))
+    save_marks(body, db, user)
+    return ImportResult(updated=len(items))
 
 
 class MarksSmsIn(BaseModel):
