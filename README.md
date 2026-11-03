@@ -29,13 +29,15 @@ cp .env.example .env        # then set DATABASE_URL and SECRET_KEY
 
 API docs: http://localhost:8000/api/docs
 
-Without `REDIS_URL`, rate limits are kept per process and emails/SMS are sent in-process after the response, without retries. To run them the production way:
+Without `REDIS_URL`, rate limits are kept per process and emails/SMS are sent in-process after the response, without retries. Redis and the worker are optional locally; to run them the production way:
 
 ```bash
 docker run -d --name sms-redis -p 127.0.0.1:6379:6379 redis:7.4-alpine
 echo 'REDIS_URL=redis://127.0.0.1:6379/0' >> .env
-.venv/bin/rq worker --with-scheduler --url redis://127.0.0.1:6379/0 notifications
+.venv/bin/rq worker --with-scheduler -c app.rq_settings --url redis://127.0.0.1:6379/0 notifications
 ```
+
+Daily fee jobs (late fines, then due reminders) run with `.venv/bin/python -m scripts.daily_jobs`, or from *Fee setup*.
 
 Frontend:
 
@@ -111,7 +113,7 @@ Students apply for their own leave, parents for their children, and teachers, li
 
 - Grades come from the grade table by raw mark. Any subject with grade point 0 makes the exam a **Fail** with GPA 0; while marks are missing it is **Incomplete**; otherwise GPA is the mean grade point. Full marks per subject come from `mark.mark_total`, or 100.
 - Positions rank by total (annual: weighted percentage) over the whole class and within the section; ties share a position (1, 1, 3).
-- The annual result weighs each exam by **Exam weights** (admin, on the Report cards page); weights should add up to 100%. CGPA is the weighted GPA; any failed exam makes the year a Fail.
+- The annual result weighs each exam by **Exam weights** (admin, on the Report cards page); weights should add up to 100%. CGPA is the weighted GPA; any failed exam makes the year a Fail. While any weighted exam is missing or Incomplete, the annual card has no percentage or position (missing marks are not counted as 0), and no CGPA unless an exam was failed.
 - Attendance is days present over working days (calendar holidays and weekly days off excluded) in the term the exam's papers fall in, or else the school year's dates; without dates, from the first to the last recorded attendance day.
 - Admins and the class's teachers (class teacher, section teacher, or a teacher of one of its subjects) write the remark.
 
@@ -176,18 +178,51 @@ EOF
 docker compose up --build    # app on http://localhost:8080
 ```
 
-Compose runs the API (which applies migrations on start), an RQ `worker` for emails/SMS, and Redis. It sets `ENVIRONMENT=production`, in which the API and worker **refuse to start** unless `SECRET_KEY` is a random value of at least 32 characters, `COOKIE_SECURE=true` and `REDIS_URL` is set. Secure cookies work on `http://localhost`; anywhere else, put the site behind HTTPS. Failed notification jobs are retried after 1, 5 and 30 minutes and then kept for 7 days in RQ's failed-job registry (`rq info --url redis://redis:6379/0`).
+Compose runs the API (which applies migrations on start), an RQ `worker` for emails/SMS, Redis, a `scheduler` for the daily fee jobs and a `backup` service (see "Backups"). The api, worker, redis and backup services have health checks (`docker compose ps` shows them); the API's is `GET /api/health/ready`, which answers 503 when the database or Redis does not respond within 3 seconds (`/api/health` only says the process is up). It sets `ENVIRONMENT=production`, in which the API and worker **refuse to start** unless `SECRET_KEY` is a random value of at least 32 characters, `COOKIE_SECURE=true` and `REDIS_URL` is set. Secure cookies work on `http://localhost`; anywhere else, put the site behind HTTPS. Failed notification jobs are retried after 1, 5 and 30 minutes and then kept for 7 days in RQ's failed-job registry (`rq info --url redis://redis:6379/0`).
 
 `docker compose --profile localdb up` adds a throwaway MariaDB loaded from `sms.sql` (see the comment in the compose file).
+
+## Backups
+
+The `backup` service runs `scripts/backup.sh` every `BACKUP_INTERVAL_HOURS` (24) hours, two minutes after it starts. Each run writes a gzipped `mysqldump` (single transaction, with routines and triggers) of the database in `DATABASE_URL` to `backups/daily/sms-YYYY-MM-DD_HHMM.sql.gz`, and a tar of the uploads folder (`BACKUP_UPLOADS`: `weekly` by default, or `daily` / `off`). The Sunday run (`BACKUP_WEEKLY_DAY=7`) is also kept in `backups/weekly/`. Old files are removed beyond `BACKUP_KEEP_DAILY` (14) daily and `BACKUP_KEEP_WEEKLY` (8) weekly copies. Set `BACKUP_DIR` to put them elsewhere, preferably on another disk, and copy them off the server too. Files are readable by root only, because they contain personal data. The container reports unhealthy when no backup has succeeded for two intervals.
+
+**Disk space:** about (14 + 8) × the compressed dump size (text compresses roughly 5–10×, so a few MB per copy for a typical school), plus up to 8 copies of the uploads folder (photos and documents barely compress; with `BACKUP_UPLOADS=daily`, up to 22 copies). Check `du -sh ../uploads` before choosing.
+
+The client image is `mysql:8.4` (`BACKUP_IMAGE` to change it); it works with MySQL 8.4/9.x and MariaDB servers. The legacy tables are MyISAM, which `--single-transaction` does not freeze, so a dump taken while the old app writes can be slightly inconsistent between those tables.
+
+```bash
+docker compose run --rm backup once                       # back up now
+docker compose run --rm backup restore /backups/daily/sms-2026-11-03_0200.sql.gz --yes
+tar -xzf backups/weekly/uploads-2026-11-01_0200.tar.gz -C ..   # restore uploads (as root; replaces ../uploads files)
+```
+
+Restoring replaces the tables in the dump and leaves other tables alone; stop the api, worker and scheduler first (`docker compose stop api worker scheduler`), then run `alembic upgrade head` if the dump is older than the code. Without Docker, run the script directly: `DATABASE_URL=... BACKUP_ROOT=./backups UPLOADS_DIR=../uploads scripts/backup.sh once` (needs `mysqldump`, `gzip`, `tar`).
+
+## Monitoring
+
+- **Errors:** set `SENTRY_DSN` (Sentry, or a self-hosted compatible server) to report unhandled errors from the API, the worker and the daily jobs. Nothing is sent while it is empty. Events carry no personal data: request bodies, cookies, query strings, `Authorization`/`Cookie`/device-key headers and user details are removed before sending. `SENTRY_TRACES_SAMPLE_RATE` (0 by default) turns on performance tracing.
+- **Logs:** `LOG_FORMAT=json` writes one JSON object per line (`time`, `level`, `logger`, `message`, `exception`) for log collectors; the default is plain text.
+- **Health:** `GET /api/health` (process up) and `GET /api/health/ready` (database and Redis reachable) for load balancers and uptime checks.
+
+## Upgrading an existing install
+
+1. Back up: `docker compose run --rm backup once` (or `scripts/backup.sh once`).
+2. Get the new code: `git pull`.
+3. Apply database changes: Docker does this when the api starts; without Docker run `cd backend && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head`.
+4. Restart: `docker compose up -d --build`, or restart uvicorn, the worker and the frontend (`npm install && npm run build`).
+
+Migrations only create (and fill) new tables; they never change the legacy tables, so the old CodeIgniter app keeps working on the same database.
 
 ## Tests
 
 ```bash
 cd backend && .venv/bin/python -m pytest
-cd frontend && npm run typecheck && npm run build
+cd frontend && npm run typecheck && npm run build && npm test
 ```
 
-The backend tests use SQLite and need no database server. They include a check that **every** non-public endpoint rejects anonymous requests.
+The backend tests use SQLite and need no database server. They include a check that **every** non-public endpoint rejects anonymous requests. The frontend tests (Vitest and Testing Library, `src/**/*.test.ts(x)`) cover the shared hooks and components and which pages each role can open.
+
+GitHub Actions (`.github/workflows/update-system.yml`) runs both, applies every migration to the legacy `sms.sql` schema on MariaDB 10.11, MySQL 8.4 and MySQL 9.5 with a backup/restore round trip, and builds the Docker images.
 
 ## What changed compared to the CodeIgniter app
 
@@ -222,6 +257,8 @@ Set a date to switch it off once staff have moved to the new app, then set `PASS
 
 - `ENVIRONMENT`: `development` (default) or `production`; see the Docker section for what production requires.
 - `REDIS_URL`: shared rate limits and the email/SMS job queue. Required in production.
+- `SENTRY_DSN`, `SENTRY_TRACES_SAMPLE_RATE`, `LOG_FORMAT`: see "Monitoring".
+- `BACKUP_DIR`, `BACKUP_INTERVAL_HOURS`, `BACKUP_KEEP_DAILY`, `BACKUP_KEEP_WEEKLY`, `BACKUP_UPLOADS`: see "Backups".
 
 - `PASSWORD_HASH_SCHEME=sha1`: use this only while the old app still logs users in against the same database. With `argon2` (the default), users who log in through the new app can no longer log in through the old one.
 - `SCHOOL_TIMEZONE`: the time zone online exam times are entered in.
@@ -233,6 +270,7 @@ Set a date to switch it off once staff have moved to the new app, then set `PASS
 ### Not ported
 
 - PayUMoney: the service was shut down and merged into PayU, so the old integration (which also confirmed payments in the browser) has nothing to talk to. Stripe and PayPal are implemented.
-- In-browser database backup/restore, the updater, and the installer. Use database-level backups and Docker images instead.
+- In-browser database backup/restore, the updater, and the installer. Scheduled database backups (see "Backups") and Docker images replace them.
 - The admin screen for editing translation phrases. The interface is English only.
-- Barcode and ID-card printing.
+
+ID cards with barcodes are printed from *People → ID cards*; the barcode is the person's active check-in card code (see "Period attendance and check-in").
