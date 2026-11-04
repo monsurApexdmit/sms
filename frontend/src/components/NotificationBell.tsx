@@ -9,6 +9,7 @@ import type { AppNotification } from "../api/types";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { t } from "../i18n";
 
 /** Unread count (polled every minute and when the window regains focus) and the latest notifications. */
 export function NotificationBell() {
@@ -43,7 +44,7 @@ export function NotificationBell() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon-sm" className="relative" aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}>
+        <Button variant="ghost" size="icon-sm" className="relative" aria-label={unread ? t("Notifications, {unread} unread", { unread }) : t("Notifications")}>
           <BellIcon />
           {unread > 0 && (
             <span className="bg-destructive text-destructive-foreground absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums">
@@ -54,15 +55,14 @@ export function NotificationBell() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0">
         <div className="flex items-center justify-between border-b px-3 py-2">
-          <span className="text-sm font-semibold">Notifications</span>
+          <span className="text-sm font-semibold">{t("Notifications")}</span>
           <Button variant="ghost" size="xs" disabled={unread === 0} onClick={readAll}>
             <CheckCheckIcon />
-            Mark all read
-          </Button>
+            {t("Mark all read")}</Button>
         </div>
         <div className="max-h-96 overflow-y-auto">
-          {latest.isLoading && <p className="text-muted-foreground p-4 text-sm">Loading…</p>}
-          {latest.data?.items.length === 0 && <p className="text-muted-foreground p-6 text-center text-sm">You're all caught up</p>}
+          {latest.isLoading && <p className="text-muted-foreground p-4 text-sm">{t("Loading…")}</p>}
+          {latest.data?.items.length === 0 && <p className="text-muted-foreground p-6 text-center text-sm">{t("You're all caught up")}</p>}
           {latest.data?.items.map((n) => (
             <button
               key={n.notification_id}
@@ -81,8 +81,7 @@ export function NotificationBell() {
         </div>
         <div className="border-t p-1">
           <Button variant="ghost" size="sm" className="w-full" onClick={() => { setOpen(false); navigate("/app/notifications"); }}>
-            See all
-          </Button>
+            {t("See all")}</Button>
         </div>
       </PopoverContent>
     </Popover>

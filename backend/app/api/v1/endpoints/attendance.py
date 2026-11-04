@@ -14,6 +14,7 @@ from app.models import Attendance, Enroll, Student
 from app.schemas.attendance import SheetRow, SheetSave
 from app.services.access import ensure_can_view_student
 from app.services.leave import students_on_leave
+from app.services.messages import msg, school_language
 from app.services.notifications import notify, user
 from app.services.school_calendar import holidays_between, weekly_off_days, working_days
 from app.services.settings import running_year
@@ -113,10 +114,11 @@ def save_sheet(body: SheetSave, tasks: BackgroundTasks, db: DB):
     # parents already know about approved leave
     newly_absent = [sid for sid in newly_absent if sid not in students_on_leave(db, newly_absent, body.date)]
     if newly_absent:
+        lang = school_language(db)
         for student in db.scalars(select(Student).where(Student.student_id.in_(newly_absent), Student.parent_id.is_not(None))):
-            text = f"Your child {student.name} is absent today ({body.date.isoformat()})."
+            text = msg(lang, "attendance.absent.text", name=student.name, date=body.date.isoformat())
             notify(
-                db, tasks, [user("parent", student.parent_id)], "attendance", f"{student.name} is absent", text,
+                db, tasks, [user("parent", student.parent_id)], "attendance", msg(lang, "attendance.absent.title", name=student.name), text,
                 "/app/attendance-report", sms_text=text, commit=False,
             )  # fmt: skip
         db.commit()

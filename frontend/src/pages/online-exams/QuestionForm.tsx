@@ -16,6 +16,7 @@ import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { Textarea } from "../../components/ui/textarea";
 import { cn } from "../../lib/utils";
 import { TYPE_LABEL, parseList } from "./shared";
+import { t } from "../../i18n";
 
 /** Add or edit a question; `draft` (an AI-drafted question) prefills a new one. */
 export function QuestionForm({ examId, question, draft, onDone }: { examId: number; question: Question | null; draft?: QuestionDraft; onDone: () => void }) {
@@ -41,13 +42,13 @@ export function QuestionForm({ examId, question, draft, onDone }: { examId: numb
       const body = { type, question_title: title, mark: Number(mark), options: type === "multiple_choice" ? options : [], correct_answers };
       return question ? api.put(`/online-exams/questions/${question.question_bank_id}`, body) : api.post(`/online-exams/${examId}/questions`, body);
     },
-    { success: "Question saved", invalidate: [[`/online-exams/${examId}`]], onSuccess: onDone },
+    { success: t("Question saved"), invalidate: [[`/online-exams/${examId}`]], onSuccess: onDone },
   );
 
   return (
     <div className="grid gap-4">
       <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
-        <Field label="Type">
+        <Field label={t("Type")}>
           <Combobox
             disabled={!!question}
             data={Object.entries(TYPE_LABEL).map(([value, label]) => ({ value, label }))}
@@ -55,26 +56,26 @@ export function QuestionForm({ examId, question, draft, onDone }: { examId: numb
             onChange={(v) => v && setType(v as Question["type"])}
           />
         </Field>
-        <Field label="Marks" htmlFor="q-mark">
+        <Field label={t("Marks")} htmlFor="q-mark">
           <Input id="q-mark" type="number" min={0.5} step={0.5} value={mark} onChange={(e) => setMark(e.target.value)} />
         </Field>
       </div>
-      <Field label="Question" htmlFor="q-title" description={type === "fill_in_the_blanks" ? "Write ___ where each blank goes" : undefined}>
+      <Field label={t("Question")} htmlFor="q-title" description={type === "fill_in_the_blanks" ? t("Write ___ where each blank goes") : undefined}>
         <Textarea id="q-title" rows={3} value={title} onChange={(e) => setTitle(e.target.value)} />
       </Field>
       {type === "multiple_choice" && (
         <div className="grid gap-2">
-          <Label>Options (tick the correct ones)</Label>
+          <Label>{t("Options (tick the correct ones)")}</Label>
           {options.map((o, i) => (
             <div key={i} className="flex items-center gap-2">
               <Checkbox
-                aria-label={`Option ${i + 1} is correct`}
+                aria-label={t("Option {value} is correct", { value: i + 1 })}
                 checked={correct.includes(String(i + 1))}
                 onCheckedChange={(c) => setCorrect(c === true ? [...correct, String(i + 1)] : correct.filter((x) => x !== String(i + 1)))}
               />
               <Input
                 className="flex-1"
-                placeholder={`Option ${i + 1}`}
+                placeholder={t("Option {value}", { value: i + 1 })}
                 value={o}
                 onChange={(e) => {
                   const v = e.target.value;
@@ -82,7 +83,7 @@ export function QuestionForm({ examId, question, draft, onDone }: { examId: numb
                 }}
               />
               <IconAction
-                label="Remove option"
+                label={t("Remove option")}
                 destructive
                 disabled={options.length <= 2}
                 onClick={() => {
@@ -96,12 +97,11 @@ export function QuestionForm({ examId, question, draft, onDone }: { examId: numb
           ))}
           <Button type="button" variant="ghost" size="sm" className="w-fit" onClick={() => setOptions((all) => [...all, ""])}>
             <PlusIcon />
-            Add option
-          </Button>
+            {t("Add option")}</Button>
         </div>
       )}
       {type === "true_false" && (
-        <Field label="Correct answer">
+        <Field label={t("Correct answer")}>
           <RadioGroup value={truth} onValueChange={setTruth} className="flex gap-6">
             {["true", "false"].map((v) => (
               <div key={v} className="flex items-center gap-2">
@@ -115,17 +115,15 @@ export function QuestionForm({ examId, question, draft, onDone }: { examId: numb
         </Field>
       )}
       {type === "fill_in_the_blanks" && (
-        <Field label="Correct words, in order" htmlFor="q-words" description="Comma separated; matching ignores case">
+        <Field label={t("Correct words, in order")} htmlFor="q-words" description={t("Comma separated; matching ignores case")}>
           <Input id="q-words" value={words} onChange={(e) => setWords(e.target.value)} />
         </Field>
       )}
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onDone}>
-          Cancel
-        </Button>
+          {t("Cancel")}</Button>
         <Button loading={save.isPending} onClick={() => save.mutate(undefined)}>
-          Save question
-        </Button>
+          {t("Save question")}</Button>
       </DialogFooter>
     </div>
   );
@@ -137,15 +135,15 @@ export function QuestionAnswers({ q, showAnswers }: { q: Question; showAnswers: 
   if (q.type === "fill_in_the_blanks")
     return showAnswers ? (
       <p className="text-sm">
-        <span className="text-muted-foreground">Answers: </span>
+        <span className="text-muted-foreground">{t("Answers:")}{" "}</span>
         <span className="font-medium">{correct.join(", ") || "—"}</span>
       </p>
     ) : null;
   const options =
     q.type === "true_false"
       ? [
-          { value: "true", label: "True" },
-          { value: "false", label: "False" },
+          { value: "true", label: t("True") },
+          { value: "false", label: t("False") },
         ]
       : parseList(q.options).map((label, i) => ({ value: String(i + 1), label }));
   const truth = q.type === "true_false" ? [q.correct_answers ?? ""] : correct;

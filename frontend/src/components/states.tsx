@@ -5,9 +5,10 @@ import type { ReactNode } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { t } from "../i18n";
 
 /** Loading / empty rows for a <TableBody>. Renders nothing once there is data. */
-export function TableState({ loading, empty, colSpan, emptyText = "No records yet" }: { loading?: boolean; empty?: boolean; colSpan: number; emptyText?: string }) {
+export function TableState({ loading, empty, colSpan, emptyText = t("No records yet") }: { loading?: boolean; empty?: boolean; colSpan: number; emptyText?: string }) {
   if (loading)
     return (
       <>

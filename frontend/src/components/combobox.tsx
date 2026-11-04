@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { t, tn } from "../i18n";
 
 export type Option = { value: string; label: string };
 
@@ -22,7 +23,7 @@ interface BaseProps {
 
 /** Searchable single select. `value` is null when nothing is chosen. */
 export function Combobox({
-  data, value, onChange, placeholder = "Select…", disabled, emptyText = "Nothing found", clearable, className, id, ...rest
+  data, value, onChange, placeholder = t("Select…"), disabled, emptyText = t("Nothing found"), clearable, className, id, ...rest
 }: BaseProps & { value: string | null | undefined; onChange: (value: string | null) => void; clearable?: boolean }) {  // prettier-ignore
   const [open, setOpen] = useState(false);
   const selected = data.find((o) => o.value === value);
@@ -45,7 +46,7 @@ export function Combobox({
             {clearable && selected && !disabled && (
               <XIcon
                 className="opacity-50 hover:opacity-100"
-                aria-label="Clear"
+                aria-label={t("Clear")}
                 onPointerDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -59,7 +60,7 @@ export function Combobox({
       </PopoverTrigger>
       <PopoverContent className="w-(--radix-popover-trigger-width) min-w-48 p-0" align="start">
         <Command>
-          {data.length > 7 && <CommandInput placeholder="Search…" />}
+          {data.length > 7 && <CommandInput placeholder={t("Search…")} />}
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
@@ -86,7 +87,7 @@ export function Combobox({
 
 /** Searchable multi select shown as badges. */
 export function MultiCombobox({
-  data, value, onChange, placeholder = "Select…", disabled, emptyText = "Nothing found", className, id,
+  data, value, onChange, placeholder = t("Select…"), disabled, emptyText = t("Nothing found"), className, id,
 }: BaseProps & { value: string[]; onChange: (value: string[]) => void }) {  // prettier-ignore
   const [open, setOpen] = useState(false);
   const labels = new Map(data.map((o) => [o.value, o.label]));
@@ -111,14 +112,14 @@ export function MultiCombobox({
                 {labels.get(v) ?? v}
               </Badge>
             ))}
-            {value.length > 6 && <Badge variant="outline">+{value.length - 6} more</Badge>}
+            {value.length > 6 && <Badge variant="outline">{tn("+{value} more", { value: value.length - 6 })}</Badge>}
           </span>
           <ChevronsUpDownIcon className="opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-(--radix-popover-trigger-width) min-w-56 p-0" align="start">
         <Command>
-          <CommandInput placeholder="Search…" />
+          <CommandInput placeholder={t("Search…")} />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
@@ -133,8 +134,7 @@ export function MultiCombobox({
           {value.length > 0 && (
             <div className="border-t p-1">
               <Button type="button" variant="ghost" size="sm" className="w-full" onClick={() => onChange([])}>
-                Clear selection
-              </Button>
+                {t("Clear selection")}</Button>
             </div>
           )}
         </Command>

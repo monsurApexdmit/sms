@@ -39,6 +39,7 @@ from app.schemas.common import Page
 from app.services.accounts import email_taken, insert_account, insert_student
 from app.services.files import delete_file, media_url, save_document
 from app.services.jobs import enqueue
+from app.services.messages import msg, school_language
 from app.services.notifications import Recipient, notify
 from app.services.notify import send_email
 from app.services.ratelimit import throttle
@@ -177,18 +178,14 @@ def _notify_guardian(tasks: BackgroundTasks, db: Session, row: AdmissionApplicat
     if not row.guardian_email:
         return
     school = get_setting(db, "system_name", "School")
-    lines = {
-        "accepted": f"We are pleased to tell you that the application for {row.student_name} has been accepted. "
-        "The school office will contact you about enrolment.",
-        "rejected": f"We are sorry to tell you that we cannot offer a place to {row.student_name} at this time.",
-    }
-    text = f"Dear {row.guardian_name},\n\n{lines[row.status]}"
+    lang = school_language(db)
+    text = msg(lang, "admissions.greeting", name=row.guardian_name) + "\n\n" + msg(lang, f"admissions.{row.status}", name=row.student_name)
     if row.status_note:
         text += f"\n\n{row.status_note}"
-    text += f"\n\nApplication reference: {row.reference}\n\n{school}"
+    text += "\n\n" + msg(lang, "admissions.reference", reference=row.reference) + f"\n\n{school}"
     # the guardian has no account yet: email only
     notify(
-        db, tasks, [Recipient(email=row.guardian_email)], "admissions", f"{school}: admission application {row.reference}",
+        db, tasks, [Recipient(email=row.guardian_email)], "admissions", msg(lang, "admissions.subject", school=school, reference=row.reference),
         text, defaults={"email"},
     )  # fmt: skip
 

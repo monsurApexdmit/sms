@@ -17,6 +17,7 @@ from app.schemas.common import Page
 from app.schemas.leave import MAX_SPAN_DAYS, DecisionIn, LeaveIn, LeaveOut
 from app.services.access import children_ids, current_enroll
 from app.services.accounts import get_account, ref_name
+from app.services.messages import msg, school_language
 from app.services.notifications import notify, parent_or_student, user
 from app.services.payroll import record_staff_leave
 from app.services.school_calendar import working_days
@@ -128,20 +129,21 @@ def _page(db: Session, user: CurrentUser, stmt, order, limit: int, offset: int) 
 
 
 def _notify_decision(db: Session, tasks: BackgroundTasks, row: LeaveRequest) -> None:
-    span = row.from_date.isoformat() if row.from_date == row.to_date else f"{row.from_date.isoformat()} to {row.to_date.isoformat()}"
-    note = f" Note: {row.decision_note}" if row.decision_note else ""
+    lang = school_language(db)
+    span = row.from_date.isoformat() if row.from_date == row.to_date else msg(lang, "leave.span", start=row.from_date.isoformat(), end=row.to_date.isoformat())
+    note = msg(lang, "leave.note", note=row.decision_note) if row.decision_note else ""
     if row.student_id is not None:
         student = db.get(Student, row.student_id)
-        name = student.name if student else "your child"
+        name = student.name if student else msg(lang, "word.your_child")
         recipient = parent_or_student(db, row.student_id)
         # a student without a linked parent was only ever emailed
         defaults = None if student and student.parent_id else {"email", "push"}
     else:
-        name = "you"
+        name = msg(lang, "word.you")
         recipient = user(row.staff_role or "", row.staff_id or 0)
         defaults = {"email", "push"}  # staff decisions were emailed, not texted
-    text = f"Leave for {name} ({span}) was {row.status}.{note}"
-    notify(db, tasks, [recipient], "leave", f"Leave request {row.status}", text, "/app/leave", defaults=defaults)
+    text = msg(lang, f"leave.text.{row.status}", name=name, span=span, note=note)
+    notify(db, tasks, [recipient], "leave", msg(lang, f"leave.title.{row.status}"), text, "/app/leave", defaults=defaults)
 
 
 # --- routes -------------------------------------------------------------------------

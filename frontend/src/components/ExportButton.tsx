@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { api, errorMessage } from "../api/client";
 import { Button } from "./ui/button";
+import { t } from "../i18n";
 
 /** Turns a blob error body (responseType "blob") back into JSON so errorMessage can read it. */
 async function blobError(error: unknown): Promise<unknown> {
@@ -38,7 +39,7 @@ export async function downloadFile(path: string, params?: Record<string, unknown
 
 /** "Export to Excel" for a list screen; `params` should be the screen's current filters. */
 export function ExportButton({
-  path, params, label = "Export to Excel", size = "sm", variant = "outline", ...rest
+  path, params, label = t("Export to Excel"), size = "sm", variant = "outline", ...rest
 }: { path: string; params?: Record<string, unknown>; label?: string } & Omit<ComponentProps<typeof Button>, "onClick" | "children">) {  // prettier-ignore
   const [busy, setBusy] = useState(false);
   const run = async () => {

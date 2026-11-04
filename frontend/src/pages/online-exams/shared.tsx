@@ -7,6 +7,7 @@ import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../components/ui/tooltip";
 import { cn } from "../../lib/utils";
+import { t } from "../../i18n";
 
 const STATUS_CLASS: Record<string, string> = {
   pending: "bg-warning/20 text-warning-foreground border-transparent",
@@ -14,9 +15,9 @@ const STATUS_CLASS: Record<string, string> = {
   expired: "",
 };
 export const TYPE_LABEL: Record<Question["type"], string> = {
-  multiple_choice: "Multiple choice",
-  true_false: "True / false",
-  fill_in_the_blanks: "Fill in the blanks",
+  multiple_choice: t("Multiple choice"),
+  true_false: t("True / false"),
+  fill_in_the_blanks: t("Fill in the blanks"),
 };
 
 export function StatusBadge({ status }: { status: string }) {

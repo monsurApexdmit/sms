@@ -27,13 +27,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { cn } from "../lib/utils";
 import { disablePush, enablePush, pushState, type PushState } from "../lib/push";
+import { t, tn } from "../i18n";
 
 const CHANNELS = [
-  { key: "in_app", label: "In app" },
-  { key: "email", label: "Email" },
-  { key: "sms", label: "SMS" },
-  { key: "push", label: "Push" },
-  { key: "whatsapp", label: "WhatsApp" },
+  { key: "in_app", label: t("In app") },
+  { key: "email", label: t("Email") },
+  { key: "sms", label: t("SMS") },
+  { key: "push", label: t("Push") },
+  { key: "whatsapp", label: t("WhatsApp") },
 ] as const;
 type Channel = (typeof CHANNELS)[number]["key"];
 
@@ -66,13 +67,13 @@ function NotificationList() {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
         <div className="flex flex-wrap items-center gap-2">
           <ToggleGroup type="single" variant="outline" size="sm" value={show} onValueChange={(v) => v && setShow(v)}>
-            <ToggleGroupItem value="all">All</ToggleGroupItem>
-            <ToggleGroupItem value="unread">Unread</ToggleGroupItem>
+            <ToggleGroupItem value="all">{t("All")}</ToggleGroupItem>
+            <ToggleGroupItem value="unread">{t("Unread")}</ToggleGroupItem>
           </ToggleGroup>
           <Combobox
             className="w-52"
             clearable
-            placeholder="All categories"
+            placeholder={t("All categories")}
             data={(prefs.data?.items ?? []).map((i) => ({ value: i.category, label: i.label }))}
             value={category}
             onChange={setCategory}
@@ -80,8 +81,7 @@ function NotificationList() {
         </div>
         <Button size="sm" variant="outline" loading={readAll.isPending} onClick={() => readAll.mutate(undefined)}>
           <CheckCheckIcon />
-          Mark all read
-        </Button>
+          {t("Mark all read")}</Button>
       </div>
       {isLoading ? (
         <div className="space-y-2 p-4">
@@ -89,7 +89,7 @@ function NotificationList() {
           <Skeleton className="h-12 w-full" />
         </div>
       ) : (data?.items ?? []).length === 0 ? (
-        <EmptyState icon={BellIcon} title="No notifications" className="m-4 border-0" />
+        <EmptyState icon={BellIcon} title={t("No notifications")} className="m-4 border-0" />
       ) : (
         <ul>
           {data!.items.map((n) => (
@@ -129,7 +129,7 @@ function PushControls() {
       if (state === "on") await disablePush();
       else await enablePush(key.data!.public_key!);
       setState(await pushState());
-      toast.success(state === "on" ? "Push notifications turned off on this device" : "Push notifications turned on for this device");
+      toast.success(state === "on" ? t("Push notifications turned off on this device") : t("Push notifications turned on for this device"));
     } catch (e) {
       toast.error(e instanceof Error && !("isAxiosError" in e) ? e.message : errorMessage(e));
       setState(await pushState());
@@ -138,14 +138,14 @@ function PushControls() {
     }
   };
   if (!key.data || state === null) return null;
-  if (!key.data.public_key) return <p className="text-muted-foreground text-sm">Push notifications are not set up by the school yet.</p>;
-  if (state === "unsupported") return <p className="text-muted-foreground text-sm">This browser does not support push notifications. On iPhone, add the portal to your Home Screen first.</p>;
-  if (state === "dev") return <p className="text-muted-foreground text-sm">Push notifications work in the installed (production) app only.</p>;
-  if (state === "denied") return <p className="text-muted-foreground text-sm">Notifications are blocked for this site. Allow them in the browser's site settings.</p>;
+  if (!key.data.public_key) return <p className="text-muted-foreground text-sm">{t("Push notifications are not set up by the school yet.")}</p>;
+  if (state === "unsupported") return <p className="text-muted-foreground text-sm">{t("This browser does not support push notifications. On iPhone, add the portal to your Home Screen first.")}</p>;
+  if (state === "dev") return <p className="text-muted-foreground text-sm">{t("Push notifications work in the installed (production) app only.")}</p>;
+  if (state === "denied") return <p className="text-muted-foreground text-sm">{t("Notifications are blocked for this site. Allow them in the browser's site settings.")}</p>;
   return (
     <Button variant="outline" size="sm" loading={busy} onClick={toggle}>
       {state === "on" ? <BellOffIcon /> : <BellRingIcon />}
-      {state === "on" ? "Turn off push on this device" : "Enable push on this device"}
+      {state === "on" ? t("Turn off push on this device") : t("Enable push on this device")}
     </Button>
   );
 }
@@ -156,10 +156,10 @@ export function NotificationSettingsCard() {
   useEffect(() => setItems(data?.items ?? []), [data]);
   const save = useAction(
     () => api.put("/notifications/preferences", { items: items.map(({ label: _label, ...rest }) => rest) }),
-    { success: "Notification settings saved", invalidate: [["/notifications/preferences"]] },
+    { success: t("Notification settings saved"), invalidate: [["/notifications/preferences"]] },
   );
   const test = useAction(() => api.post<{ channels: string[] }>("/notifications/test"), {
-    onSuccess: (r) => toast.success(`Test sent (${r.data.channels.join(", ") || "no channels"})`),
+    onSuccess: (r) => toast.success(t("Test sent ({value})", { value: r.data.channels.join(", ") || t("no channels") })),
     invalidate: [["/notifications"], ["/notifications/unread-count"]],
   });
   const set = (category: string, channel: Channel, value: boolean) =>
@@ -170,8 +170,8 @@ export function NotificationSettingsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notifications</CardTitle>
-        <CardDescription>Choose how you hear about each kind of update. Channels the school hasn't set up are greyed out.</CardDescription>
+        <CardTitle>{t("Notifications")}</CardTitle>
+        <CardDescription>{t("Choose how you hear about each kind of update. Channels the school hasn't set up are greyed out.")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <PushControls />
@@ -182,7 +182,7 @@ export function NotificationSettingsCard() {
             <Table className="min-w-[560px]">
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead>Category</TableHead>
+                  <TableHead>{t("Category")}</TableHead>
                   {CHANNELS.map((c) => (
                     <TableHead key={c.key} className={cn("text-center", available && !available[c.key] && "text-muted-foreground/60")}>
                       {c.label}
@@ -197,7 +197,7 @@ export function NotificationSettingsCard() {
                     {CHANNELS.map((c) => (
                       <TableCell key={c.key} className="text-center">
                         <Switch
-                          aria-label={`${row.label}: ${c.label}`}
+                          aria-label={t("{label}: {label2}", { label: row.label, label2: c.label })}
                           checked={row[c.key]}
                           disabled={available ? !available[c.key] : false}
                           onCheckedChange={(v) => set(row.category, c.key, v)}
@@ -214,12 +214,10 @@ export function NotificationSettingsCard() {
       <CardFooter className="justify-between gap-2 border-t">
         <Button variant="ghost" loading={test.isPending} onClick={() => test.mutate(undefined)}>
           <SendIcon />
-          Send me a test
-        </Button>
+          {t("Send me a test")}</Button>
         <Button loading={save.isPending} disabled={!dirty} onClick={() => save.mutate(undefined)}>
           <SaveIcon />
-          Save
-        </Button>
+          {t("Save")}</Button>
       </CardFooter>
     </Card>
   );
@@ -246,11 +244,11 @@ function ChannelSettingsCard() {
         whatsapp_template_language: values.whatsapp_template_language ?? "",
         vapid_subject: values.vapid_subject ?? "",
       }),
-    { success: "Saved", invalidate },
+    { success: t("Saved"), invalidate },
   );
-  const generate = useAction(() => api.post("/notifications/settings/vapid"), { success: "New push keys created", invalidate });
+  const generate = useAction(() => api.post("/notifications/settings/vapid"), { success: t("New push keys created"), invalidate });
   const field = (key: keyof ChannelSettings, label: string, hint?: string, secret = false) => (
-    <Field label={label} htmlFor={`ch-${key}`} description={secret && values[key] === MASK ? "Saved; type to replace" : hint}>
+    <Field label={label} htmlFor={`ch-${key}`} description={secret && values[key] === MASK ? t("Saved; type to replace") : hint}>
       <Input id={`ch-${key}`} type={secret ? "password" : "text"} autoComplete="off" value={String(values[key] ?? "")} onChange={(e) => setValues((v) => ({ ...v, [key]: e.target.value }))} />
     </Field>
   );
@@ -259,15 +257,15 @@ function ChannelSettingsCard() {
     <div className="grid gap-6 lg:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Web push</CardTitle>
-          <CardDescription>Notifications on phones and computers that installed or opened the portal and turned push on.</CardDescription>
+          <CardTitle>{t("Web push")}</CardTitle>
+          <CardDescription>{t("Notifications on phones and computers that installed or opened the portal and turned push on.")}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <Field label="Public key">
-            <Input readOnly value={data?.vapid_public_key || "Not created yet"} className="font-mono text-xs" />
+          <Field label={t("Public key")}>
+            <Input readOnly value={data?.vapid_public_key || t("Not created yet")} className="font-mono text-xs" />
           </Field>
-          {field("vapid_subject", "Contact", 'Sent to push services, e.g. "mailto:office@school.edu". Defaults to the system email.')}
-          <p className="text-muted-foreground text-sm">{data?.subscriptions ?? 0} device(s) subscribed.</p>
+          {field("vapid_subject", t("Contact"), t("Sent to push services, e.g. \"mailto:office@school.edu\". Defaults to the system email."))}
+          <p className="text-muted-foreground text-sm">{tn("{value} device(s) subscribed.", { value: data?.subscriptions ?? 0 })}</p>
         </CardContent>
         <CardFooter className="justify-between gap-2 border-t">
           <Button
@@ -275,42 +273,40 @@ function ChannelSettingsCard() {
             loading={generate.isPending}
             onClick={() =>
               confirmAction({
-                title: data?.vapid_public_key ? "Replace the push keys?" : "Create push keys?",
-                description: data?.vapid_public_key ? "Every device has to turn push on again." : "Users can then turn on push notifications.",
-                confirmLabel: data?.vapid_public_key ? "Replace keys" : "Create keys",
+                title: data?.vapid_public_key ? t("Replace the push keys?") : t("Create push keys?"),
+                description: data?.vapid_public_key ? t("Every device has to turn push on again.") : t("Users can then turn on push notifications."),
+                confirmLabel: data?.vapid_public_key ? t("Replace keys") : t("Create keys"),
                 destructive: !!data?.vapid_public_key,
                 onConfirm: () => generate.mutate(undefined),
               })
             }
           >
             <KeyRoundIcon />
-            {data?.vapid_public_key ? "Replace keys" : "Create keys"}
+            {data?.vapid_public_key ? t("Replace keys") : t("Create keys")}
           </Button>
           <Button loading={save.isPending} onClick={() => save.mutate(undefined)}>
             <SaveIcon />
-            Save
-          </Button>
+            {t("Save")}</Button>
         </CardFooter>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>WhatsApp</CardTitle>
-          <CardDescription>Meta WhatsApp Cloud API. Messages go to the phone number on each account.</CardDescription>
+          <CardTitle>{t("WhatsApp")}</CardTitle>
+          <CardDescription>{t("Meta WhatsApp Cloud API. Messages go to the phone number on each account.")}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          {field("whatsapp_phone_number_id", "Phone number ID", "WhatsApp Manager → API setup")}
-          {field("whatsapp_token", "Access token", "A permanent system-user token", true)}
-          {field("whatsapp_template", "Message template", "Approved template with one body variable {{1}}. Needed to message people who haven't written to the school in the last 24 hours.")}
-          {field("whatsapp_template_language", "Template language", 'Default "en"')}
+          {field("whatsapp_phone_number_id", t("Phone number ID"), t("WhatsApp Manager → API setup"))}
+          {field("whatsapp_token", t("Access token"), t("A permanent system-user token"), true)}
+          {field("whatsapp_template", t("Message template"), "Approved template with one body variable {{1}}. Needed to message people who haven't written to the school in the last 24 hours.")}
+          {field("whatsapp_template_language", t("Template language"), t("Default \"en\""))}
           <Alert>
-            <AlertDescription>Leave the token empty to turn WhatsApp off.</AlertDescription>
+            <AlertDescription>{t("Leave the token empty to turn WhatsApp off.")}</AlertDescription>
           </Alert>
         </CardContent>
         <CardFooter className="justify-end border-t">
           <Button loading={save.isPending} onClick={() => save.mutate(undefined)}>
             <SaveIcon />
-            Save
-          </Button>
+            {t("Save")}</Button>
         </CardFooter>
       </Card>
     </div>
@@ -321,12 +317,12 @@ export function NotificationsPage() {
   const user = useUser();
   return (
     <>
-      <PageHeader title="Notifications" subtitle="Updates about attendance, homework, leave, fees, meetings and notices." />
+      <PageHeader title={t("Notifications")} subtitle={t("Updates about attendance, homework, leave, fees, meetings and notices.")} />
       <Tabs defaultValue="inbox" className="gap-6">
         <TabsList>
-          <TabsTrigger value="inbox">Inbox</TabsTrigger>
-          <TabsTrigger value="settings">My settings</TabsTrigger>
-          {user.role === "admin" && <TabsTrigger value="channels">Delivery channels</TabsTrigger>}
+          <TabsTrigger value="inbox">{t("Inbox")}</TabsTrigger>
+          <TabsTrigger value="settings">{t("My settings")}</TabsTrigger>
+          {user.role === "admin" && <TabsTrigger value="channels">{t("Delivery channels")}</TabsTrigger>}
         </TabsList>
         <TabsContent value="inbox">
           <NotificationList />

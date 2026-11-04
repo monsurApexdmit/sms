@@ -4,11 +4,16 @@ import { Link } from "react-router-dom";
 import { useGet } from "../api/hooks";
 import type { TransportExpiry } from "../api/types";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { t, tn, tp } from "../i18n";
 
-const WHAT: Record<TransportExpiry["kind"], string> = { insurance: "insurance", fitness: "fitness certificate", licence: "driving licence" };
+const WHAT: Record<TransportExpiry["kind"], string> = { insurance: t("insurance"), fitness: t("fitness certificate"), licence: t("driving licence") };
 
 export const expiryText = (e: TransportExpiry) =>
-  `${e.label}: ${WHAT[e.kind]} ${e.days_left < 0 ? `expired ${-e.days_left} day${e.days_left === -1 ? "" : "s"} ago` : e.days_left === 0 ? "expires today" : `expires in ${e.days_left} day${e.days_left === 1 ? "" : "s"}`}`;
+  e.days_left < 0
+    ? tp(-e.days_left, "{label}: {what} expired {count} day ago", "{label}: {what} expired {count} days ago", { label: e.label, what: WHAT[e.kind] })
+    : e.days_left === 0
+      ? t("{label}: {what} expires today", { label: e.label, what: WHAT[e.kind] })
+      : tp(e.days_left, "{label}: {what} expires in {count} day", "{label}: {what} expires in {count} days", { label: e.label, what: WHAT[e.kind] });
 
 /** Admin-only: vehicle insurance/fitness and driver licences expiring within 30 days. Renders nothing when all is current. */
 export function TransportExpiryAlert({ linkToPage = true }: { linkToPage?: boolean }) {
@@ -18,18 +23,17 @@ export function TransportExpiryAlert({ linkToPage = true }: { linkToPage?: boole
   return (
     <Alert variant={expired ? "destructive" : "default"}>
       <BusIcon />
-      <AlertTitle>Transport documents need renewing</AlertTitle>
+      <AlertTitle>{t("Transport documents need renewing")}</AlertTitle>
       <AlertDescription>
         <ul className="list-disc pl-4">
           {data.slice(0, 5).map((e) => (
             <li key={`${e.kind}-${e.item_id}`}>{expiryText(e)}</li>
           ))}
-          {data.length > 5 && <li>and {data.length - 5} more</li>}
+          {data.length > 5 && <li>{tn("and {value} more", { value: data.length - 5 })}</li>}
         </ul>
         {linkToPage && (
           <Link to="/app/transport" className="text-primary font-medium underline underline-offset-4">
-            Open transport
-          </Link>
+            {t("Open transport")}</Link>
         )}
       </AlertDescription>
     </Alert>

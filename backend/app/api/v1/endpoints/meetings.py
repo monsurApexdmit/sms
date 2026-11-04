@@ -24,6 +24,7 @@ from app.models import (
 )
 from app.schemas.meetings import BlockIn, BookingIn, OutcomeIn, SessionIn, SessionOut, _slot_times
 from app.services.access import children_ids, current_enroll
+from app.services.messages import msg, school_language, short_date
 from app.services.notifications import notify, user
 from app.services.settings import get_setting
 
@@ -155,17 +156,18 @@ def _deactivate(booking: MeetingBooking, slot: MeetingSlot) -> None:
 def _notify(db: Session, tasks: BackgroundTasks, booking: MeetingBooking, slot: MeetingSlot, session: MeetingSession, what: str) -> None:
     """Tell the parent and the teacher that a booking was made or cancelled."""
     school = get_setting(db, "system_name", "School")
+    lang = school_language(db)
     parent, teacher, student = db.get(Parent, booking.parent_id), db.get(Teacher, slot.teacher_id), db.get(Student, booking.student_id)
-    when = f"{session.date:%d %b %Y}, {slot.start_time:%H:%M}–{slot.end_time:%H:%M}"
-    where = f"\nLocation: {session.location}" if session.location else ""
-    child = student.name if student else "your child"
-    subject = f"Parent-teacher meeting {what}: {when}"
-    body = (
-        f"{session.title}\n{when}{where}\n\nStudent: {child}\nParent: {parent.name if parent else '-'}\n"
-        f"Teacher: {teacher.name if teacher else '-'}\n"
-        f"{f'Agenda: {booking.note}' if booking.note else ''}\n\n{school}"
-    )
-    short = f"{child} with {teacher.name if teacher else 'the teacher'}, {when}"
+    when = f"{short_date(lang, session.date)}, {slot.start_time:%H:%M}–{slot.end_time:%H:%M}"
+    where = msg(lang, "meetings.location", location=session.location) if session.location else ""
+    child = student.name if student else msg(lang, "word.your_child")
+    subject = msg(lang, f"meetings.subject.{what}", when=when)
+    body = msg(
+        lang, "meetings.body", title=session.title, when=when, where=where, child=child,
+        parent=parent.name if parent else "-", teacher=teacher.name if teacher else "-",
+        agenda=msg(lang, "meetings.agenda", note=booking.note) if booking.note else "", school=school,
+    )  # fmt: skip
+    short = msg(lang, "meetings.short", child=child, teacher=teacher.name if teacher else msg(lang, "word.the_teacher"), when=when)
     if parent is not None:
         notify(db, tasks, [user("parent", parent.parent_id)], "meetings", subject, short, "/app/book-meeting", email_body=body)
     if teacher is not None:

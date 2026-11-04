@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Textarea } from "../components/ui/textarea";
 import { cn } from "../lib/utils";
 import { DAYS, fromUnix, titleCase, toOptions } from "../utils";
+import { t as tr, tn } from "../i18n";
 
 function useTeacherOptions() {
   const t = useList<{ teacher_id: number; name: string }>("/teachers");
@@ -55,35 +56,35 @@ export function ClassesPage() {
   return (
     <Tabs defaultValue="classes" className="gap-4">
       <TabsList>
-        <TabsTrigger value="classes">Classes</TabsTrigger>
-        <TabsTrigger value="sections">Sections</TabsTrigger>
+        <TabsTrigger value="classes">{tr("Classes")}</TabsTrigger>
+        <TabsTrigger value="sections">{tr("Sections")}</TabsTrigger>
       </TabsList>
       <TabsContent value="classes">
         <CrudPage
-          title="Classes"
+          title={tr("Classes")}
           path="/classes"
           idField="class_id"
           fields={[
-            { name: "name", label: "Name", required: true, placeholder: "e.g. Ten (max 11 characters)" },
-            { name: "name_numeric", label: "Numeric name", placeholder: "e.g. 10" },
-            { name: "teacher_id", label: "Class teacher", type: "select", options: teachers },
+            { name: "name", label: tr("Name"), required: true, placeholder: tr("e.g. Ten (max 11 characters)") },
+            { name: "name_numeric", label: tr("Numeric name"), placeholder: tr("e.g. 10") },
+            { name: "teacher_id", label: tr("Class teacher"), type: "select", options: teachers },
           ]}
         />
       </TabsContent>
       <TabsContent value="sections">
         <CrudPage
-          title="Sections"
+          title={tr("Sections")}
           path="/sections"
           idField="section_id"
           params={{ class_id: classId || undefined }}
           headerExtra={
-            <Combobox className="w-48" placeholder="Filter by class" clearable data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} />
+            <Combobox className="w-48" placeholder={tr("Filter by class")} clearable data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} />
           }
           fields={[
-            { name: "name", label: "Name", required: true },
-            { name: "nick_name", label: "Nick name" },
-            { name: "class_id", label: "Class", type: "select", required: true, options: toOptions(classes.data?.items, "class_id", "name") },
-            { name: "teacher_id", label: "Section teacher", type: "select", options: teachers },
+            { name: "name", label: tr("Name"), required: true },
+            { name: "nick_name", label: tr("Nick name") },
+            { name: "class_id", label: tr("Class"), type: "select", required: true, options: toOptions(classes.data?.items, "class_id", "name") },
+            { name: "teacher_id", label: tr("Section teacher"), type: "select", options: teachers },
           ]}
         />
       </TabsContent>
@@ -98,18 +99,18 @@ export function SubjectsPage() {
   const [classId, setClassId] = useState<string | null>(null);
   return (
     <CrudPage
-      title="Subjects"
+      title={tr("Subjects")}
       path="/subjects"
       idField="subject_id"
       canWrite={user.role === "admin"}
       params={{ class_id: classId || undefined }}
       headerExtra={
-        <Combobox className="w-48" placeholder="Filter by class" clearable data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} />
+        <Combobox className="w-48" placeholder={tr("Filter by class")} clearable data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} />
       }
       fields={[
-        { name: "name", label: "Name", required: true },
-        { name: "class_id", label: "Class", type: "select", required: true, options: toOptions(classes.data?.items, "class_id", "name") },
-        { name: "teacher_id", label: "Teacher", type: "select", options: teachers },
+        { name: "name", label: tr("Name"), required: true },
+        { name: "class_id", label: tr("Class"), type: "select", required: true, options: toOptions(classes.data?.items, "class_id", "name") },
+        { name: "teacher_id", label: tr("Teacher"), type: "select", options: teachers },
       ]}
     />
   );
@@ -150,7 +151,8 @@ function RoutineGrid({
 }) {  // prettier-ignore
   const subject = new Map(subjects.map((s) => [s.subject_id, s]));
   const teacher = new Map(teachers.map((t) => [t.value, t.label]));
-  const today = dayjs().format("dddd").toLowerCase();
+  // English day names: compared with the routine's stored day values
+  const today = dayjs().locale("en").format("dddd").toLowerCase();
 
   return (
     <Card className="gap-0 overflow-hidden py-0 print:border-0 print:shadow-none">
@@ -160,8 +162,7 @@ function RoutineGrid({
         <CardAction>
           <Button variant="outline" size="sm" onClick={() => window.print()}>
             <PrinterIcon />
-            Print
-          </Button>
+            {tr("Print")}</Button>
         </CardAction>
       </CardHeader>
       <div className="divide-y print:[&>div]:border-black/30">
@@ -171,11 +172,11 @@ function RoutineGrid({
             <div key={day} className={cn("grid gap-3 px-4 py-3 sm:grid-cols-[8rem_1fr] sm:items-start sm:px-6 print:break-inside-avoid", day === today && "bg-primary/5 print:bg-transparent")}>
               <div className="flex items-center gap-2 pt-1 text-sm font-medium">
                 {titleCase(day)}
-                {day === today && <Badge variant="secondary" className="no-print">Today</Badge>}
+                {day === today && <Badge variant="secondary" className="no-print">{tr("Today")}</Badge>}
               </div>
               <div className="flex flex-wrap gap-2">
                 {loading && <Skeleton className="h-16 w-40" />}
-                {!loading && items.length === 0 && <span className="text-muted-foreground pt-1 text-sm">No classes</span>}
+                {!loading && items.length === 0 && <span className="text-muted-foreground pt-1 text-sm">{tr("No classes")}</span>}
                 {items.map((r) => {
                   const s = subject.get(r.subject_id);
                   const t = s?.teacher_id ? teacher.get(String(s.teacher_id)) : undefined;
@@ -188,7 +189,7 @@ function RoutineGrid({
                         (onEdit || onDelete) && "pr-16",
                       )}
                     >
-                      <div className="font-medium">{s?.name ?? `Subject #${r.subject_id}`}</div>
+                      <div className="font-medium">{s?.name ?? tr("Subject #{subject_id}", { subject_id: r.subject_id })}</div>
                       <div className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
                         <ClockIcon className="size-3" />
                         {slot(r)}
@@ -202,12 +203,12 @@ function RoutineGrid({
                       {(onEdit || onDelete) && (
                         <div className="absolute top-1 right-1 flex">
                           {onEdit && (
-                            <IconAction label="Edit period" onClick={() => onEdit(r)}>
+                            <IconAction label={tr("Edit period")} onClick={() => onEdit(r)}>
                               <PencilIcon />
                             </IconAction>
                           )}
                           {onDelete && (
-                            <IconAction label="Remove period" destructive onClick={() => onDelete(r.class_routine_id)}>
+                            <IconAction label={tr("Remove period")} destructive onClick={() => onDelete(r.class_routine_id)}>
                               <Trash2Icon />
                             </IconAction>
                           )}
@@ -262,7 +263,7 @@ export function RoutinePage() {
       };  // prettier-ignore
       return editing ? api.put(`/class-routines/${editing.class_routine_id}`, body) : api.post("/class-routines", body);
     },
-    { success: editing ? "Period updated" : "Added", invalidate: [["/class-routines"]], onSuccess: () => setOpened(false) },
+    { success: editing ? tr("Period updated") : tr("Added"), invalidate: [["/class-routines"]], onSuccess: () => setOpened(false) },
   );
   const del = useAction((id: number) => api.delete(`/class-routines/${id}`), { invalidate: [["/class-routines"]] });
 
@@ -280,9 +281,9 @@ export function RoutinePage() {
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const next: typeof error = {};
-    if (!form.subject_id) next.subject = "Required";
-    if (!form.start || !form.end) next.time = "Start and end times are required";
-    else if (form.end <= form.start) next.time = "End time must be after the start time";
+    if (!form.subject_id) next.subject = tr("Required");
+    if (!form.start || !form.end) next.time = tr("Start and end times are required");
+    else if (form.end <= form.start) next.time = tr("End time must be after the start time");
     setError(next);
     if (!next.subject && !next.time) save.mutate(form);
   };
@@ -290,15 +291,14 @@ export function RoutinePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Class routine"
-        subtitle={canEdit ? undefined : "Weekly timetable (read only)"}
+        title={tr("Class routine")}
+        subtitle={canEdit ? undefined : tr("Weekly timetable (read only)")}
         actions={
           ready &&
           canEdit && (
             <Button onClick={() => openForm(null)}>
               <PlusIcon />
-              Add period
-            </Button>
+              {tr("Add period")}</Button>
           )
         }
       />
@@ -309,10 +309,10 @@ export function RoutinePage() {
       </Card>
       {ready ? (
         <>
-          <PrintHeader title="Class routine" lines={[`Class ${className ?? ""} : Section ${sectionName ?? ""}`]} />
+          <PrintHeader title={tr("Class routine")} lines={[tr("Class {value} : Section {value2}", { value: className ?? "", value2: sectionName ?? "" })]} />
           <RoutineGrid
-            title="Weekly timetable"
-            description={className && sectionName ? `Class ${className} · Section ${sectionName}` : undefined}
+            title={tr("Weekly timetable")}
+            description={className && sectionName ? tr("Class {className} · Section {sectionName}", { className, sectionName }) : undefined}
             loading={rows.isLoading}
             rows={rows.data?.items ?? []}
             subjects={subjects.data?.items ?? []}
@@ -320,36 +320,35 @@ export function RoutinePage() {
             onEdit={canEdit ? openForm : undefined}
             onDelete={
               canEdit
-                ? (id) => confirmAction({ title: "Remove this period?", confirmLabel: "Remove", onConfirm: () => del.mutate(id) })
+                ? (id) => confirmAction({ title: tr("Remove this period?"), confirmLabel: tr("Remove"), onConfirm: () => del.mutate(id) })
                 : undefined
             }
           />
         </>
       ) : (
-        <EmptyState icon={CalendarDaysIcon} title="Choose a class and section">
-          The weekly timetable appears here.
-        </EmptyState>
+        <EmptyState icon={CalendarDaysIcon} title={tr("Choose a class and section")}>
+          {tr("The weekly timetable appears here.")}</EmptyState>
       )}
       <Dialog open={opened} onOpenChange={setOpened}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit period" : "Add period"}</DialogTitle>
+            <DialogTitle>{editing ? tr("Edit period") : tr("Add period")}</DialogTitle>
             <DialogDescription>
-              {className && sectionName ? `Class ${className} · Section ${sectionName}` : null}
+              {className && sectionName ? tr("Class {className} · Section {sectionName}", { className, sectionName }) : null}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={submit} className="grid gap-4">
-            <Field label="Subject" htmlFor="period-subject" required error={error.subject}>
+            <Field label={tr("Subject")} htmlFor="period-subject" required error={error.subject}>
               <Combobox
                 id="period-subject"
                 data={toOptions(subjects.data?.items, "subject_id", "name")}
                 value={form.subject_id}
                 onChange={(subject_id) => setForm((f) => ({ ...f, subject_id }))}
-                placeholder="Choose subject"
+                placeholder={tr("Choose subject")}
                 aria-invalid={!!error.subject || undefined}
               />
             </Field>
-            <Field label="Day" htmlFor="period-day" required>
+            <Field label={tr("Day")} htmlFor="period-day" required>
               <Combobox
                 id="period-day"
                 data={DAYS.map((d) => ({ value: d, label: titleCase(d) }))}
@@ -358,20 +357,19 @@ export function RoutinePage() {
               />
             </Field>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Starts" htmlFor="period-start" required>
+              <Field label={tr("Starts")} htmlFor="period-start" required>
                 <Input id="period-start" type="time" value={form.start} onChange={(e) => setForm((f) => ({ ...f, start: e.target.value }))} aria-invalid={!!error.time || undefined} />
               </Field>
-              <Field label="Ends" htmlFor="period-end" required>
+              <Field label={tr("Ends")} htmlFor="period-end" required>
                 <Input id="period-end" type="time" value={form.end} onChange={(e) => setForm((f) => ({ ...f, end: e.target.value }))} aria-invalid={!!error.time || undefined} />
               </Field>
             </div>
             {error.time && <p className="text-destructive -mt-2 text-xs">{error.time}</p>}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpened(false)}>
-                Cancel
-              </Button>
+                {tr("Cancel")}</Button>
               <Button type="submit" loading={save.isPending}>
-                {editing ? "Save" : "Add"}
+                {editing ? tr("Save") : tr("Add")}
               </Button>
             </DialogFooter>
           </form>
@@ -388,7 +386,7 @@ export function useChildSelect() {
   const childId = user.role === "parent" ? picked ?? (children.data?.[0] ? String(children.data[0].student_id) : null) : null;
   const select =
     user.role === "parent" ? (
-      <Combobox className="w-56" placeholder="Choose child" data={toOptions(children.data, "student_id", "name")} value={childId} onChange={setPicked} />
+      <Combobox className="w-56" placeholder={tr("Choose child")} data={toOptions(children.data, "student_id", "name")} value={childId} onChange={setPicked} />
     ) : null;
   return { childId, select };
 }
@@ -401,11 +399,11 @@ export function MyRoutinePage() {
   const teachers = useTeacherOptions();
   return (
     <div className="space-y-6">
-      <PageHeader title="My routine" actions={select} />
-      <PrintHeader title="Class routine" lines={user.role === "parent" ? undefined : [user.name]} />
+      <PageHeader title={tr("My routine")} actions={select} />
+      <PrintHeader title={tr("Class routine")} lines={user.role === "parent" ? undefined : [user.name]} />
       <RoutineGrid
-        title="Weekly timetable"
-        description={user.role === "teacher" ? "Periods of the subjects you teach" : undefined}
+        title={tr("Weekly timetable")}
+        description={user.role === "teacher" ? tr("Periods of the subjects you teach") : undefined}
         loading={rows.isLoading}
         rows={rows.data ?? []}
         subjects={subjects.data?.items ?? []}
@@ -454,7 +452,7 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
       return api.post(path, body);
     },
     {
-      success: "Uploaded",
+      success: tr("Uploaded"),
       invalidate: [[path]],
       onSuccess: () => {
         setForm(EMPTY_UPLOAD);
@@ -463,14 +461,14 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
       },
     },
   );
-  const del = useAction((id: unknown) => api.delete(`${path}/${id}`), { success: "Deleted", invalidate: [[path]] });
+  const del = useAction((id: unknown) => api.delete(`${path}/${id}`), { success: tr("Deleted"), invalidate: [[path]] });
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const next: typeof errors = {};
-    if (!form.title) next.title = "Required";
-    if (!form.class_id) next.class_id = "Required";
-    if (!form.file) next.file = "Choose a file";
+    if (!form.title) next.title = tr("Required");
+    if (!form.class_id) next.class_id = tr("Required");
+    if (!form.file) next.file = tr("Choose a file");
     setErrors(next);
     if (Object.keys(next).length === 0) upload.mutate(form);
   };
@@ -484,13 +482,12 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
           <>
             {select}
             {staff && (
-              <Combobox className="w-48" placeholder="Filter by class" clearable data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} />
+              <Combobox className="w-48" placeholder={tr("Filter by class")} clearable data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} />
             )}
             {staff && (
               <Button onClick={() => { setErrors({}); setOpened(true); }}>
                 <UploadIcon />
-                Upload
-              </Button>
+                {tr("Upload")}</Button>
             )}
           </>
         }
@@ -499,15 +496,15 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
         <Table className="min-w-[600px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>File</TableHead>
+              <TableHead>{tr("Title")}</TableHead>
+              <TableHead>{tr("Class")}</TableHead>
+              <TableHead>{tr("Date")}</TableHead>
+              <TableHead>{tr("File")}</TableHead>
               {staff && <TableHead className="w-16" />}
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={list.isLoading} empty={list.data?.items.length === 0} colSpan={colSpan} emptyText="Nothing uploaded yet" />
+            <TableState loading={list.isLoading} empty={list.data?.items.length === 0} colSpan={colSpan} emptyText={tr("Nothing uploaded yet")} />
             {list.data?.items.map((f) => (
               <TableRow key={String(f[idField])}>
                 <TableCell className="whitespace-normal">
@@ -520,15 +517,14 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
                   {f.download_url ? (
                     <a href={f.download_url} target="_blank" rel="noopener" className="text-primary inline-flex items-center gap-1 hover:underline">
                       <DownloadIcon className="size-3.5" />
-                      Download
-                    </a>
+                      {tr("Download")}</a>
                   ) : (
                     <Dash />
                   )}
                 </TableCell>
                 {staff && (
                   <TableCell className="text-right">
-                    <IconAction label="Delete" destructive onClick={() => confirmAction({ title: "Delete file?", onConfirm: () => del.mutate(f[idField]) })}>
+                    <IconAction label={tr("Delete")} destructive onClick={() => confirmAction({ title: tr("Delete file?"), onConfirm: () => del.mutate(f[idField]) })}>
                       <Trash2Icon />
                     </IconAction>
                   </TableCell>
@@ -541,28 +537,28 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
       <Dialog open={opened} onOpenChange={setOpened}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Upload {title.toLowerCase()}</DialogTitle>
-            <DialogDescription>Files are renamed and served through signed links.</DialogDescription>
+            <DialogTitle>{tn("Upload {toLowerCase}", { toLowerCase: title.toLowerCase() })}</DialogTitle>
+            <DialogDescription>{tr("Files are renamed and served through signed links.")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={submit} className="grid gap-4">
-            <Field label="Title" htmlFor="upload-title" required error={errors.title}>
+            <Field label={tr("Title")} htmlFor="upload-title" required error={errors.title}>
               <Input id="upload-title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} aria-invalid={!!errors.title || undefined} />
             </Field>
-            <Field label="Description" htmlFor="upload-description">
+            <Field label={tr("Description")} htmlFor="upload-description">
               <Textarea id="upload-description" rows={3} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Class" htmlFor="upload-class" required error={errors.class_id}>
+              <Field label={tr("Class")} htmlFor="upload-class" required error={errors.class_id}>
                 <Combobox
                   id="upload-class"
                   data={toOptions(classes.data?.items, "class_id", "name")}
                   value={form.class_id}
                   onChange={(class_id) => setForm((f) => ({ ...f, class_id, subject_id: null }))}
-                  placeholder="Choose class"
+                  placeholder={tr("Choose class")}
                   aria-invalid={!!errors.class_id || undefined}
                 />
               </Field>
-              <Field label="Subject" htmlFor="upload-subject">
+              <Field label={tr("Subject")} htmlFor="upload-subject">
                 <Combobox
                   id="upload-subject"
                   clearable
@@ -570,11 +566,11 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
                   data={toOptions(formSubjects.data?.items, "subject_id", "name")}
                   value={form.subject_id}
                   onChange={(subject_id) => setForm((f) => ({ ...f, subject_id }))}
-                  placeholder="Optional"
+                  placeholder={tr("Optional")}
                 />
               </Field>
             </div>
-            <Field label="File" htmlFor="upload-file" required error={errors.file} description="PDF, Office documents, images, audio/video or zip; max 10 MB">
+            <Field label={tr("File")} htmlFor="upload-file" required error={errors.file} description={tr("PDF, Office documents, images, audio/video or zip; max 10 MB")}>
               <Input
                 key={fileKey}
                 id="upload-file"
@@ -588,11 +584,9 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
             </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpened(false)}>
-                Cancel
-              </Button>
+                {tr("Cancel")}</Button>
               <Button type="submit" loading={upload.isPending}>
-                Upload
-              </Button>
+                {tr("Upload")}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -601,5 +595,5 @@ function FilesPage({ title, path, idField }: { title: string; path: string; idFi
   );
 }
 
-export const SyllabusPage = () => <FilesPage title="Syllabus" path="/syllabus" idField="academic_syllabus_id" />;
-export const StudyMaterialPage = () => <FilesPage title="Study material" path="/study-materials" idField="document_id" />;
+export const SyllabusPage = () => <FilesPage title={tr("Syllabus")} path="/syllabus" idField="academic_syllabus_id" />;
+export const StudyMaterialPage = () => <FilesPage title={tr("Study material")} path="/study-materials" idField="document_id" />;

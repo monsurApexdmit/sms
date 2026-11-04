@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { t } from "../i18n";
 
 interface Props {
   /** "YYYY-MM-DD", or "" when empty */
@@ -20,7 +21,7 @@ interface Props {
 }
 
 /** Date field backed by the shadcn calendar. Works with plain YYYY-MM-DD strings. */
-export function DatePicker({ value, onChange, placeholder = "Pick a date", disabled, clearable = true, className, id, ...rest }: Props) {
+export function DatePicker({ value, onChange, placeholder = t("Pick a date"), disabled, clearable = true, className, id, ...rest }: Props) {
   const [open, setOpen] = useState(false);
   const date = value && dayjs(value).isValid() ? dayjs(value).toDate() : undefined;
 
@@ -40,7 +41,7 @@ export function DatePicker({ value, onChange, placeholder = "Pick a date", disab
             {clearable && date && !disabled && (
               <XIcon
                 className="opacity-50 hover:opacity-100"
-                aria-label="Clear"
+                aria-label={t("Clear")}
                 onPointerDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

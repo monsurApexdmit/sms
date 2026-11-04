@@ -37,6 +37,7 @@ import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Textarea } from "../components/ui/textarea";
 import { cn } from "../lib/utils";
 import { fromUnix, initials, titleCase } from "../utils";
+import { t as tr, tn } from "../i18n";
 
 type Active = { kind: "thread" | "group"; code: string; title: string } | null;
 
@@ -53,8 +54,8 @@ function shortTime(ts: string | null | undefined) {
 
 function dayLabel(ts: string | null) {
   const d = dayjs.unix(Number(ts));
-  if (d.isSame(dayjs(), "day")) return "Today";
-  if (d.isSame(dayjs().subtract(1, "day"), "day")) return "Yesterday";
+  if (d.isSame(dayjs(), "day")) return tr("Today");
+  if (d.isSame(dayjs().subtract(1, "day"), "day")) return tr("Yesterday");
   return d.format("dddd, DD MMM YYYY");
 }
 
@@ -112,7 +113,7 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
       },
     },
   );
-  const remove = useAction(() => api.delete(`/groups/${active.code}`), { success: "Group deleted", invalidate: [["/groups"]], onSuccess: onDeleted });
+  const remove = useAction(() => api.delete(`/groups/${active.code}`), { success: tr("Group deleted"), invalidate: [["/groups"]], onSuccess: onDeleted });
   const title = group?.group_name ?? active.title;
   const submit = () => {
     if (text.trim() && !send.isPending) send.mutate(undefined);
@@ -121,28 +122,28 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex items-center gap-3 border-b px-3 py-2.5">
-        <Button variant="ghost" size="icon-sm" className="md:hidden" onClick={onBack} aria-label="Back to conversations">
+        <Button variant="ghost" size="icon-sm" className="md:hidden" onClick={onBack} aria-label={tr("Back to conversations")}>
           <ArrowLeftIcon />
         </Button>
         <ChatAvatar name={title} group={active.kind === "group"} />
         <div className="min-w-0 flex-1">
           <div className="truncate font-semibold">{title}</div>
-          {group && <div className="text-muted-foreground truncate text-xs">{group.members.length} members</div>}
+          {group && <div className="text-muted-foreground truncate text-xs">{tn("{length} members", { length: group.members.length })}</div>}
         </div>
         {group && (
           <div className="flex items-center gap-1">
             <Button variant="outline" size="sm" onClick={() => setMembersOpen(true)}>
               <UsersIcon />
-              <span className="hidden sm:inline">Members</span>
+              <span className="hidden sm:inline">{tr("Members")}</span>
             </Button>
             {isAdmin && (
               <>
-                <IconAction label="Edit group" onClick={onEdit}><PencilIcon /></IconAction>
+                <IconAction label={tr("Edit group")} onClick={onEdit}><PencilIcon /></IconAction>
                 <IconAction
-                  label="Delete group"
+                  label={tr("Delete group")}
                   destructive
                   loading={remove.isPending}
-                  onClick={() => confirmAction({ title: `Delete "${title}"?`, description: "The group and all its messages are removed for every member.", onConfirm: () => remove.mutate(undefined) })}
+                  onClick={() => confirmAction({ title: tr("Delete \"{title}\"?", { title }), description: tr("The group and all its messages are removed for every member."), onConfirm: () => remove.mutate(undefined) })}
                 >
                   <Trash2Icon />
                 </IconAction>
@@ -160,7 +161,7 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
             <Skeleton className="h-12 w-3/5 rounded-2xl" />
           </div>
         ) : data?.length === 0 ? (
-          <div className="text-muted-foreground flex h-full items-center justify-center text-sm">No messages yet. Say hello!</div>
+          <div className="text-muted-foreground flex h-full items-center justify-center text-sm">{tr("No messages yet. Say hello!")}</div>
         ) : (
           <div className="space-y-2">
             {data?.map((m, i) => {
@@ -194,7 +195,7 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
                           )}
                         >
                           <PaperclipIcon className="size-3.5 shrink-0" />
-                          <span className="truncate">{m.attachment_name ?? "Attachment"}</span>
+                          <span className="truncate">{m.attachment_name ?? tr("Attachment")}</span>
                         </a>
                       )}
                       <div className={cn("mt-0.5 text-right text-[10px]", m.mine ? "text-primary-foreground/70" : "text-muted-foreground")}>
@@ -215,7 +216,7 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
             <Badge variant="secondary" className="max-w-full gap-1.5 py-1">
               <PaperclipIcon />
               <span className="truncate">{file.name}</span>
-              <button type="button" onClick={() => setFile(null)} aria-label="Remove attachment" className="hover:text-destructive">
+              <button type="button" onClick={() => setFile(null)} aria-label={tr("Remove attachment")} className="hover:text-destructive">
                 <XIcon className="size-3" />
               </button>
             </Badge>
@@ -224,7 +225,7 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
         <div className="flex items-end gap-2">
           <FileButton onChange={setFile}>
             {(props) => (
-              <Button {...props} type="button" variant={file ? "secondary" : "ghost"} size="icon" aria-label="Attach file">
+              <Button {...props} type="button" variant={file ? "secondary" : "ghost"} size="icon" aria-label={tr("Attach file")}>
                 <PaperclipIcon />
               </Button>
             )}
@@ -232,7 +233,7 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
           <Textarea
             className="max-h-32 min-h-9 flex-1 resize-none py-2"
             rows={1}
-            placeholder="Write a message"
+            placeholder={tr("Write a message")}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
@@ -242,7 +243,7 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
               }
             }}
           />
-          <Button size="icon" disabled={!text.trim()} loading={send.isPending} onClick={submit} aria-label="Send">
+          <Button size="icon" disabled={!text.trim()} loading={send.isPending} onClick={submit} aria-label={tr("Send")}>
             {!send.isPending && <SendIcon />}
           </Button>
         </div>
@@ -253,13 +254,13 @@ function Conversation({ active, group, isAdmin, onBack, onEdit, onDeleted }: {
           <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-sm">
             <SheetHeader>
               <SheetTitle>{group.group_name}</SheetTitle>
-              <SheetDescription>{group.members.length} members</SheetDescription>
+              <SheetDescription>{tn("{length} members", { length: group.members.length })}</SheetDescription>
             </SheetHeader>
             <ul className="space-y-1 px-4 pb-6">
               {group.member_names.map((name, i) => (
                 <li key={group.members[i] ?? i} className="flex items-center gap-3 rounded-md p-2">
                   <ChatAvatar name={name} className="size-8" />
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium">{name || "Unknown"}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium">{name || tr("Unknown")}</span>
                   {group.members[i] && <Badge variant="outline">{titleCase(group.members[i].split("_")[0])}</Badge>}
                 </li>
               ))}
@@ -289,18 +290,17 @@ function NewMessage({ contacts, onSent, onCancel }: { contacts: Contact[]; onSen
   );
   return (
     <div className="grid gap-4">
-      <Field label="To" required>
-        <Combobox data={contactOptions(contacts)} value={to} onChange={setTo} placeholder="Choose a person" />
+      <Field label={tr("To")} required>
+        <Combobox data={contactOptions(contacts)} value={to} onChange={setTo} placeholder={tr("Choose a person")} />
       </Field>
-      <Field label="Message" htmlFor="new-message" required>
+      <Field label={tr("Message")} htmlFor="new-message" required>
         <Textarea id="new-message" rows={5} value={text} onChange={(e) => setText(e.target.value)} />
       </Field>
       <DialogFooter>
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button variant="outline" onClick={onCancel}>{tr("Cancel")}</Button>
         <Button disabled={!to || !text.trim()} loading={send.isPending} onClick={() => send.mutate(undefined)}>
           <SendIcon />
-          Send
-        </Button>
+          {tr("Send")}</Button>
       </DialogFooter>
     </div>
   );
@@ -319,20 +319,20 @@ function GroupForm({ contacts, group, onDone }: { contacts: Contact[]; group?: C
       const body = { group_name: name, members: members.map((m) => m.replace("-", "_")) };
       return group ? api.put(`/groups/${group.code}`, body) : api.post("/groups", body);
     },
-    { success: group ? "Group updated" : "Group created", invalidate: [["/groups"]], onSuccess: onDone },
+    { success: group ? tr("Group updated") : tr("Group created"), invalidate: [["/groups"]], onSuccess: onDone },
   );
   return (
     <div className="grid gap-4">
-      <Field label="Group name" htmlFor="group-name" required>
+      <Field label={tr("Group name")} htmlFor="group-name" required>
         <Input id="group-name" value={name} onChange={(e) => setName(e.target.value)} />
       </Field>
-      <Field label="Members" description="You are always a member of groups you create or edit.">
-        <MultiCombobox data={options} value={members} onChange={setMembers} placeholder="Choose members" />
+      <Field label={tr("Members")} description={tr("You are always a member of groups you create or edit.")}>
+        <MultiCombobox data={options} value={members} onChange={setMembers} placeholder={tr("Choose members")} />
       </Field>
       <DialogFooter>
-        <Button variant="outline" onClick={onDone}>Cancel</Button>
+        <Button variant="outline" onClick={onDone}>{tr("Cancel")}</Button>
         <Button disabled={!name.trim()} loading={save.isPending} onClick={() => save.mutate(undefined)}>
-          {group ? "Save changes" : "Create group"}
+          {group ? tr("Save changes") : tr("Create group")}
         </Button>
       </DialogFooter>
     </div>
@@ -395,20 +395,18 @@ export function MessagesPage() {
   return (
     <>
       <PageHeader
-        title="Messages"
-        subtitle="Private conversations and group chats."
+        title={tr("Messages")}
+        subtitle={tr("Private conversations and group chats.")}
         actions={
           <>
             {isAdmin && (
               <Button variant="outline" onClick={() => setGroupOpen(true)}>
                 <UsersIcon />
-                New group
-              </Button>
+                {tr("New group")}</Button>
             )}
             <Button onClick={() => setNewOpen(true)}>
               <MessageSquarePlusIcon />
-              New message
-            </Button>
+              {tr("New message")}</Button>
           </>
         }
       />
@@ -418,15 +416,14 @@ export function MessagesPage() {
             <Tabs value={tab} onValueChange={(v) => setTab(v as "private" | "groups")}>
               <TabsList className="w-full">
                 <TabsTrigger value="private">
-                  Private
-                  {unreadTotal > 0 && <span className="bg-primary size-2 rounded-full" aria-label={`${unreadTotal} unread`} />}
+                  {tr("Private")}{unreadTotal > 0 && <span className="bg-primary size-2 rounded-full" aria-label={tr("{unreadTotal} unread", { unreadTotal })} />}
                 </TabsTrigger>
-                <TabsTrigger value="groups">Groups</TabsTrigger>
+                <TabsTrigger value="groups">{tr("Groups")}</TabsTrigger>
               </TabsList>
             </Tabs>
             <div className="relative">
               <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-              <Input placeholder={tab === "private" ? "Search people" : "Search groups"} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
+              <Input placeholder={tab === "private" ? tr("Search people") : tr("Search groups")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
             </div>
           </div>
           <div className="min-h-0 flex-1 space-y-0.5 overflow-y-auto p-2">
@@ -458,7 +455,7 @@ export function MessagesPage() {
                   key={g.code}
                   group
                   title={g.group_name}
-                  subtitle={`${g.members.length} members`}
+                  subtitle={tr("{length} members", { length: g.members.length })}
                   time={shortTime(g.last_timestamp)}
                   active={active?.code === g.code}
                   onClick={() => setActive({ kind: "group", code: g.code, title: g.group_name })}
@@ -466,7 +463,7 @@ export function MessagesPage() {
               ))}
             {!loading && (tab === "private" ? threadItems : groupItems).length === 0 && (
               <p className="text-muted-foreground p-4 text-center text-sm">
-                {q ? "Nothing matches your search" : tab === "private" ? "No conversations yet" : "You are not in any group"}
+                {q ? tr("Nothing matches your search") : tab === "private" ? tr("No conversations yet") : tr("You are not in any group")}
               </p>
             )}
           </div>
@@ -484,9 +481,8 @@ export function MessagesPage() {
             />
           ) : (
             <div className="flex flex-1 items-center justify-center p-6">
-              <EmptyState icon={MessagesSquareIcon} title="No conversation selected" className="border-none">
-                Choose a conversation or start a new one.
-              </EmptyState>
+              <EmptyState icon={MessagesSquareIcon} title={tr("No conversation selected")} className="border-none">
+                {tr("Choose a conversation or start a new one.")}</EmptyState>
             </div>
           )}
         </section>
@@ -495,7 +491,7 @@ export function MessagesPage() {
       <Dialog open={newOpen} onOpenChange={setNewOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>New message</DialogTitle>
+            <DialogTitle>{tr("New message")}</DialogTitle>
           </DialogHeader>
           {newOpen && (
             <NewMessage
@@ -513,8 +509,8 @@ export function MessagesPage() {
       <Dialog open={groupOpen} onOpenChange={setGroupOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>New group</DialogTitle>
-            <DialogDescription>Everyone in the group can read and post messages.</DialogDescription>
+            <DialogTitle>{tr("New group")}</DialogTitle>
+            <DialogDescription>{tr("Everyone in the group can read and post messages.")}</DialogDescription>
           </DialogHeader>
           {groupOpen && <GroupForm contacts={contacts.data ?? []} onDone={() => setGroupOpen(false)} />}
         </DialogContent>
@@ -522,8 +518,8 @@ export function MessagesPage() {
       <Dialog open={!!editingGroup} onOpenChange={(open) => !open && setEditingGroup(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit group</DialogTitle>
-            <DialogDescription>Rename the group or change who is in it.</DialogDescription>
+            <DialogTitle>{tr("Edit group")}</DialogTitle>
+            <DialogDescription>{tr("Rename the group or change who is in it.")}</DialogDescription>
           </DialogHeader>
           {editingGroup && <GroupForm key={editingGroup.code} contacts={contacts.data ?? []} group={editingGroup} onDone={() => setEditingGroup(null)} />}
         </DialogContent>

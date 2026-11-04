@@ -20,6 +20,8 @@ export interface PublicSettings {
   system_title: string;
   currency: string;
   running_year: string;
+  /** default interface language, the legacy setting: "english", "bengali", … */
+  language?: string;
   address: string;
   phone: string;
   system_email: string;

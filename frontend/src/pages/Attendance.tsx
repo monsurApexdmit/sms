@@ -25,6 +25,7 @@ import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { cn } from "../lib/utils";
 import { toOptions } from "../utils";
 import { PrintHeader, useChildSelect } from "./Academic";
+import { t, tn } from "../i18n";
 
 interface SheetRow {
   attendance_id: number;
@@ -38,9 +39,9 @@ interface SheetRow {
 
 // legacy statuses: 0 = not marked, 1 = present, 2 = absent
 const STATUS = [
-  { value: "1", label: "Present", on: "data-[state=on]:bg-success/15 data-[state=on]:text-success" },
-  { value: "2", label: "Absent", on: "data-[state=on]:bg-destructive/10 data-[state=on]:text-destructive" },
-  { value: "0", label: "Not marked", on: "data-[state=on]:bg-muted data-[state=on]:text-foreground" },
+  { value: "1", label: t("Present"), on: "data-[state=on]:bg-success/15 data-[state=on]:text-success" },
+  { value: "2", label: t("Absent"), on: "data-[state=on]:bg-destructive/10 data-[state=on]:text-destructive" },
+  { value: "0", label: t("Not marked"), on: "data-[state=on]:bg-muted data-[state=on]:text-foreground" },
 ];
 
 const PRESENT_BADGE = "bg-success/15 text-success border-transparent";
@@ -53,7 +54,7 @@ export interface MonthCalendar {
   working_days: number;
 }
 
-export const offTitle = (cal: MonthCalendar, day: number) => cal.holidays[String(day)] ?? (cal.off_days.includes(day) ? "Weekly day off" : undefined);
+export const offTitle = (cal: MonthCalendar, day: number) => cal.holidays[String(day)] ?? (cal.off_days.includes(day) ? t("Weekly day off") : undefined);
 const ABSENT_BADGE = "bg-destructive/10 text-destructive border-transparent";
 
 export function AttendancePage() {
@@ -73,7 +74,7 @@ export function AttendancePage() {
         date,
         items: rows.map((r) => ({ attendance_id: r.attendance_id, status: r.status ?? 0 })),
       }),
-    { success: "Attendance saved", invalidate: [["/attendance/sheet"]] },
+    { success: t("Attendance saved"), invalidate: [["/attendance/sheet"]] },
   );
   const setAll = (status: number) => setRows((rs) => rs.map((r) => ({ ...r, status })));
   const present = rows.filter((r) => r.status === 1).length;
@@ -83,7 +84,7 @@ export function AttendancePage() {
 
   const pickDate = (v: string) => {
     if (v && dayjs(v).isAfter(dayjs(), "day")) {
-      toast.error("Attendance can't be taken for a future date");
+      toast.error(t("Attendance can't be taken for a future date"));
       return;
     }
     setDate(v);
@@ -91,11 +92,11 @@ export function AttendancePage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Daily attendance" subtitle="Absent students' parents are notified by SMS when a gateway is configured" />
+      <PageHeader title={t("Daily attendance")} subtitle={t("Absent students' parents are notified by SMS when a gateway is configured")} />
       <Card className="py-4">
         <CardContent className="flex flex-wrap items-end gap-3 px-4">
           <ClassPicker value={sel} onChange={setSel} />
-          <Field label="Date" className="w-48">
+          <Field label={t("Date")} className="w-48">
             <DatePicker value={date} onChange={pickDate} clearable={false} />
           </Field>
         </CardContent>
@@ -103,55 +104,52 @@ export function AttendancePage() {
       {(day.data?.holiday || day.data?.weekly_off) && (
         <Alert>
           <PartyPopperIcon />
-          <AlertTitle>{day.data.holiday ? `Holiday: ${day.data.holiday}` : "Weekly day off"}</AlertTitle>
-          <AlertDescription>This day is not a school day in the academic calendar. You can still record attendance if classes were held.</AlertDescription>
+          <AlertTitle>{day.data.holiday ? t("Holiday: {holiday}", { holiday: day.data.holiday }) : t("Weekly day off")}</AlertTitle>
+          <AlertDescription>{t("This day is not a school day in the academic calendar. You can still record attendance if classes were held.")}</AlertDescription>
         </Alert>
       )}
       {ready ? (
         <Card className="gap-0 overflow-hidden py-0">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
             <div className="flex flex-wrap gap-2">
-              <Badge className={PRESENT_BADGE}>Present {present}</Badge>
-              <Badge className={ABSENT_BADGE}>Absent {absent}</Badge>
-              <Badge variant="secondary">Not marked {unmarked}</Badge>
+              <Badge className={PRESENT_BADGE}>{tn("Present {present}", { present })}</Badge>
+              <Badge className={ABSENT_BADGE}>{tn("Absent {absent}", { absent })}</Badge>
+              <Badge variant="secondary">{tn("Not marked {unmarked}", { unmarked })}</Badge>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button size="sm" variant="outline" className="text-success hover:text-success" disabled={rows.length === 0} onClick={() => setAll(1)}>
                 <CheckIcon />
-                All present
-              </Button>
+                {t("All present")}</Button>
               <Button size="sm" variant="outline" className="text-destructive hover:text-destructive" disabled={rows.length === 0} onClick={() => setAll(2)}>
                 <XIcon />
-                All absent
-              </Button>
+                {t("All absent")}</Button>
               <Button size="sm" variant="ghost" disabled={rows.length === 0} onClick={() => setAll(0)}>
-                Clear
-              </Button>
+                {t("Clear")}</Button>
             </div>
           </div>
           <Table className="min-w-[480px]">
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="w-20">Roll</TableHead>
-                <TableHead>Student</TableHead>
-                <TableHead className="w-72">Status</TableHead>
+                <TableHead className="w-20">{t("Roll")}</TableHead>
+                <TableHead>{t("Student")}</TableHead>
+                <TableHead className="w-72">{t("Status")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableState loading={sheet.isLoading} empty={!sheet.isLoading && rows.length === 0} colSpan={3} emptyText="No students enrolled in this section" />
+              <TableState loading={sheet.isLoading} empty={!sheet.isLoading && rows.length === 0} colSpan={3} emptyText={t("No students enrolled in this section")} />
               {rows.map((r, i) => (
                 <TableRow key={r.attendance_id}>
                   <TableCell className="text-muted-foreground">{r.roll ?? <Dash />}</TableCell>
                   <TableCell className="font-medium">
                     {r.name}
-                    {r.on_leave && <Badge className="bg-chart-2/15 text-chart-2 ml-2 border-transparent">On leave</Badge>}
+                    {r.on_leave && <Badge className="bg-chart-2/15 text-chart-2 ml-2 border-transparent">{t("On leave")}</Badge>}
                   </TableCell>
                   <TableCell>
                     <ToggleGroup
                       type="single"
                       variant="outline"
                       size="sm"
-                      aria-label={`Attendance for ${r.name}`}
+                      aria-label={t("Attendance for {name}", { name: r.name })}
                       value={String(r.status ?? 0)}
                       onValueChange={(v) => v && setRows((rs) => rs.map((x, j) => (j === i ? { ...x, status: Number(v) } : x)))}
                     >
@@ -169,24 +167,21 @@ export function AttendancePage() {
           <CardFooter className="bg-muted/30 flex-wrap justify-between gap-3 border-t px-4 py-3 [.border-t]:pt-3">
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               {dayjs(date).format("dddd, DD MMM YYYY")}
-              {dirty && <Badge className="bg-warning/20 text-warning-foreground border-transparent">Unsaved changes</Badge>}
+              {dirty && <Badge className="bg-warning/20 text-warning-foreground border-transparent">{t("Unsaved changes")}</Badge>}
             </div>
             <div className="flex gap-2">
               <Button variant="outline" disabled={!dirty || save.isPending} onClick={() => setRows(sheet.data ?? [])}>
                 <UndoIcon />
-                Reset
-              </Button>
+                {t("Reset")}</Button>
               <Button loading={save.isPending} disabled={rows.length === 0} onClick={() => save.mutate(undefined)}>
                 <SaveIcon />
-                Save
-              </Button>
+                {t("Save")}</Button>
             </div>
           </CardFooter>
         </Card>
       ) : (
-        <EmptyState icon={ClipboardCheckIcon} title="Choose a class, section and date">
-          The attendance sheet for that day opens here.
-        </EmptyState>
+        <EmptyState icon={ClipboardCheckIcon} title={t("Choose a class, section and date")}>
+          {t("The attendance sheet for that day opens here.")}</EmptyState>
       )}
     </div>
   );
@@ -196,27 +191,23 @@ export function AttendancePage() {
 
 const cellClass = (s?: number) =>
   s === 1 ? "bg-success/15 text-success" : s === 2 ? "bg-destructive/10 text-destructive" : "";
-const cellText = (s?: number) => (s === 1 ? "P" : s === 2 ? "A" : "");
+const cellText = (s?: number) => (s === 1 ? t("P") : s === 2 ? t("A") : "");
 
 function Legend() {
   return (
     <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-xs">
       <span className="flex items-center gap-1.5">
-        <span className="bg-success/15 text-success inline-flex size-5 items-center justify-center rounded-sm font-semibold">P</span>
-        Present
-      </span>
+        <span className="bg-success/15 text-success inline-flex size-5 items-center justify-center rounded-sm font-semibold">{t("P")}</span>
+        {t("Present")}</span>
       <span className="flex items-center gap-1.5">
-        <span className="bg-destructive/10 text-destructive inline-flex size-5 items-center justify-center rounded-sm font-semibold">A</span>
-        Absent
-      </span>
+        <span className="bg-destructive/10 text-destructive inline-flex size-5 items-center justify-center rounded-sm font-semibold">{t("A")}</span>
+        {t("Absent")}</span>
       <span className="flex items-center gap-1.5">
         <span className="inline-flex size-5 rounded-sm border" />
-        Not marked
-      </span>
+        {t("Not marked")}</span>
       <span className="flex items-center gap-1.5">
-        <span className={cn("inline-flex size-5 items-center justify-center rounded-sm font-semibold", OFF_CELL)}>H</span>
-        Holiday / day off
-      </span>
+        <span className={cn("inline-flex size-5 items-center justify-center rounded-sm font-semibold", OFF_CELL)}>{t("H")}</span>
+        {t("Holiday / day off")}</span>
     </div>
   );
 }
@@ -232,15 +223,15 @@ function StudentMonth({ studentId, month }: { studentId: string; month: string }
       <CardContent className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="font-semibold">{first.format("MMMM YYYY")}</span>
-          <Badge className={PRESENT_BADGE}>Present {data.present}</Badge>
-          <Badge className={ABSENT_BADGE}>Absent {data.absent}</Badge>
-          <Badge variant="secondary">Working days {data.working_days}</Badge>
+          <Badge className={PRESENT_BADGE}>{tn("Present {present}", { present: data.present })}</Badge>
+          <Badge className={ABSENT_BADGE}>{tn("Absent {absent}", { absent: data.absent })}</Badge>
+          <Badge variant="secondary">{tn("Working days {working_days}", { working_days: data.working_days })}</Badge>
         </div>
         <Legend />
       </CardContent>
       <CardContent>
         <div className="grid grid-cols-7 gap-1 [print-color-adjust:exact] sm:gap-2">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+          {[t("Sun"), t("Mon"), t("Tue"), t("Wed"), t("Thu"), t("Fri"), t("Sat")].map((d) => (
             <div key={d} className="text-muted-foreground pb-1 text-center text-xs font-medium">
               {d}
             </div>
@@ -255,7 +246,7 @@ function StudentMonth({ studentId, month }: { studentId: string; month: string }
             return (
               <div key={i} title={off} className={cn("flex aspect-square flex-col rounded-md border p-1 sm:aspect-auto sm:h-16 sm:p-2", off && !s && OFF_CELL, cellClass(s), isToday && "ring-primary ring-2")}>
                 <span className="text-muted-foreground text-[10px] sm:text-xs">{i + 1}</span>
-                <span className="m-auto text-sm font-bold">{cellText(s) || (off ? "H" : "")}</span>
+                <span className="m-auto text-sm font-bold">{cellText(s) || (off ? t("H") : "")}</span>
                 {data.holidays[String(i + 1)] && <span className="hidden truncate text-[10px] sm:block">{data.holidays[String(i + 1)]}</span>}
               </div>
             );
@@ -294,7 +285,7 @@ export function AttendanceReportPage() {
     <div className="space-y-6">
       <style>{"@media print { @page { size: landscape; } }"}</style>
       <PageHeader
-        title="Attendance report"
+        title={t("Attendance report")}
         actions={
           <>
             {select}
@@ -304,8 +295,7 @@ export function AttendanceReportPage() {
             {canPrint && (
               <Button variant="outline" onClick={() => window.print()}>
                 <PrinterIcon />
-                Print
-              </Button>
+                {t("Print")}</Button>
             )}
           </>
         }
@@ -313,15 +303,15 @@ export function AttendanceReportPage() {
       <Card className="no-print py-4">
         <CardContent className="flex flex-wrap items-end gap-3 px-4">
           {staff && <ClassPicker value={sel} onChange={(v) => { setSel(v); setStudentId(null); }} />}
-          <Field label="Month" htmlFor="report-month" className="w-44">
+          <Field label={t("Month")} htmlFor="report-month" className="w-44">
             <Input id="report-month" type="month" value={month} max={dayjs().format("YYYY-MM")} onChange={(e) => setMonth(e.target.value)} />
           </Field>
           {staff && (
-            <Field label="Single student (optional)" className="w-60">
+            <Field label={t("Single student (optional)")} className="w-60">
               <Combobox
                 clearable
                 disabled={!sel.classId}
-                placeholder="Whole section"
+                placeholder={t("Whole section")}
                 data={toOptions(students.data?.items, "student_id", "name")}
                 value={studentId}
                 onChange={setStudentId}
@@ -333,25 +323,24 @@ export function AttendanceReportPage() {
 
       {showStudent && month && (
         <PrintHeader
-          title="Attendance sheet"
-          lines={[studentName ?? (user.role === "student" ? user.name : undefined), staff && className ? `Class ${className}${sectionName ? ` : Section ${sectionName}` : ""}` : undefined, monthLabel]}
+          title={t("Attendance sheet")}
+          lines={[studentName ?? (user.role === "student" ? user.name : undefined), staff && className ? t("Class {className}{value}", { className, value: sectionName ? ` : Section ${sectionName}` : "" }) : undefined, monthLabel]}
         />
       )}
       {!staff && ownId && month && <StudentMonth studentId={ownId} month={month} />}
       {staff && studentId && month && <StudentMonth studentId={studentId} month={month} />}
 
       {staff && !ready && !studentId && (
-        <EmptyState icon={CalendarDaysIcon} title="Choose a class, section and month">
-          The monthly attendance grid appears here.
-        </EmptyState>
+        <EmptyState icon={CalendarDaysIcon} title={t("Choose a class, section and month")}>
+          {t("The monthly attendance grid appears here.")}</EmptyState>
       )}
 
       {ready && !studentId && (
         <>
-          <PrintHeader title="Attendance sheet" lines={[`Class ${className ?? ""}`, `Section ${sectionName ?? ""}`, monthLabel]} />
+          <PrintHeader title={t("Attendance sheet")} lines={[t("Class {value}", { value: className ?? "" }), t("Section {value}", { value: sectionName ?? "" }), monthLabel]} />
           <div className="no-print flex flex-wrap items-center justify-between gap-3">
             <Legend />
-            {report.data && <Badge variant="secondary">Working days {report.data.working_days}</Badge>}
+            {report.data && <Badge variant="secondary">{tn("Working days {working_days}", { working_days: report.data.working_days })}</Badge>}
           </div>
           <Card className="gap-0 overflow-hidden py-0 print:rounded-none print:shadow-none">
             {report.isLoading ? (
@@ -364,7 +353,7 @@ export function AttendanceReportPage() {
               <Table className="border-collapse text-xs [print-color-adjust:exact] [&_td]:border [&_th]:border">
                 <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead className="bg-muted sticky left-0 z-10 min-w-44 print:static">Student</TableHead>
+                    <TableHead className="bg-muted sticky left-0 z-10 min-w-44 print:static">{t("Student")}</TableHead>
                     {Array.from({ length: report.data.days }, (_, i) => {
                       const d = first.add(i, "day");
                       const off = offTitle(report.data!, i + 1);
@@ -375,12 +364,12 @@ export function AttendanceReportPage() {
                         </TableHead>
                       );
                     })}
-                    <TableHead className="text-success px-2 text-center">P</TableHead>
-                    <TableHead className="text-destructive px-2 text-center">A</TableHead>
+                    <TableHead className="text-success px-2 text-center">{t("P")}</TableHead>
+                    <TableHead className="text-destructive px-2 text-center">{t("A")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableState empty={report.data.rows.length === 0} colSpan={report.data.days + 3} emptyText="No students enrolled in this section" />
+                  <TableState empty={report.data.rows.length === 0} colSpan={report.data.days + 3} emptyText={t("No students enrolled in this section")} />
                   {report.data.rows.map((r) => (
                     <TableRow key={r.student_id}>
                       <TableCell className="bg-card sticky left-0 z-10 font-medium print:static">
@@ -392,7 +381,7 @@ export function AttendanceReportPage() {
                         const off = offTitle(report.data!, i + 1);
                         return (
                           <TableCell key={i} className={cn("min-w-7 px-1 text-center font-semibold", off && !s && OFF_CELL, cellClass(s))}>
-                            {cellText(s) || (off ? "H" : "")}
+                            {cellText(s) || (off ? t("H") : "")}
                           </TableCell>
                         );
                       })}

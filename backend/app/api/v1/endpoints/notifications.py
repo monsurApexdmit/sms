@@ -10,6 +10,7 @@ from app.api.deps import DB, Me, not_found, require_roles
 from app.models import Notification, NotificationPreference, PushSubscription
 from app.schemas.common import Page
 from app.schemas.notifications import ChannelSettingsIn, NotificationOut, PreferencesIn, SubscribeIn, UnsubscribeIn
+from app.services.messages import msg, school_language
 from app.services.notifications import CATEGORIES, available_channels, channels_for, generate_vapid_keys, notify, user, vapid_keys
 from app.services.settings import MASK, SECRET_KEYS, get_setting, set_setting
 from app.utils.dates import utc_now as _now
@@ -156,7 +157,8 @@ def push_unsubscribe(body: UnsubscribeIn, me: Me, db: DB):
 @router.post("/test")
 def send_test(me: Me, tasks: BackgroundTasks, db: DB):
     """Send myself a test notification on every channel I have on for "Account and system"."""
-    notify(db, tasks, [user(me.role, me.id)], "system", "Test notification", "Notifications are working.", "/app/notifications")
+    lang = school_language(db)
+    notify(db, tasks, [user(me.role, me.id)], "system", msg(lang, "notifications.test.title"), msg(lang, "notifications.test.text"), "/app/notifications")
     return {"channels": sorted(channels_for(db, me.role, me.id, "system"))}
 
 
