@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.openapi import API_DESCRIPTION, TAGS, docs_kwargs, install_openapi
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.monitoring import init_sentry, setup_logging
@@ -22,10 +23,11 @@ on_new_sessionmaker(audit_trail.install)
 app = FastAPI(
     title="School Management API",
     version="1.0.0",
-    description="FastAPI backend for the school management system (shares the legacy `sms` MySQL schema).",
-    docs_url="/api/docs",
-    openapi_url="/api/openapi.json",
+    description=API_DESCRIPTION,
+    openapi_tags=TAGS,
+    **docs_kwargs(get_settings()),
 )
+install_openapi(app)
 
 app.add_middleware(
     CORSMiddleware,

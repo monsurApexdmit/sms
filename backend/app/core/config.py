@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     # "production" refuses to start with unsafe settings (see check_production below).
     environment: Literal["development", "production"] = "development"
 
+    # Swagger UI and ReDoc. Unset: on in development, off in production, because the docs
+    # list every endpoint. Set API_DOCS_ENABLED=true to serve them in production too.
+    api_docs_enabled: bool | None = None
+
     database_url: str = "mysql+pymysql://sms:sms@127.0.0.1:3307/sms?charset=utf8mb4"
 
     # Shared rate limits and the email/SMS job queue. Empty: rate limits are kept
@@ -57,6 +61,10 @@ class Settings(BaseSettings):
     control_database_url: str = ""
     # Use X-Forwarded-Host instead of Host. Only behind a proxy that sets it itself.
     trust_forwarded_host: bool = False
+
+    @property
+    def docs_enabled(self) -> bool:
+        return self.environment != "production" if self.api_docs_enabled is None else self.api_docs_enabled
 
     @model_validator(mode="after")
     def check_production(self) -> "Settings":

@@ -26,6 +26,8 @@ x-backend: &backend
     SENTRY_DSN: ${SENTRY_DSN:-}
     SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0}
     LOG_FORMAT: ${LOG_FORMAT:-text}
+    # Swagger UI and ReDoc list every endpoint, so they are off unless asked for.
+    API_DOCS_ENABLED: ${API_DOCS_ENABLED:-false}
     # Several schools: the database listing them (README "Several schools"). Empty = one school.
     # The api, worker and scheduler then serve/run for every school; DATABASE_URL is unused.
     CONTROL_DATABASE_URL: ${CONTROL_DATABASE_URL:-}

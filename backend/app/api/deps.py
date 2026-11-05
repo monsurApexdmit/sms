@@ -56,6 +56,7 @@ def require_roles(*roles: str):
             raise HTTPException(status.HTTP_403_FORBIDDEN, "Not allowed for your role")
         return user
 
+    checker.roles = roles  # type: ignore[attr-defined]  # read by app/api/openapi.py for the API docs
     return checker
 
 

@@ -24,10 +24,10 @@ cd backend
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cp .env.example .env        # then set DATABASE_URL and SECRET_KEY
 .venv/bin/alembic upgrade head   # creates the tables this system adds (see "Database migrations")
-.venv/bin/uvicorn app.main:app --reload --port 8000
+.venv/bin/uvicorn app.main:app --reload --port 8001
 ```
 
-API docs: http://localhost:8000/api/docs
+API docs: http://localhost:8001/api/docs (see [API documentation](#api-documentation))
 
 Without `REDIS_URL`, rate limits are kept per process and emails/SMS are sent in-process after the response, without retries. Redis and the worker are optional locally; to run them the production way:
 
@@ -44,7 +44,7 @@ Frontend:
 ```bash
 cd frontend
 npm install
-npm run dev                  # http://localhost:5173, proxies /api to :8000
+npm run dev                  # http://localhost:5173, proxies /api to :8001
 ```
 
 UI components live in `frontend/src/components/ui` (generated with the shadcn CLI, then owned by this repo; `Button` has an extra `loading` prop). Shared form pieces such as `Combobox`, `DatePicker`, `Field` and `confirmAction` are next to them in `src/components`. Theme colours are CSS variables in `src/index.css`.
@@ -246,6 +246,20 @@ The interface is available in **English and Bangla**. Everyone can pick a langua
 - **How it works:** every interface string goes through `t()` from `frontend/src/i18n` (`tn()` when the text contains elements, `tp()` for counts). The English text is the key, so English output is exactly the source text. `npm run i18n` regenerates the typed English catalog (`src/i18n/en.ts`) and files new keys, untranslated, into `src/i18n/bn/<page>.ts`; `npm run i18n -- --check` (also a test) fails when the catalog is stale, a translation is missing, or text is hard-coded in JSX.
 - **Adding a language:** add it to `LANGUAGES` and `DICTIONARIES` in `src/i18n/index.ts` and to `LANGS` in `scripts/i18n-lib.mjs`, run `npm run i18n` and translate the generated files; add its column to `CATALOG` in `messages.py` and its legacy setting value to `normalize()`.
 - The Bangla translation was written for this release and should be reviewed by a native speaker; fix wording directly in `src/i18n/bn/*.ts`.
+
+## API documentation
+
+| Page | Address |
+|---|---|
+| Swagger UI (try requests in the browser) | `/api/docs` |
+| ReDoc (easier to read) | `/api/redoc` |
+| OpenAPI schema (for Postman or code generators) | `/api/openapi.json` |
+
+To try a request in Swagger UI, call `POST /api/auth/login`, copy `access_token`, click **Authorize** and paste it. The pages load their scripts from a CDN, so the browser needs internet access.
+
+The **Access** line on each operation is generated from `require_roles` and `get_current_user` in the code (`backend/app/api/openapi.py`). To document a new endpoint, give it a docstring, which appears below that line. A new router `tags` value also needs a description in `TAGS` in that file; a test fails without one.
+
+The docs are on in development and off when `ENVIRONMENT=production`, because they list every endpoint. Docker Compose also defaults to off. Set `API_DOCS_ENABLED=true` to serve them.
 
 ## Docker
 

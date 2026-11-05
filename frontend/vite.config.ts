@@ -9,7 +9,7 @@ export default defineConfig({
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
   server: {
     port: 5173,
-    proxy: { "/api": process.env.API_URL ?? "http://127.0.0.1:8000" },
+    proxy: { "/api": process.env.API_URL ?? "http://127.0.0.1:8001" },
   },
   build: {
     chunkSizeWarningLimit: 600,
