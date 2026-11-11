@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 
 import { api } from "../api/client";
 import { useAction, useList } from "../api/hooks";
+import { usePageLevel } from "../hooks/use-access";
 import { initials } from "../utils";
 import { Combobox, type Option } from "./combobox";
 import { confirmAction } from "./confirm";
@@ -67,9 +68,10 @@ function emptyValue(f: FieldDef) {
 
 /** Generic table + dialog form for simple tables served by the backend crud_router. */
 export function CrudPage({
-  title, subtitle, path, idField, fields, canWrite = true, params, searchable, avatar,
+  title, subtitle, path, idField, fields, canWrite: roleCanWrite = true, params, searchable, avatar,
   extraActions, headerExtra, fixed,
 }: CrudPageProps) {  // prettier-ignore
+  const pageLevel = usePageLevel();
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Values | null>(null);
   const [opened, setOpened] = useState(false);
@@ -146,6 +148,8 @@ export function CrudPage({
     return String(v);
   };
 
+  // a role with view-only access to this page sees the list without add, edit or delete
+  const canWrite = roleCanWrite && pageLevel === "full";
   const hasActions = canWrite || !!extraActions;
   const colSpan = columns.length + (avatar ? 1 : 0) + (hasActions ? 1 : 0);
 

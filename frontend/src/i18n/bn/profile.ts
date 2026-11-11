@@ -3,7 +3,6 @@
 
 export const profile: Record<string, string> = {
   "Change password": "পাসওয়ার্ড পরিবর্তন",
-  "Change photo": "ছবি পরিবর্তন",
   "Confirm new password": "নতুন পাসওয়ার্ড নিশ্চিত করুন",
   "Current password": "বর্তমান পাসওয়ার্ড",
   "How you appear to others in the school portal.": "বিদ্যালয়ের পোর্টালে অন্যরা আপনাকে যেভাবে দেখেন।",

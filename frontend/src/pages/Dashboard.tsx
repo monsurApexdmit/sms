@@ -8,6 +8,7 @@ import {
   GraduationCapIcon,
   InboxIcon,
   LaptopIcon,
+  SparklesIcon,
   MegaphoneIcon,
   PresentationIcon,
   ReceiptIcon,
@@ -19,18 +20,21 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { useGet } from "../api/hooks";
+import dayjs from "dayjs";
+import { Link } from "react-router-dom";
+
+import { useGet, usePublicSettings } from "../api/hooks";
 import { useUser } from "../auth/AuthContext";
 import { AiProgressSummary } from "../components/Ai";
 import { AnalyticsTiles } from "../components/AnalyticsTiles";
-import { PageHeader } from "../components/PageHeader";
 import { EmptyState } from "../components/states";
 import { TransportExpiryAlert } from "../components/TransportExpiryAlert";
 import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Skeleton } from "../components/ui/skeleton";
 import { cn } from "../lib/utils";
-import { fromUnix, initials, money } from "../utils";
+import { navFor } from "../nav";
+import { fromUnix, initials, money, titleCase } from "../utils";
 import { t, tn, tp } from "../i18n";
 
 interface StudentSummary {
@@ -64,19 +68,82 @@ const TONES: Record<Tone, string> = {
   violet: "bg-chart-5/15 text-chart-5",
 };
 
+const BARS: Record<Tone, string> = {
+  primary: "bg-primary",
+  success: "bg-success",
+  danger: "bg-destructive",
+  warning: "bg-warning",
+  info: "bg-chart-2",
+  violet: "bg-chart-5",
+};
+
 function Stat({ label, value, icon: Icon, tone = "primary" }: { label: string; value: string | number; icon: LucideIcon; tone?: Tone }) {
   return (
-    <Card className="py-5">
-      <CardContent className="flex items-center gap-4 px-5">
-        <div className={cn("flex size-12 shrink-0 items-center justify-center rounded-full", TONES[tone])}>
-          <Icon className="size-5" />
-        </div>
+    <Card className="group relative overflow-hidden py-5 transition-shadow hover:shadow-md">
+      <div className={cn("absolute inset-y-0 left-0 w-1", BARS[tone])} />
+      <div className={cn("absolute -right-6 -bottom-6 size-24 rounded-full opacity-60 transition-transform group-hover:scale-110", TONES[tone])} />
+      <CardContent className="relative flex items-center justify-between gap-4 px-5">
         <div className="min-w-0">
-          <div className="truncate text-2xl font-semibold tabular-nums">{value}</div>
-          <div className="text-muted-foreground truncate text-sm">{label}</div>
+          <div className="text-muted-foreground truncate text-xs font-semibold tracking-wide uppercase">{label}</div>
+          <div className="mt-1.5 truncate text-[1.7rem] leading-none font-bold tracking-tight tabular-nums">{value}</div>
+        </div>
+        <div className={cn("flex size-12 shrink-0 items-center justify-center rounded-2xl", TONES[tone])}>
+          <Icon className="size-[22px]" />
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// Shortcuts on the welcome banner: the first of these the user's role can open.
+const SHORTCUTS = ["admissions", "students", "attendance", "invoices", "marks", "homework", "my-routine", "notices", "messages"];
+
+function greeting(name: string) {
+  const h = new Date().getHours();
+  if (h < 12) return t("Good morning, {name}", { name });
+  if (h < 17) return t("Good afternoon, {name}", { name });
+  return t("Good evening, {name}", { name });
+}
+
+function WelcomeBanner({ year }: { year?: string }) {
+  const user = useUser();
+  const school = usePublicSettings().data?.system_name;
+  const links = navFor(user.role, user.permissions)
+    .filter((n) => SHORTCUTS.includes(n.path))
+    .sort((a, b) => SHORTCUTS.indexOf(a.path) - SHORTCUTS.indexOf(b.path))
+    .slice(0, 4);
+  return (
+    <section className="relative isolate overflow-hidden rounded-2xl bg-[linear-gradient(120deg,var(--site-ink),color-mix(in_oklch,var(--primary),var(--site-ink)_35%))] p-6 text-white shadow-lg md:p-8">
+      <div className="site-dots absolute inset-0 -z-10 text-white/[0.07]" />
+      <div className="bg-gold/25 absolute -top-24 -right-16 -z-10 size-72 rounded-full blur-3xl" />
+      <GraduationCapIcon className="absolute -right-6 -bottom-10 -z-10 size-56 text-white/[0.06]" strokeWidth={1.2} />
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="max-w-xl space-y-2">
+          <p className="text-gold inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.18em] uppercase">
+            <SparklesIcon className="size-3.5" />
+            {dayjs().format("dddd, D MMMM YYYY")}
+          </p>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{greeting(user.name.split(" ")[0] || user.name)}</h1>
+          <p className="text-sm text-white/70">
+            {[school, tn("{titleCase} portal", { titleCase: titleCase(user.role) }), year && t("Academic year {running_year}", { running_year: year })].filter(Boolean).join(" · ")}
+          </p>
+        </div>
+        {links.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {links.map((l) => (
+              <Link
+                key={l.path}
+                to={`/app/${l.path}`}
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-2 text-sm font-medium backdrop-blur transition-colors hover:bg-white/20"
+              >
+                <l.icon className="text-gold size-4" />
+                {l.label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -170,8 +237,8 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHeader title={t("Welcome, {name}", { name: user.name })} subtitle={data ? t("Academic year {running_year}", { running_year: data.running_year }) : undefined} />
       <div className="space-y-6">
+        <WelcomeBanner year={data?.running_year} />
         {isLoading && <StatSkeletons />}
         {user.role === "admin" && <TransportExpiryAlert />}
         {user.role === "admin" && <AnalyticsTiles />}
@@ -206,7 +273,7 @@ export function DashboardPage() {
           <Card className="lg:col-span-7">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MegaphoneIcon className="text-muted-foreground size-4" />
+                <span className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg"><MegaphoneIcon className="size-4" /></span>
                 {t("Latest notices")}</CardTitle>
             </CardHeader>
             <CardContent>
@@ -229,7 +296,7 @@ export function DashboardPage() {
           <Card className="lg:col-span-5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CalendarDaysIcon className="text-muted-foreground size-4" />
+                <span className="bg-chart-2/15 text-chart-2 flex size-8 items-center justify-center rounded-lg"><CalendarDaysIcon className="size-4" /></span>
                 {t("Upcoming events")}</CardTitle>
             </CardHeader>
             <CardContent>

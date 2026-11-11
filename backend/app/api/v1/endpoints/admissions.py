@@ -9,6 +9,7 @@ status only.
 import re
 import secrets
 from datetime import date
+from decimal import Decimal, InvalidOperation
 from typing import Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, Request, UploadFile, status
@@ -33,6 +34,7 @@ from app.schemas.admissions import (
     EnrollIn,
     LookupIn,
     OfficeApplicationIn,
+    PaymentVerifyIn,
     StatusIn,
 )
 from app.schemas.common import Page
@@ -54,6 +56,7 @@ enquiries = APIRouter(prefix="/enquiries", tags=["admissions"])
 READ = [Depends(require_roles("admin", "accountant"))]
 admin_only = [Depends(require_roles("admin"))]
 Admin = Depends(require_roles("admin"))
+Staff = Depends(require_roles("admin", "accountant"))
 
 Status = Literal["new", "reviewing", "accepted", "rejected", "enrolled", "withdrawn"]
 STATUS_LABELS = {
@@ -78,10 +81,20 @@ def _digits(phone: str | None) -> str:
 # --- settings -------------------------------------------------------------------------
 
 
+def _fee(raw: str | None) -> Decimal | None:
+    try:
+        return Decimal(raw) if raw else None
+    except InvalidOperation:
+        return None
+
+
 def _settings(db: Session) -> AdmissionSettings:
     return AdmissionSettings(
         open=get_setting(db, "admissions_open", "0") == "1",
         year=get_setting(db, "admission_year") or running_year(db),
+        fee=_fee(get_setting(db, "admission_fee")),
+        payment_required=get_setting(db, "admission_payment_required", "0") == "1",
+        payment_instructions=get_setting(db, "admission_payment_instructions") or None,
     )
 
 
@@ -95,6 +108,20 @@ def _class_names(db: Session) -> dict[int, str]:
 def _check_class(db: Session, class_id: int) -> None:
     if db.get(SchoolClass, class_id) is None:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Unknown class")
+
+
+def _check_payment(db: Session, body: ApplicationIn, *, exclude_id: int | None = None) -> None:
+    """One transaction ID pays for one application."""
+    if not body.payment_reference:
+        return
+    stmt = select(AdmissionApplication.reference).where(
+        AdmissionApplication.payment_method == body.payment_method,
+        func.upper(AdmissionApplication.payment_reference) == body.payment_reference.upper(),
+    )
+    if exclude_id is not None:
+        stmt = stmt.where(AdmissionApplication.application_id != exclude_id)
+    if db.scalar(stmt.limit(1)):
+        raise HTTPException(status.HTTP_409_CONFLICT, "This payment transaction ID is already used by another application")
 
 
 def _new_reference(db: Session, year: str) -> str:
@@ -143,6 +170,7 @@ def _out(db: Session, rows: list[AdmissionApplication], *, with_documents: bool 
 
 def _create_application(db: Session, body: ApplicationIn, *, year: str, source: str) -> AdmissionApplication:
     _check_class(db, body.class_id)
+    _check_payment(db, body)
     now = _now()
     row = AdmissionApplication(
         **body.model_dump(exclude={"year"}),
@@ -195,10 +223,13 @@ def _notify_guardian(tasks: BackgroundTasks, db: Session, row: AdmissionApplicat
 
 @public.get("/options")
 def public_options(db: DB):
-    """Whether online applications are open, for which year, and the classes to apply for."""
+    """Whether online applications are open, for which year, the classes to apply for and the application fee."""
     s = _settings(db)
     classes = db.execute(select(SchoolClass.class_id, SchoolClass.name).order_by(SchoolClass.name_numeric, SchoolClass.name)).all()
-    return {"open": s.open, "year": s.year, "classes": [{"class_id": c, "name": n} for c, n in classes] if s.open else []}
+    out = {"open": s.open, "year": s.year, "classes": [{"class_id": c, "name": n} for c, n in classes] if s.open else []}
+    if s.open:
+        out |= {"fee": s.fee, "payment_required": s.payment_required, "payment_instructions": s.payment_instructions}
+    return out
 
 
 @public.post("", status_code=201)
@@ -217,6 +248,9 @@ async def apply_online(
     guardian_email: str | None = Form(None),
     address: str | None = Form(None),
     notes: str | None = Form(None),
+    payment_method: str | None = Form(None),
+    payment_reference: str | None = Form(None),
+    payment_amount: str | None = Form(None),
     recaptcha_token: str | None = Form(None),
     files: list[UploadFile] = File(default=[]),
     labels: list[str] = Form(default=[]),
@@ -232,10 +266,13 @@ async def apply_online(
             class_id=class_id, student_name=student_name, guardian_name=guardian_name, guardian_phone=guardian_phone,
             date_of_birth=date_of_birth or None, gender=gender or None, previous_school=previous_school or None,
             guardian_relation=guardian_relation or None, guardian_email=guardian_email or None,
-            address=address or None, notes=notes or None,
+            address=address or None, notes=notes or None, payment_method=payment_method or None,
+            payment_reference=(payment_reference or "").strip() or None, payment_amount=payment_amount or None,
         )  # fmt: skip
     except ValidationError as e:
         raise RequestValidationError(e.errors()) from None
+    if settings.payment_required and not body.payment_reference:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Enter the payment method and transaction ID of the application fee")
     if len(files) > MAX_DOCUMENTS:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Attach at most {MAX_DOCUMENTS} documents")
 
@@ -281,6 +318,9 @@ def update_settings(body: AdmissionSettings, db: DB):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Year must look like 2025-2026")
     set_setting(db, "admissions_open", "1" if body.open else "0")
     set_setting(db, "admission_year", body.year)
+    set_setting(db, "admission_fee", str(body.fee) if body.fee is not None else "")
+    set_setting(db, "admission_payment_required", "1" if body.payment_required else "0")
+    set_setting(db, "admission_payment_instructions", (body.payment_instructions or "").strip())
     db.commit()
     return _settings(db)
 
@@ -291,7 +331,8 @@ def list_applications(
     status_: Status | None = Query(None, alias="status"),
     class_id: int | None = None,
     year: str | None = None,
-    q: str | None = Query(None, max_length=100, description="Reference, student, guardian name or phone"),
+    q: str | None = Query(None, max_length=100, description="Reference, student, guardian name or phone, or payment transaction ID"),
+    payment: Literal["none", "unverified", "verified"] | None = Query(None, description="Filter by application fee payment"),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
 ):
@@ -302,12 +343,17 @@ def list_applications(
         stmt = stmt.where(AdmissionApplication.class_id == class_id)
     if year:
         stmt = stmt.where(AdmissionApplication.year == year)
+    if payment == "none":
+        stmt = stmt.where(AdmissionApplication.payment_reference.is_(None))
+    elif payment:
+        stmt = stmt.where(AdmissionApplication.payment_reference.is_not(None), AdmissionApplication.payment_verified.is_(payment == "verified"))
     if q and q.strip():
         like = f"%{q.strip()}%"
         stmt = stmt.where(
             or_(
                 AdmissionApplication.reference.like(like), AdmissionApplication.student_name.like(like),
                 AdmissionApplication.guardian_name.like(like), AdmissionApplication.guardian_phone.like(like),
+                AdmissionApplication.payment_reference.like(like),
             )  # fmt: skip
         )
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
@@ -354,7 +400,11 @@ def _editable(db: Session, application_id: int) -> AdmissionApplication:
 def update_application(application_id: int, body: OfficeApplicationIn, db: DB):
     row = _editable(db, application_id)
     _check_class(db, body.class_id)
+    _check_payment(db, body, exclude_id=row.application_id)
     data = body.model_dump(exclude={"year"})
+    paid = ("payment_method", "payment_reference", "payment_amount")
+    if any(getattr(row, k) != data[k] for k in paid):  # a changed payment has to be checked again
+        row.payment_verified, row.payment_verified_by, row.payment_verified_at = False, None, None
     if body.year:
         if not valid_year_name(body.year):
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Year must look like 2025-2026")
@@ -401,6 +451,20 @@ def change_status(application_id: int, body: StatusIn, tasks: BackgroundTasks, d
     db.commit()
     if changed and body.notify and row.status in ("accepted", "rejected"):
         _notify_guardian(tasks, db, row)
+    return _out(db, [row], with_documents=True)[0]
+
+
+@router.post("/{application_id}/payment", response_model=ApplicationOut)
+def verify_payment(application_id: int, body: PaymentVerifyIn, db: DB, user: CurrentUser = Staff):
+    """Mark the application fee as checked against the bank or mobile wallet statement (or undo that)."""
+    row = get_or_404(db, AdmissionApplication, application_id, "Application")
+    if body.verified and not row.payment_reference:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "This application has no payment to verify")
+    row.payment_verified = body.verified
+    row.payment_verified_by = user.ref if body.verified else None
+    row.payment_verified_at = _now() if body.verified else None
+    row.updated_at = _now()
+    db.commit()
     return _out(db, [row], with_documents=True)[0]
 
 

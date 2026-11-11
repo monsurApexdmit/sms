@@ -15,6 +15,10 @@ class UserOut(BaseModel):
     name: str
     email: str
     image_url: str | None = None
+    # module -> full | view | none; null for a full administrator (everything)
+    permissions: dict[str, str] | None = None
+    # name of the role whose permissions apply (a custom role for restricted administrators)
+    access_role: str | None = None
 
 
 class TokenOut(BaseModel):

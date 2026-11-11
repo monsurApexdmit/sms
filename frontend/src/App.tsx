@@ -11,6 +11,8 @@ const page = <M extends Record<string, unknown>>(load: () => Promise<M>, name: k
   lazy(async () => ({ default: (await load())[name] as ComponentType<any> }));
 
 const AdmissionsPage = page(() => import("./pages/Admissions"), "AdmissionsPage");
+const RolesPage = page(() => import("./pages/Roles"), "RolesPage");
+const ApplicationFormPage = page(() => import("./pages/Admissions"), "ApplicationFormPage");
 const ClassesPage = page(() => import("./pages/Academic"), "ClassesPage");
 const MyRoutinePage = page(() => import("./pages/Academic"), "MyRoutinePage");
 const RoutinePage = page(() => import("./pages/Academic"), "RoutinePage");
@@ -95,12 +97,13 @@ const PublicTextPage = page(() => import("./pages/public/Public"), "PublicTextPa
 function Guard({ page, children }: { page: string; children: ReactNode }) {
   const { user } = useAuth();
   if (!user) return null;
-  if (!canAccess(user.role, page)) return <Navigate to="/app/dashboard" replace />;
+  if (!canAccess(user.role, page, user.permissions)) return <Navigate to="/app/dashboard" replace />;
   return <>{children}</>;
 }
 
 const APP_PAGES: [string, ReactNode][] = [
   ["dashboard", <DashboardPage />],
+  ["roles", <RolesPage />],
   ["analytics", <AnalyticsPage />],
   ["students", <StudentsPage />],
   ["teachers", <TeachersPage />],
@@ -208,6 +211,7 @@ export default function App() {
             <Route key={path} path={path} element={<Guard page={path}>{element}</Guard>} />
           ))}
           <Route path="online-exams/:id" element={<Guard page="online-exams"><OnlineExamDetailPage /></Guard>} />
+          <Route path="admissions/:id/form" element={<Guard page="admissions"><ApplicationFormPage /></Guard>} />
           <Route path="students/:id/records" element={<Guard page="students"><StudentProfilePage /></Guard>} />
           <Route path="certificates/:id" element={<Guard page="certificates"><CertificatePrintPage /></Guard>} />
           <Route path="my-records/certificates/:id" element={<Guard page="my-records"><CertificatePrintPage /></Guard>} />

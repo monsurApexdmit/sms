@@ -1,7 +1,8 @@
 """All API routes under /api. (The v1 folder organises the code; URLs carry no version.)"""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.api.deps import enforce_permissions
 from app.api.v1.endpoints import (
     academic,
     accounts,
@@ -30,6 +31,7 @@ from app.api.v1.endpoints import (
     notices,
     notifications,
     online_exams,
+    permissions,
     records,
     report_cards,
     students,
@@ -38,7 +40,7 @@ from app.api.v1.endpoints import (
     years,
 )
 
-api_router = APIRouter(prefix="/api")
+api_router = APIRouter(prefix="/api", dependencies=[Depends(enforce_permissions)])
 # One module per line: each feature adds its own line here. Order matters where paths overlap.
 ROUTERS = (
     auth.router,
@@ -70,6 +72,7 @@ ROUTERS = (
     notifications.router,
     ai.router,
     gateways.router,
+    permissions.router,
     *accounts.routers,
     cms.public,
     records.public,

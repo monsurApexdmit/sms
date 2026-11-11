@@ -9,6 +9,9 @@ export const dashboard: Record<string, string> = {
   "Amount due": "বকেয়া পরিমাণ",
   "Copies issued": "ইস্যু করা কপি",
   "Expenses this year": "এ বছরের ব্যয়",
+  "Good afternoon, {name}": "শুভ অপরাহ্ন, {name}",
+  "Good evening, {name}": "শুভ সন্ধ্যা, {name}",
+  "Good morning, {name}": "শুভ সকাল, {name}",
   "Income this year": "এ বছরের আয়",
   "My subjects": "আমার বিষয়",
   "No children are linked to your account yet.": "আপনার অ্যাকাউন্টের সাথে এখনও কোনো সন্তান যুক্ত করা হয়নি।",
@@ -18,5 +21,4 @@ export const dashboard: Record<string, string> = {
   "Present (month)": "উপস্থিত (মাস)",
   "Unpaid invoices": "অপরিশোধিত ইনভয়েস",
   "Upcoming events": "আসন্ন অনুষ্ঠান",
-  "Welcome, {name}": "স্বাগতম, {name}",
 };

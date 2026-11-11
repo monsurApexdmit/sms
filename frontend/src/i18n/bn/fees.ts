@@ -74,8 +74,8 @@ export const fees: Record<string, string> = {
   "Remove fee": "ফি সরান",
   "Remove instalment": "কিস্তি সরান",
   "Run daily jobs": "দৈনিক কাজ চালান",
+  "Session": "শিক্ষাবর্ষ",
   "Share percent": "অংশের শতকরা হার",
   "Shares {shares}% of 100%": "১০০%-এর মধ্যে {shares}%",
-  "Student ID": "শিক্ষার্থীর আইডি",
   "Value": "মান",
 };

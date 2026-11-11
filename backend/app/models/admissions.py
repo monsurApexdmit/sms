@@ -1,8 +1,9 @@
 """Admission applications, their documents and enquiries."""
 
 from datetime import date, datetime
+from decimal import Decimal
 
-from sqlalchemy import Date, DateTime, ForeignKey, Index, Integer, String
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -38,6 +39,14 @@ class AdmissionApplication(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     student_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     parent_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # Application fee paid outside the system (bKash, Nagad, bank, cash...): the applicant
+    # or the office records the transaction ID, and the office marks it verified once checked.
+    payment_method: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    payment_reference: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
+    payment_amount: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    payment_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    payment_verified_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    payment_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
 class AdmissionDocument(Base):

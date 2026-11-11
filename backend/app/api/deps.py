@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
@@ -66,3 +66,22 @@ def forbid() -> HTTPException:
 
 def not_found(what: str = "Record") -> HTTPException:
     return HTTPException(status.HTTP_404_NOT_FOUND, f"{what} not found")
+
+
+def enforce_permissions(request: Request, db: DB) -> None:
+    """Applied to every API route: a signed-in user's role must include the module the path
+    belongs to (view for reading, full for changes). Requests without a valid token pass
+    through to the endpoint, which decides on its own. (Reads the header itself rather than
+    through `bearer`, so the API docs still show which endpoints need a token.)"""
+    from app.services.permissions import denial
+
+    scheme, _, token = request.headers.get("authorization", "").partition(" ")
+    if scheme.lower() != "bearer" or not token:
+        return
+    payload = decode_token(token.strip(), "access")
+    role, _, raw_id = str((payload or {}).get("sub", "")).partition(":")
+    if not raw_id.isdigit():
+        return
+    reason = denial(db, role, int(raw_id), request.method, request.url.path)
+    if reason:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, reason)

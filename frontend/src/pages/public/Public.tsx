@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  BookOpenIcon,
   CalendarDaysIcon,
   CheckIcon,
   ChevronLeftIcon,
@@ -9,6 +10,7 @@ import {
   ClipboardListIcon,
   DownloadIcon,
   ExternalLinkIcon,
+  GraduationCapIcon,
   ImageIcon,
   LogInIcon,
   MailIcon,
@@ -23,7 +25,7 @@ import {
   SendIcon,
   UsersIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { Link, Navigate, Outlet, useLocation, useParams } from "react-router-dom";
 
@@ -31,6 +33,7 @@ import { api } from "../../api/client";
 import { useAction, useGet, usePublicSettings } from "../../api/hooks";
 import { EmptyState } from "../../components/states";
 import { Field } from "../../components/field";
+import { PAYMENT_METHODS } from "../../components/payment-methods";
 import { LanguageSwitcher } from "../../components/LanguageSwitcher";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -51,6 +54,7 @@ import { Skeleton } from "../../components/ui/skeleton";
 import { Textarea } from "../../components/ui/textarea";
 import { cn } from "../../lib/utils";
 import { fromUnix, initials } from "../../utils";
+import { PHOTO_ACCEPT, PHOTO_LABEL } from "../../components/admission-photo";
 import { t as tr, tn } from "../../i18n";
 
 interface Site {
@@ -156,15 +160,20 @@ function Prose({ text, className }: { text: string | null | undefined; className
   return <div className={cn("text-foreground/80 leading-relaxed whitespace-pre-wrap", className)}>{text || ""}</div>;
 }
 
-function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: { to: string; label: string } }) {
+function SectionHeading({ eyebrow, title, action, center }: { eyebrow?: string; title: string; action?: { to: string; label: string }; center?: boolean }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div className={cn("mb-8 flex flex-wrap items-end justify-between gap-3", center && "flex-col items-center text-center")}>
       <div>
-        {eyebrow && <p className="text-primary mb-1 text-xs font-semibold tracking-widest uppercase">{eyebrow}</p>}
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h2>
+        {eyebrow && (
+          <p className={cn("text-primary mb-2 flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase", center && "justify-center")}>
+            <span className="bg-gold h-0.5 w-6 rounded-full" />
+            {eyebrow}
+          </p>
+        )}
+        <h2 className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{title}</h2>
       </div>
       {action && (
-        <Button asChild variant="ghost" size="sm">
+        <Button asChild variant="outline" size="sm" className="rounded-full">
           <Link to={action.to}>
             {action.label}
             <ArrowRightIcon />
@@ -175,15 +184,28 @@ function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: s
   );
 }
 
-/** Title band at the top of inner pages; the "ultimate" theme uses the brand colour. */
+/** Decorative dot grid used behind bands of brand colour. */
+function Dots({ className }: { className?: string }) {
+  return <div aria-hidden className={cn("site-dots pointer-events-none absolute inset-0", className)} />;
+}
+
+/** Title band at the top of inner pages, with a trail back to the home page. */
 function PageHero({ title, subtitle, children }: { title: string; subtitle?: ReactNode; children?: ReactNode }) {
-  const { data: site } = useSite();
-  const ultimate = site?.theme === "ultimate";
   return (
-    <div className={cn("no-print border-b", ultimate ? "bg-primary text-primary-foreground" : "bg-muted/50")}>
-      <Container className="py-10 sm:py-14">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
-        {subtitle && <p className={cn("mt-2 max-w-2xl", ultimate ? "text-primary-foreground/80" : "text-muted-foreground")}>{subtitle}</p>}
+    <div className="no-print bg-ink relative isolate overflow-hidden text-white">
+      <Dots className="text-white/[0.07]" />
+      <div aria-hidden className="bg-primary/60 absolute -top-24 -right-24 size-80 rounded-full blur-3xl" />
+      <div aria-hidden className="bg-gold/20 absolute -bottom-32 left-1/4 size-72 rounded-full blur-3xl" />
+      <Container className="relative py-14 sm:py-20">
+        <nav className="mb-4 flex items-center gap-1.5 text-sm text-white/60">
+          <Link to="/" className="hover:text-white">
+            {tr("Home")}
+          </Link>
+          <ChevronRightIcon className="size-3.5" />
+          <span className="truncate text-white/90">{title}</span>
+        </nav>
+        <h1 className="font-display max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">{title}</h1>
+        {subtitle && <p className="mt-3 max-w-2xl text-lg text-white/75">{subtitle}</p>}
         {children}
       </Container>
     </div>
@@ -193,6 +215,16 @@ function PageHero({ title, subtitle, children }: { title: string; subtitle?: Rea
 function useActive() {
   const { pathname } = useLocation();
   return (to: string) => (to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(`${to}/`));
+}
+
+function Crest({ site, name, className }: { site: Site | undefined; name: string; className?: string }) {
+  return site?.header_logo_url ? (
+    <img src={site.header_logo_url} alt="" className={cn("h-11 w-auto shrink-0", className)} />
+  ) : (
+    <span className={cn("bg-primary text-primary-foreground ring-gold/60 font-display flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold ring-2 ring-offset-2 ring-offset-transparent", className)}>
+      {initials(name)}
+    </span>
+  );
 }
 
 export function PublicLayout() {
@@ -211,23 +243,57 @@ export function PublicLayout() {
 
   const navLink = (to: string, label: string) => (
     <NavigationMenuItem key={to}>
-      <NavigationMenuLink asChild active={isActive(to)} className={cn(navigationMenuTriggerStyle(), "flex-row bg-transparent data-[active=true]:text-primary")}>
+      <NavigationMenuLink
+        asChild
+        active={isActive(to)}
+        className={cn(
+          navigationMenuTriggerStyle(),
+          "relative flex-row bg-transparent data-[active=true]:bg-transparent data-[active=true]:text-primary",
+          "after:bg-gold after:absolute after:inset-x-4 after:-bottom-[13px] after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:transition-transform data-[active=true]:after:scale-x-100",
+        )}
+      >
         <Link to={to}>{label}</Link>
       </NavigationMenuLink>
     </NavigationMenuItem>
   );
 
   return (
-    <div className="bg-background text-foreground flex min-h-svh flex-col">
-      <header className="bg-background/90 supports-[backdrop-filter]:bg-background/75 sticky top-0 z-40 border-b backdrop-blur">
-        <Container className="flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex min-w-0 items-center gap-3">
-            {site?.header_logo_url ? (
-              <img src={site.header_logo_url} alt="" className="h-10 w-auto shrink-0" />
-            ) : (
-              <span className="bg-primary text-primary-foreground flex size-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold">{initials(name)}</span>
+    <div className="site-theme bg-background text-foreground flex min-h-svh flex-col">
+      {(site?.phone || site?.email || social.length > 0) && (
+        <div className="no-print bg-ink hidden text-xs text-white/70 md:block">
+          <Container className="flex h-9 items-center justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-5">
+              {site?.phone && (
+                <a href={`tel:${site.phone}`} className="flex items-center gap-1.5 hover:text-white">
+                  <PhoneIcon className="text-gold size-3.5" />
+                  {site.phone}
+                </a>
+              )}
+              {site?.email && (
+                <a href={`mailto:${site.email}`} className="flex min-w-0 items-center gap-1.5 hover:text-white">
+                  <MailIcon className="text-gold size-3.5 shrink-0" />
+                  <span className="truncate">{site.email}</span>
+                </a>
+              )}
+            </div>
+            {social.length > 0 && (
+              <div className="flex shrink-0 items-center gap-4">
+                {social.map(([k, url]) => (
+                  <a key={k} href={url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                    {SOCIAL_LABEL[k] ?? k}
+                  </a>
+                ))}
+              </div>
             )}
-            <span className="truncate text-base font-bold tracking-tight sm:text-lg">{name}</span>
+          </Container>
+        </div>
+      )}
+
+      <header className="bg-background/90 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40 border-b shadow-[0_1px_0_0_rgb(0_0_0/0.02)] backdrop-blur-md">
+        <Container className="flex h-[4.25rem] items-center justify-between gap-4">
+          <Link to="/" className="flex min-w-0 items-center gap-3">
+            <Crest site={site} name={name} />
+            <span className="font-display truncate text-lg leading-tight font-semibold tracking-tight sm:text-xl">{name}</span>
           </Link>
 
           <NavigationMenu viewport={false} className="hidden lg:flex">
@@ -236,12 +302,14 @@ export function PublicLayout() {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className={cn("bg-transparent", LIFE_LINKS.some((l) => isActive(l.to)) && "text-primary")}>{tr("School life")}</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[30rem] grid-cols-2 gap-1 p-1">
+                  <ul className="grid w-[32rem] grid-cols-2 gap-1 p-2">
                     {LIFE_LINKS.map((l) => (
                       <li key={l.to}>
                         <NavigationMenuLink asChild active={isActive(l.to)}>
-                          <Link to={l.to} className="flex-row items-start gap-3">
-                            <l.icon className="text-primary! mt-0.5 size-5!" />
+                          <Link to={l.to} className="flex-row items-start gap-3 rounded-lg p-3">
+                            <span className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg">
+                              <l.icon className="text-primary! size-4.5!" />
+                            </span>
                             <span className="grid gap-0.5">
                               <span className="font-medium">{l.label}</span>
                               <span className="text-muted-foreground text-xs leading-snug">{l.description}</span>
@@ -259,7 +327,7 @@ export function PublicLayout() {
 
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
-            <Button asChild size="sm" className="hidden sm:inline-flex">
+            <Button asChild size="sm" className="hidden rounded-full px-4 shadow-sm sm:inline-flex">
               <Link to="/login">
                 <LogInIcon />
                 {tr("Portal login")}</Link>
@@ -270,9 +338,12 @@ export function PublicLayout() {
                   <MenuIcon />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xs">
-                <SheetHeader>
-                  <SheetTitle>{name}</SheetTitle>
+              <SheetContent side="right" className="site-theme w-full overflow-y-auto sm:max-w-xs">
+                <SheetHeader className="border-b">
+                  <SheetTitle className="flex items-center gap-3">
+                    <Crest site={site} name={name} className="size-9 text-xs" />
+                    <span className="font-display">{name}</span>
+                  </SheetTitle>
                 </SheetHeader>
                 <nav className="grid gap-1 px-4">
                   {ALL_LINKS.map((l) => (
@@ -280,8 +351,8 @@ export function PublicLayout() {
                       key={l.to}
                       to={l.to}
                       className={cn(
-                        "hover:bg-accent rounded-md px-3 py-2.5 text-base font-medium transition-colors",
-                        isActive(l.to) && "bg-accent text-primary",
+                        "hover:bg-accent rounded-lg border-l-2 border-transparent px-3 py-2.5 text-base font-medium transition-colors",
+                        isActive(l.to) && "bg-accent text-primary border-gold",
                       )}
                     >
                       {l.label}
@@ -289,13 +360,13 @@ export function PublicLayout() {
                   ))}
                 </nav>
                 <div className="mt-4 grid gap-2 px-4 pb-6">
-                  <Button asChild>
+                  <Button asChild className="rounded-full">
                     <Link to="/login">
                       <LogInIcon />
                       {tr("Portal login")}</Link>
                   </Button>
                   {site?.phone && (
-                    <Button asChild variant="outline">
+                    <Button asChild variant="outline" className="rounded-full">
                       <a href={`tel:${site.phone}`}>
                         <PhoneIcon />
                         {site.phone}
@@ -313,16 +384,18 @@ export function PublicLayout() {
         <Outlet />
       </main>
 
-      <footer className="no-print mt-16 bg-zinc-950 text-zinc-400">
-        <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
+      <footer className="no-print bg-ink relative isolate mt-24 overflow-hidden text-white/65">
+        <Dots className="text-white/[0.04]" />
+        <div aria-hidden className="via-gold absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent to-transparent" />
+        <Container className="relative grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               {site?.footer_logo_url ? (
-                <img src={site.footer_logo_url} alt="" className="h-10 w-auto" />
+                <img src={site.footer_logo_url} alt="" className="h-11 w-auto" />
               ) : (
-                <span className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-lg text-sm font-bold">{initials(name)}</span>
+                <Crest site={undefined} name={name} />
               )}
-              <span className="font-bold text-white">{name}</span>
+              <span className="font-display text-lg font-semibold text-white">{name}</span>
             </div>
             {site?.homepage_note_description && <p className="line-clamp-4 text-sm leading-relaxed">{site.homepage_note_description}</p>}
             {social.length > 0 && (
@@ -333,7 +406,7 @@ export function PublicLayout() {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+                    className="hover:border-gold hover:text-gold rounded-full border border-white/15 px-3 py-1 text-xs text-white/80 transition-colors"
                   >
                     {SOCIAL_LABEL[k] ?? k}
                   </a>
@@ -343,26 +416,26 @@ export function PublicLayout() {
           </div>
           <FooterLinks title={tr("School")} links={[...MAIN_LINKS.slice(1), ...END_LINKS, { to: "/login", label: tr("Portal login") }]} />
           <FooterLinks title={tr("School life")} links={LIFE_LINKS} />
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">{tr("Get in touch")}</h3>
-            <ul className="space-y-2.5 text-sm">
+          <div className="space-y-4">
+            <FooterTitle>{tr("Get in touch")}</FooterTitle>
+            <ul className="space-y-3 text-sm">
               {site?.address && (
-                <li className="flex gap-2">
-                  <MapPinIcon className="mt-0.5 size-4 shrink-0" />
+                <li className="flex gap-2.5">
+                  <MapPinIcon className="text-gold mt-0.5 size-4 shrink-0" />
                   <span>{site.address}</span>
                 </li>
               )}
               {site?.phone && (
-                <li className="flex gap-2">
-                  <PhoneIcon className="mt-0.5 size-4 shrink-0" />
+                <li className="flex gap-2.5">
+                  <PhoneIcon className="text-gold mt-0.5 size-4 shrink-0" />
                   <a href={`tel:${site.phone}`} className="hover:text-white">
                     {site.phone}
                   </a>
                 </li>
               )}
               {site?.email && (
-                <li className="flex gap-2">
-                  <MailIcon className="mt-0.5 size-4 shrink-0" />
+                <li className="flex gap-2.5">
+                  <MailIcon className="text-gold mt-0.5 size-4 shrink-0" />
                   <a href={`mailto:${site.email}`} className="break-all hover:text-white">
                     {site.email}
                   </a>
@@ -371,7 +444,7 @@ export function PublicLayout() {
             </ul>
           </div>
         </Container>
-        <div className="border-t border-zinc-800">
+        <div className="relative border-t border-white/10">
           <Container className="flex flex-col gap-2 py-5 text-xs sm:flex-row sm:items-center sm:justify-between">
             <p>{site?.copyright_text || tr("© {getFullYear} {name}. All rights reserved.", { getFullYear: new Date().getFullYear(), name })}</p>
             <div className="flex gap-4">
@@ -387,14 +460,23 @@ export function PublicLayout() {
   );
 }
 
+function FooterTitle({ children }: { children: ReactNode }) {
+  return (
+    <h3 className="font-display relative pb-2 text-base font-semibold text-white after:bg-gold after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-8 after:rounded-full">
+      {children}
+    </h3>
+  );
+}
+
 function FooterLinks({ title, links }: { title: string; links: { to: string; label: string }[] }) {
   return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-white">{title}</h3>
-      <ul className="space-y-2 text-sm">
+    <div className="space-y-4">
+      <FooterTitle>{title}</FooterTitle>
+      <ul className="space-y-2.5 text-sm">
         {links.map((l) => (
           <li key={l.to}>
-            <Link to={l.to} className="transition-colors hover:text-white">
+            <Link to={l.to} className="group inline-flex items-center gap-1.5 transition-colors hover:text-white">
+              <ChevronRightIcon className="text-gold size-3.5 transition-transform group-hover:translate-x-0.5" />
               {l.label}
             </Link>
           </li>
@@ -409,20 +491,24 @@ function FooterLinks({ title, links }: { title: string; links: { to: string; lab
 function NewsCard({ n }: { n: NewsItem }) {
   return (
     <Link to={`/news/${n.frontend_news_id}`} className="group">
-      <Card className="h-full gap-0 overflow-hidden py-0 transition-shadow group-hover:shadow-md">
-        <div className="bg-muted aspect-video overflow-hidden">
+      <Card className="h-full gap-0 overflow-hidden rounded-2xl py-0 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
+        <div className="bg-muted relative aspect-[16/10] overflow-hidden">
           {n.image_url ? (
-            <img src={n.image_url} alt="" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img src={n.image_url} alt="" className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
           ) : (
-            <div className="text-muted-foreground flex size-full items-center justify-center">
-              <NewspaperIcon className="size-8" />
+            <div className="from-primary/15 to-gold/15 text-primary/50 flex size-full items-center justify-center bg-gradient-to-br">
+              <NewspaperIcon className="size-10" />
             </div>
           )}
+          <span className="bg-background/95 text-foreground absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-medium shadow-sm">{fromUnix(n.date_added)}</span>
         </div>
-        <CardContent className="space-y-2 p-5">
-          <p className="text-muted-foreground text-xs">{fromUnix(n.date_added)}</p>
-          <h3 className="group-hover:text-primary line-clamp-2 font-semibold transition-colors">{n.title}</h3>
-          <p className="text-muted-foreground line-clamp-3 text-sm">{n.description}</p>
+        <CardContent className="flex flex-1 flex-col gap-2 p-6">
+          <h3 className="font-display group-hover:text-primary line-clamp-2 text-lg leading-snug font-semibold transition-colors">{n.title}</h3>
+          <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">{n.description}</p>
+          <span className="text-primary mt-auto inline-flex items-center gap-1 pt-2 text-sm font-medium">
+            {tr("Learn more")}
+            <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-1" />
+          </span>
         </CardContent>
       </Card>
     </Link>
@@ -431,9 +517,10 @@ function NewsCard({ n }: { n: NewsItem }) {
 
 function DateTile({ ts, className }: { ts: number | string; className?: string }) {
   return (
-    <div className={cn("bg-primary/10 text-primary flex w-16 shrink-0 flex-col items-center justify-center rounded-lg py-2", className)}>
-      <span className="text-2xl leading-none font-bold">{fromUnix(ts, "DD")}</span>
-      <span className="mt-1 text-[11px] font-medium uppercase">{fromUnix(ts, "MMM YY")}</span>
+    <div className={cn("bg-background flex w-16 shrink-0 flex-col overflow-hidden rounded-xl border text-center shadow-sm", className)}>
+      <span className="bg-primary text-primary-foreground py-0.5 text-[10px] font-semibold tracking-wider uppercase">{fromUnix(ts, "MMM")}</span>
+      <span className="font-display py-1 text-2xl leading-none font-semibold">{fromUnix(ts, "DD")}</span>
+      <span className="text-muted-foreground pb-1 text-[10px]">{fromUnix(ts, "YYYY")}</span>
     </div>
   );
 }
@@ -441,17 +528,18 @@ function DateTile({ ts, className }: { ts: number | string; className?: string }
 function TeacherCard({ t }: { t: TeacherItem }) {
   const social = validSocial(t.social_links);
   return (
-    <Card className="gap-0 overflow-hidden py-0 text-center">
-      <div className="bg-muted aspect-square overflow-hidden">
+    <Card className="group gap-0 overflow-hidden rounded-2xl py-0 text-center transition-shadow hover:shadow-xl">
+      <div className="bg-muted relative aspect-[4/5] overflow-hidden">
         {t.image_url ? (
-          <img src={t.image_url} alt={t.name} className="size-full object-cover" />
+          <img src={t.image_url} alt={t.name} className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
         ) : (
-          <div className="text-muted-foreground flex size-full items-center justify-center text-3xl font-semibold">{initials(t.name)}</div>
+          <div className="from-primary/20 to-gold/20 text-primary font-display flex size-full items-center justify-center bg-gradient-to-br text-4xl font-semibold">{initials(t.name)}</div>
         )}
+        <div aria-hidden className="bg-gold absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100" />
       </div>
       <CardContent className="space-y-1 p-5">
-        <h3 className="font-semibold">{t.name}</h3>
-        {t.designation && <p className="text-primary text-sm">{t.designation}</p>}
+        <h3 className="font-display text-lg font-semibold">{t.name}</h3>
+        {t.designation && <p className="text-primary text-xs font-semibold tracking-wider uppercase">{t.designation}</p>}
         {t.about && <p className="text-muted-foreground line-clamp-3 pt-1 text-sm">{t.about}</p>}
         {social.length > 0 && (
           <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 pt-2 text-xs">
@@ -467,14 +555,21 @@ function TeacherCard({ t }: { t: TeacherItem }) {
   );
 }
 
-function GalleryCard({ g }: { g: GalleryItem }) {
+function GalleryCard({ g, className }: { g: GalleryItem; className?: string }) {
   return (
-    <Link to={`/gallery/${g.frontend_gallery_id}`} className="group relative block overflow-hidden rounded-xl">
-      <div className="bg-muted aspect-[4/3]">
-        {g.image_url && <img src={g.image_url} alt="" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+    <Link to={`/gallery/${g.frontend_gallery_id}`} className={cn("group relative block min-h-56 overflow-hidden rounded-2xl", className)}>
+      <div className="bg-muted absolute inset-0">
+        {g.image_url ? (
+          <img src={g.image_url} alt="" className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        ) : (
+          <div className="from-primary/20 to-gold/20 text-primary/50 flex size-full items-center justify-center bg-gradient-to-br">
+            <ImageIcon className="size-10" />
+          </div>
+        )}
       </div>
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-12 text-white">
-        <h3 className="font-semibold">{g.title}</h3>
+      <div className="from-ink/90 via-ink/30 absolute inset-0 bg-gradient-to-t to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+        <h3 className="font-display text-lg font-semibold">{g.title}</h3>
         {g.description && <p className="line-clamp-1 text-sm text-white/80">{g.description}</p>}
       </div>
     </Link>
@@ -485,7 +580,7 @@ function GridSkeleton({ count = 3, className }: { count?: number; className?: st
   return (
     <div className={cn("grid gap-6 sm:grid-cols-2 lg:grid-cols-3", className)}>
       {Array.from({ length: count }, (_, i) => (
-        <Skeleton key={i} className="aspect-[4/3] w-full rounded-xl" />
+        <Skeleton key={i} className="aspect-[4/3] w-full rounded-2xl" />
       ))}
     </div>
   );
@@ -505,92 +600,119 @@ function HeroSlider({ site }: { site: Site | undefined }) {
   const name = schoolName(site);
   const title = slide?.title || name;
   const description = slide?.description || site?.homepage_note_title || tr("Welcome to {name}", { name });
-  const ultimate = site?.theme === "ultimate";
   const go = (step: number) => setIndex((i) => (i + step + slides.length) % slides.length);
+  const current = index % Math.max(slides.length, 1);
 
   const ctas = (
-    <div className="mt-8 flex flex-wrap gap-3">
-      <Button asChild size="lg" variant={ultimate ? "secondary" : "default"}>
+    <div className="mt-9 flex flex-wrap gap-3">
+      <Button asChild size="lg" className="bg-gold text-ink hover:bg-gold/90 h-12 rounded-full px-6 font-semibold shadow-lg">
         <Link to="/admission">
           <ClipboardListIcon />
           {tr("Admission")}</Link>
       </Button>
-      <Button
-        asChild
-        size="lg"
-        variant="outline"
-        className="border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20 hover:text-white"
-      >
+      <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-white/30 bg-white/10 px-6 text-white backdrop-blur hover:bg-white/20 hover:text-white">
         <Link to="/contact">
           <MailIcon />
           {tr("Contact us")}</Link>
       </Button>
-      <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
+      <Button asChild size="lg" variant="ghost" className="h-12 rounded-full px-5 text-white hover:bg-white/10 hover:text-white">
         <Link to="/login">
           <LogInIcon />
           {tr("Portal login")}</Link>
       </Button>
     </div>
   );
-  const dots = slides.length > 1 && (
-    <div className="flex items-center gap-2">
-      {slides.map((_, i) => (
-        <button
-          key={i}
-          type="button"
-          aria-label={tr("Slide {value}", { value: i + 1 })}
-          onClick={() => setIndex(i)}
-          className={cn("h-1.5 rounded-full bg-white/50 transition-all", i === index % slides.length ? "w-8 bg-white" : "w-3")}
-        />
-      ))}
+  const controls = slides.length > 1 && (
+    <div className="mt-12 flex items-center gap-4">
+      <button type="button" aria-label={tr("Previous slide")} onClick={() => go(-1)} className="rounded-full border border-white/30 p-2.5 transition-colors hover:bg-white/15">
+        <ChevronLeftIcon className="size-4" />
+      </button>
+      <div className="flex items-center gap-2">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={tr("Slide {value}", { value: i + 1 })}
+            onClick={() => setIndex(i)}
+            className={cn("h-1.5 rounded-full transition-all", i === current ? "bg-gold w-10" : "w-3 bg-white/50 hover:bg-white/80")}
+          />
+        ))}
+      </div>
+      <button type="button" aria-label={tr("Next slide")} onClick={() => go(1)} className="rounded-full border border-white/30 p-2.5 transition-colors hover:bg-white/15">
+        <ChevronRightIcon className="size-4" />
+      </button>
     </div>
   );
-  const images = slides.map((s, i) => (
-    <img
-      key={s.image_url}
-      src={s.image_url!}
-      alt=""
-      className={cn("absolute inset-0 size-full object-cover transition-opacity duration-1000", i === index % slides.length ? "opacity-100" : "opacity-0")}
-    />
-  ));
+  const text = (
+    <div className="relative">
+      <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-[0.18em] text-white/90 uppercase backdrop-blur">
+        <GraduationCapIcon className="text-gold size-4" />
+        {name}
+      </p>
+      <h1 key={title} className="font-display animate-in fade-in slide-in-from-bottom-3 max-w-3xl text-4xl leading-[1.08] font-semibold tracking-tight text-balance duration-700 sm:text-5xl lg:text-6xl">
+        {title}
+      </h1>
+      <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">{description}</p>
+      {ctas}
+      {controls}
+    </div>
+  );
 
-  if (ultimate)
+  // Photos uploaded under Website → Slider fill the band; without any, a patterned brand band with the crest.
+  const framed = site?.theme === "ultimate";
+  if (slides.length && !framed)
     return (
-      <section className="bg-primary text-primary-foreground">
-        <Container className="grid items-center gap-10 py-12 lg:grid-cols-2 lg:py-20">
-          <div>
-            <p className="text-primary-foreground/70 mb-3 text-sm font-semibold tracking-widest uppercase">{name}</p>
-            <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">{title}</h1>
-            <p className="text-primary-foreground/80 mt-4 max-w-xl text-lg">{description}</p>
-            {ctas}
-          </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white/10 shadow-2xl ring-1 ring-white/20">
-            {images}
-            {slides.length > 1 && <div className="absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-black/50 to-transparent p-4">{dots}</div>}
-          </div>
-        </Container>
+      <section className="bg-ink relative isolate overflow-hidden text-white">
+        {slides.map((s, i) => (
+          <img
+            key={s.image_url}
+            src={s.image_url!}
+            alt=""
+            className={cn("absolute inset-0 size-full object-cover transition-all duration-[1500ms]", i === current ? "scale-100 opacity-100" : "scale-105 opacity-0")}
+          />
+        ))}
+        <div className="from-ink via-ink/75 to-ink/20 absolute inset-0 bg-gradient-to-r" />
+        <div className="from-ink/60 absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t to-transparent" />
+        <Container className="relative flex min-h-[32rem] flex-col justify-center py-24 sm:min-h-[38rem]">{text}</Container>
       </section>
     );
 
   return (
-    <section className="bg-primary relative isolate overflow-hidden text-white">
-      {images}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
-      <Container className="relative flex min-h-[28rem] flex-col justify-center py-20 sm:min-h-[34rem]">
-        <p className="mb-3 text-sm font-semibold tracking-widest text-white/70 uppercase">{name}</p>
-        <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">{title}</h1>
-        <p className="mt-4 max-w-2xl text-lg text-white/80">{description}</p>
-        {ctas}
-        {slides.length > 1 && (
-          <div className="mt-10 flex items-center gap-4">
-            <button type="button" aria-label={tr("Previous slide")} onClick={() => go(-1)} className="rounded-full border border-white/30 p-2 hover:bg-white/10">
-              <ChevronLeftIcon className="size-4" />
-            </button>
-            {dots}
-            <button type="button" aria-label={tr("Next slide")} onClick={() => go(1)} className="rounded-full border border-white/30 p-2 hover:bg-white/10">
-              <ChevronRightIcon className="size-4" />
-            </button>
+    <section className="bg-ink relative isolate overflow-hidden text-white">
+      <Dots className="text-white/[0.07]" />
+      <div aria-hidden className="bg-primary absolute -top-40 -left-40 size-[34rem] rounded-full opacity-70 blur-3xl" />
+      <div aria-hidden className="bg-gold/25 absolute -right-20 -bottom-40 size-[28rem] rounded-full blur-3xl" />
+      <Container className="relative grid min-h-[32rem] items-center gap-12 py-24 sm:min-h-[36rem] lg:grid-cols-[1.4fr_1fr]">
+        {text}
+        {framed && slides.length ? (
+          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-white/10 shadow-2xl ring-1 ring-white/20">
+            {slides.map((s, i) => (
+              <img
+                key={s.image_url}
+                src={s.image_url!}
+                alt=""
+                className={cn("absolute inset-0 size-full object-cover transition-opacity duration-1000", i === current ? "opacity-100" : "opacity-0")}
+              />
+            ))}
           </div>
+        ) : (
+        <div aria-hidden className="relative mx-auto hidden aspect-square w-full max-w-sm lg:block">
+          <div className="absolute inset-0 rounded-full border border-white/15" />
+          <div className="border-gold/40 absolute inset-8 rounded-full border border-dashed" />
+          <div className="absolute inset-16 flex items-center justify-center rounded-full bg-white/10 shadow-2xl ring-1 ring-white/20 backdrop-blur">
+            {site?.header_logo_url ? (
+              <img src={site.header_logo_url} alt="" className="max-h-[55%] max-w-[55%] object-contain" />
+            ) : (
+              <span className="font-display text-gold text-7xl font-semibold">{initials(name)}</span>
+            )}
+          </div>
+          <span className="bg-gold text-ink absolute top-10 right-0 flex size-14 items-center justify-center rounded-2xl shadow-xl">
+            <BookOpenIcon className="size-6" />
+          </span>
+          <span className="bg-primary text-primary-foreground absolute bottom-8 left-0 flex size-14 items-center justify-center rounded-2xl shadow-xl ring-1 ring-white/20">
+            <GraduationCapIcon className="size-6" />
+          </span>
+        </div>
         )}
       </Container>
     </section>
@@ -616,15 +738,15 @@ export function HomePage() {
       <HeroSlider site={site} />
 
       {contacts.length > 0 && (
-        <Container className="relative z-10 -mt-10">
-          <div className="bg-card grid divide-y rounded-xl border shadow-lg sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <Container className="relative z-10 -mt-12">
+          <div className={cn("bg-card grid divide-y overflow-hidden rounded-2xl border shadow-xl sm:divide-x sm:divide-y-0", contacts.length === 3 ? "sm:grid-cols-3" : contacts.length === 2 ? "sm:grid-cols-2" : "")}>
             {contacts.map((c) => (
-              <div key={c.label} className="flex items-center gap-4 p-5">
-                <span className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-full">
+              <div key={c.label} className="flex items-center gap-4 p-6">
+                <span className="bg-gold/15 text-ink flex size-12 shrink-0 items-center justify-center rounded-2xl">
                   <c.icon className="size-5" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-muted-foreground text-xs font-medium uppercase">{c.label}</p>
+                  <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">{c.label}</p>
                   {c.href ? (
                     <a href={c.href} className="hover:text-primary block truncate font-medium">
                       {c.value}
@@ -639,22 +761,51 @@ export function HomePage() {
         </Container>
       )}
 
+      <Container className="mt-20">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {LIFE_LINKS.map((l, i) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className="group bg-card hover:border-primary/30 relative overflow-hidden rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <span className="font-display text-muted-foreground/15 absolute top-3 right-5 text-5xl font-semibold">{String(i + 1).padStart(2, "0")}</span>
+              <span className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground flex size-12 items-center justify-center rounded-xl transition-colors">
+                <l.icon className="size-5" />
+              </span>
+              <h3 className="font-display mt-5 text-lg font-semibold">{l.label}</h3>
+              <p className="text-muted-foreground mt-1 text-sm">{l.description}</p>
+              <ArrowRightIcon className="text-primary mt-4 size-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          ))}
+        </div>
+      </Container>
+
       {(site?.homepage_note_title || site?.about_us) && (
-        <Container className="mt-20 grid items-center gap-10 lg:grid-cols-2">
-          <div className="bg-muted aspect-[4/3] overflow-hidden rounded-2xl">
-            {site?.about_us_image_url ? (
-              <img src={site.about_us_image_url} alt="" className="size-full object-cover" />
-            ) : (
-              <div className="text-muted-foreground flex size-full items-center justify-center">
-                <UsersIcon className="size-12" />
-              </div>
-            )}
+        <Container className="mt-24 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="relative">
+            <div aria-hidden className="bg-gold/30 absolute -top-4 -left-4 size-32 rounded-3xl" />
+            <div aria-hidden className="site-dots text-primary/30 absolute -right-4 -bottom-4 size-40" />
+            <div className="bg-muted relative aspect-[4/3] overflow-hidden rounded-3xl shadow-xl">
+              {site?.about_us_image_url ? (
+                <img src={site.about_us_image_url} alt="" className="size-full object-cover" />
+              ) : (
+                <div className="from-primary to-ink text-gold flex size-full items-center justify-center bg-gradient-to-br">
+                  <UsersIcon className="size-16" />
+                </div>
+              )}
+            </div>
           </div>
           <div>
-            <p className="text-primary mb-1 text-xs font-semibold tracking-widest uppercase">{tr("About us")}</p>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{site?.homepage_note_title || tr("Welcome to {schoolName}", { schoolName: schoolName(site) })}</h2>
-            <Prose text={site?.homepage_note_description || site?.about_us} className="text-muted-foreground mt-4 line-clamp-[10]" />
-            <Button asChild variant="outline" className="mt-6">
+            <p className="text-primary mb-2 flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase">
+              <span className="bg-gold h-0.5 w-6 rounded-full" />
+              {tr("About us")}
+            </p>
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+              {site?.homepage_note_title || tr("Welcome to {schoolName}", { schoolName: schoolName(site) })}
+            </h2>
+            <Prose text={site?.homepage_note_description || site?.about_us} className="text-muted-foreground mt-5 line-clamp-[10] text-base" />
+            <Button asChild className="mt-8 rounded-full px-6">
               <Link to="/about">
                 {tr("Learn more")}<ArrowRightIcon />
               </Link>
@@ -663,69 +814,76 @@ export function HomePage() {
         </Container>
       )}
 
-      <Container className="mt-20 grid gap-8 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="space-y-1.5">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <MegaphoneIcon className="text-primary size-5" />
-                {tr("Latest notices")}</CardTitle>
-              <CardDescription>{tr("Announcements from the school office")}</CardDescription>
-            </div>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/notices">
-                {tr("View all")}<ArrowRightIcon />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {notices.isLoading && <Skeleton className="h-40 w-full" />}
-            {notices.data?.length === 0 && <p className="text-muted-foreground text-sm">{tr("No notices at the moment.")}</p>}
-            <ul className="divide-y">
-              {notices.data?.slice(0, 5).map((n) => (
-                <li key={n.notice_id}>
-                  <Link to={`/notices/${n.notice_id}`} className="group flex items-start justify-between gap-4 py-3">
-                    <span className="group-hover:text-primary font-medium transition-colors">{n.notice_title}</span>
-                    <span className="text-muted-foreground shrink-0 text-xs">{fromUnix(n.create_timestamp)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="space-y-1.5">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <CalendarDaysIcon className="text-primary size-5" />
-                {tr("Events")}</CardTitle>
-              <CardDescription>{tr("Dates for your calendar")}</CardDescription>
-            </div>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/events">
-                {tr("View all")}<ArrowRightIcon />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {events.isLoading && <Skeleton className="h-40 w-full" />}
-            {events.data?.length === 0 && <p className="text-muted-foreground text-sm">{tr("No events scheduled.")}</p>}
-            <ul className="space-y-3">
-              {events.data?.slice(0, 4).map((e) => (
-                <li key={e.frontend_events_id} className="flex items-center gap-4">
-                  <DateTile ts={e.timestamp} />
-                  <div className="min-w-0">
-                    <p className="font-medium">{e.title}</p>
-                    <p className="text-muted-foreground text-xs">{e.timestamp >= today ? tr("Upcoming") : tr("Past")} · {fromUnix(e.timestamp, "dddd")}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      </Container>
+      <section className="bg-muted/70 relative mt-24 py-20">
+        <Container className="grid gap-8 lg:grid-cols-2">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div className="space-y-1.5">
+                <CardTitle className="font-display flex items-center gap-2.5 text-xl">
+                  <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg">
+                    <MegaphoneIcon className="size-4.5" />
+                  </span>
+                  {tr("Latest notices")}</CardTitle>
+                <CardDescription>{tr("Announcements from the school office")}</CardDescription>
+              </div>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/notices">
+                  {tr("View all")}<ArrowRightIcon />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {notices.isLoading && <Skeleton className="h-40 w-full" />}
+              {notices.data?.length === 0 && <p className="text-muted-foreground text-sm">{tr("No notices at the moment.")}</p>}
+              <ul className="space-y-1">
+                {notices.data?.slice(0, 5).map((n) => (
+                  <li key={n.notice_id}>
+                    <Link to={`/notices/${n.notice_id}`} className="group hover:bg-muted/70 -mx-3 flex items-center gap-4 rounded-lg px-3 py-3 transition-colors">
+                      <span className="bg-gold size-2 shrink-0 rounded-full" />
+                      <span className="group-hover:text-primary min-w-0 flex-1 font-medium transition-colors">{n.notice_title}</span>
+                      <span className="text-muted-foreground shrink-0 text-xs">{fromUnix(n.create_timestamp)}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div className="space-y-1.5">
+                <CardTitle className="font-display flex items-center gap-2.5 text-xl">
+                  <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg">
+                    <CalendarDaysIcon className="size-4.5" />
+                  </span>
+                  {tr("Events")}</CardTitle>
+                <CardDescription>{tr("Dates for your calendar")}</CardDescription>
+              </div>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/events">
+                  {tr("View all")}<ArrowRightIcon />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {events.isLoading && <Skeleton className="h-40 w-full" />}
+              {events.data?.length === 0 && <p className="text-muted-foreground text-sm">{tr("No events scheduled.")}</p>}
+              <ul className="space-y-3">
+                {events.data?.slice(0, 4).map((e) => (
+                  <li key={e.frontend_events_id} className="flex items-center gap-4">
+                    <DateTile ts={e.timestamp} />
+                    <div className="min-w-0">
+                      <p className="font-medium">{e.title}</p>
+                      <p className="text-muted-foreground text-xs">{e.timestamp >= today ? tr("Upcoming") : tr("Past")} · {fromUnix(e.timestamp, "dddd")}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        </Container>
+      </section>
 
-      <Container className="mt-20">
+      <Container className="mt-24">
         <SectionHeading eyebrow={tr("Stay informed")} title={tr("Latest news")} action={{ to: "/news", label: tr("All news") }} />
         {news.isLoading && <GridSkeleton />}
         {news.data?.length === 0 && <EmptyState icon={NewspaperIcon} title={tr("No news yet")} />}
@@ -737,7 +895,7 @@ export function HomePage() {
       </Container>
 
       {!!teachers.data?.length && (
-        <Container className="mt-20">
+        <Container className="mt-24">
           <SectionHeading eyebrow={tr("Our people")} title={tr("Meet our teachers")} action={{ to: "/teachers", label: tr("All teachers") }} />
           <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
             {teachers.data.slice(0, 4).map((t) => (
@@ -748,33 +906,37 @@ export function HomePage() {
       )}
 
       {!!gallery.data?.length && (
-        <Container className="mt-20">
+        <Container className="mt-24">
           <SectionHeading eyebrow={tr("School life")} title={tr("Gallery")} action={{ to: "/gallery", label: tr("All albums") }} />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {gallery.data.slice(0, 6).map((g) => (
-              <GalleryCard key={g.frontend_gallery_id} g={g} />
+          <div className="grid auto-rows-[14rem] gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {gallery.data.slice(0, 5).map((g, i) => (
+              <GalleryCard key={g.frontend_gallery_id} g={g} className={cn(i === 0 && "sm:col-span-2 lg:row-span-2")} />
             ))}
           </div>
         </Container>
       )}
 
-      <Container className="mt-20">
-        <div className="bg-primary text-primary-foreground relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12">
-          <div className="absolute -top-16 -right-16 size-64 rounded-full bg-white/10" />
-          <div className="absolute -bottom-24 left-1/3 size-48 rounded-full bg-white/5" />
-          <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+      <Container className="mt-24">
+        <div className="bg-ink relative isolate overflow-hidden rounded-3xl px-6 py-14 text-white sm:px-14">
+          <Dots className="text-white/[0.06]" />
+          <div aria-hidden className="bg-primary absolute -top-24 -right-16 size-80 rounded-full opacity-80 blur-3xl" />
+          <div aria-hidden className="bg-gold/30 absolute -bottom-28 left-1/4 size-64 rounded-full blur-3xl" />
+          <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{tr("Admissions are open")}</h2>
-              <p className="text-primary-foreground/80 mt-2 max-w-xl">
+              <span className="bg-gold/20 text-gold mb-4 inline-flex size-12 items-center justify-center rounded-2xl">
+                <GraduationCapIcon className="size-6" />
+              </span>
+              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{tr("Admissions are open")}</h2>
+              <p className="mt-3 max-w-xl text-white/75">
                 {tr("Download the admission form, fill it in and bring it to the school office, or get in touch with any questions.")}</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" variant="secondary">
+              <Button asChild size="lg" className="bg-gold text-ink hover:bg-gold/90 h-12 rounded-full px-6 font-semibold">
                 <Link to="/admission">
                   <ClipboardListIcon />
                   {tr("Admission form")}</Link>
               </Button>
-              <Button asChild size="lg" variant="ghost" className="hover:text-primary-foreground hover:bg-white/10">
+              <Button asChild size="lg" variant="ghost" className="h-12 rounded-full px-5 text-white hover:bg-white/10 hover:text-white">
                 <Link to="/contact">
                   {tr("Contact us")}<ArrowRightIcon />
                 </Link>
@@ -799,10 +961,10 @@ export function PublicNoticesPage() {
         {data?.length === 0 && <EmptyState icon={MegaphoneIcon} title={tr("No notices")} />}
         {data?.map((n) => (
           <Link key={n.notice_id} to={`/notices/${n.notice_id}`} className="group block">
-            <Card className="flex-row items-start gap-4 p-5 transition-shadow group-hover:shadow-md">
+            <Card className="flex-row items-start gap-4 rounded-2xl p-5 transition-all group-hover:-translate-y-0.5 group-hover:shadow-lg">
               <DateTile ts={n.create_timestamp} />
               <div className="min-w-0 space-y-1">
-                <h2 className="group-hover:text-primary font-semibold transition-colors">{n.notice_title}</h2>
+                <h2 className="font-display group-hover:text-primary text-lg font-semibold transition-colors">{n.notice_title}</h2>
                 <p className="text-muted-foreground line-clamp-2 text-sm">{n.notice}</p>
               </div>
             </Card>
@@ -839,14 +1001,14 @@ export function PublicNoticePage() {
   const { data } = useGet<NoticeItem>(`/public/notices/${id}`);
   if (!data) return <ArticleSkeleton />;
   return (
-    <Container className="mt-10 max-w-3xl">
+    <Container className="mt-12 max-w-3xl">
       <BackLink to="/notices" label={tr("All notices")} />
       <Badge variant="secondary" className="mb-3">
         <MegaphoneIcon />
         {tr("Notice")}</Badge>
-      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{data.notice_title}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{data.notice_title}</h1>
       <p className="text-muted-foreground mt-2 mb-8">{fromUnix(data.create_timestamp, "dddd, DD MMMM YYYY")}</p>
-      {data.image_url && <img src={data.image_url} alt="" className="mb-8 w-full rounded-xl" />}
+      {data.image_url && <img src={data.image_url} alt="" className="mb-8 w-full rounded-2xl shadow-lg" />}
       <Prose text={data.notice} className="text-lg" />
     </Container>
   );
@@ -875,11 +1037,11 @@ export function PublicNewsItemPage() {
   const { data } = useGet<NewsItem>(`/public/news/${id}`);
   if (!data) return <ArticleSkeleton />;
   return (
-    <Container className="mt-10 max-w-3xl">
+    <Container className="mt-12 max-w-3xl">
       <BackLink to="/news" label={tr("All news")} />
-      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{data.title}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{data.title}</h1>
       <p className="text-muted-foreground mt-2 mb-8">{fromUnix(data.date_added, "dddd, DD MMMM YYYY")}</p>
-      {data.image_url && <img src={data.image_url} alt="" className="mb-8 w-full rounded-xl" />}
+      {data.image_url && <img src={data.image_url} alt="" className="mb-8 w-full rounded-2xl shadow-lg" />}
       <Prose text={data.description} className="text-lg" />
     </Container>
   );
@@ -895,7 +1057,7 @@ export function PublicEventsPage() {
         {isLoading && <Skeleton className="h-24 w-full" />}
         {data?.length === 0 && <EmptyState icon={CalendarDaysIcon} title={tr("No events")} />}
         {data?.map((e) => (
-          <Card key={e.frontend_events_id} className="flex-row items-center gap-4 p-4">
+          <Card key={e.frontend_events_id} className="flex-row items-center gap-4 rounded-2xl p-4 transition-shadow hover:shadow-md">
             <DateTile ts={e.timestamp} />
             <div className="min-w-0 flex-1">
               <p className="font-semibold">{e.title}</p>
@@ -1289,6 +1451,9 @@ interface AdmissionOptions {
   open: boolean;
   year: string;
   classes: { class_id: number; name: string }[];
+  fee?: string | number | null;
+  payment_required?: boolean;
+  payment_instructions?: string | null;
 }
 
 interface ApplicationValues {
@@ -1303,18 +1468,27 @@ interface ApplicationValues {
   guardian_email: string;
   address: string;
   notes: string;
+  payment_method: string;
+  payment_reference: string;
+  payment_amount: string;
 }
 
 const EMPTY_APPLICATION: ApplicationValues = {
   student_name: "", class_id: "", date_of_birth: "", gender: "", previous_school: "", guardian_name: "",
   guardian_relation: "", guardian_phone: "", guardian_email: "", address: "", notes: "",
+  payment_method: "", payment_reference: "", payment_amount: "",
 };  // prettier-ignore
 const MAX_DOCUMENTS = 5;
 const DOCUMENT_ACCEPT = ".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx";
 
 function OnlineApplicationForm({ options, siteKey }: { options: AdmissionOptions; siteKey: string | null }) {
-  const form = useForm<ApplicationValues>({ defaultValues: EMPTY_APPLICATION });
+  const fee = options.fee !== null && options.fee !== undefined && options.fee !== "" ? Number(options.fee) : null;
+  const form = useForm<ApplicationValues>({ defaultValues: { ...EMPTY_APPLICATION, payment_amount: fee ? String(fee) : "" } });
   const [docs, setDocs] = useState<{ file: File; label: string }[]>([]);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const photoUrl = useMemo(() => (photo ? URL.createObjectURL(photo) : null), [photo]);
+  useEffect(() => () => { if (photoUrl) URL.revokeObjectURL(photoUrl); }, [photoUrl]);
+  const maxDocs = MAX_DOCUMENTS - (photo ? 1 : 0);
   const [sent, setSent] = useState<string | null>(null);
   const captcha = useRecaptcha(siteKey);
   const [captchaError, setCaptchaError] = useState(false);
@@ -1322,14 +1496,22 @@ function OnlineApplicationForm({ options, siteKey }: { options: AdmissionOptions
     onSuccess: (r) => setSent(r.reference),
   });
   const { errors } = form.formState;
+  const showPayment = fee !== null || !!options.payment_required || !!options.payment_instructions;
+  const required = !!options.payment_required;
+  const hasReference = !!form.watch("payment_reference").trim();
 
   const submit = form.handleSubmit((v) => {
     if (siteKey && !captcha.token) {
       setCaptchaError(true);
       return;
     }
+    if (!v.payment_reference.trim()) v = { ...v, payment_method: "", payment_amount: "" };
     const body = new FormData();
     Object.entries(v).forEach(([k, value]) => value.trim() && body.append(k, value.trim()));
+    if (photo) {
+      body.append("files", photo);
+      body.append("labels", PHOTO_LABEL);
+    }
     docs.forEach((d) => {
       body.append("files", d.file);
       body.append("labels", d.label.trim() || "Document");
@@ -1415,9 +1597,82 @@ function OnlineApplicationForm({ options, siteKey }: { options: AdmissionOptions
         </Field>
       </div>
 
+      {showPayment && (
+        <div className="bg-muted/50 grid gap-4 rounded-xl border p-4 sm:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="font-semibold">{tr("Application fee")}</p>
+              <p className="text-muted-foreground text-xs">{required ? tr("Pay the fee first, then enter the transaction ID below.") : tr("If you have paid the fee, enter the transaction ID below.")}</p>
+            </div>
+            {fee !== null && <span className="bg-primary text-primary-foreground rounded-full px-3 py-1 text-sm font-semibold tabular-nums">{fee.toLocaleString()}</span>}
+          </div>
+          {options.payment_instructions && <Prose text={options.payment_instructions} className="bg-background rounded-lg border p-3 text-sm" />}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label={tr("Paid with")} htmlFor="adm-pay-method" required={required || hasReference} error={errors.payment_method?.message}>
+              <select
+                id="adm-pay-method"
+                className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                aria-invalid={!!errors.payment_method}
+                {...form.register("payment_method", { validate: (m, all) => !!m || (!required && !all.payment_reference.trim()) || tr("Choose how you paid") })}
+              >
+                <option value="">{tr("Choose…")}</option>
+                {PAYMENT_METHODS.map((m) => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label={tr("Transaction ID")} htmlFor="adm-pay-ref" required={required} error={errors.payment_reference?.message}>
+              <Input
+                id="adm-pay-ref"
+                placeholder={tr("e.g. 9AB3CD7EF2")}
+                autoComplete="off"
+                className="font-mono"
+                aria-invalid={!!errors.payment_reference}
+                {...form.register("payment_reference", { validate: (r) => !required || !!r.trim() || tr("Enter the transaction ID") })}
+              />
+            </Field>
+            <Field label={tr("Amount paid")} htmlFor="adm-pay-amount">
+              <Input id="adm-pay-amount" type="number" min={0} step="0.01" {...form.register("payment_amount")} />
+            </Field>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center gap-4">
+        <div className="bg-muted/50 flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-dashed text-center">
+          {photoUrl ? <img src={photoUrl} alt={tr("Student photo")} className="size-full object-cover" /> : <ImageIcon className="text-muted-foreground size-8" />}
+        </div>
+        <div className="grid gap-2">
+          <p className="text-sm font-medium">{tr("Student photo")}</p>
+          <p className="text-muted-foreground text-xs">{tr("Optional. A recent passport-size photo: JPG, PNG or WebP. It is printed on the admission form.")}</p>
+          <div className="flex flex-wrap gap-2">
+            <label className="border-input hover:bg-accent inline-flex h-8 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm">
+              <ImageIcon className="size-4" />
+              {photo ? tr("Change photo") : tr("Choose photo")}<input
+                type="file"
+                hidden
+                accept={PHOTO_ACCEPT}
+                onChange={(e) => {
+                  const file = e.currentTarget.files?.[0];
+                  if (file) {
+                    setPhoto(file);
+                    setDocs((ds) => ds.slice(0, MAX_DOCUMENTS - 1));
+                  }
+                  e.currentTarget.value = "";
+                }}
+              />
+            </label>
+            {photo && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => setPhoto(null)}>
+                {tr("Remove")}</Button>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-2">
         <p className="text-sm font-medium">{tr("Documents")}</p>
-        <p className="text-muted-foreground text-xs">{tn("Optional. Up to {MAX_DOCUMENTS} files: PDF, image or Word, each at most 10 MB.", { MAX_DOCUMENTS })}</p>
+        <p className="text-muted-foreground text-xs">{tn("Optional. Up to {MAX_DOCUMENTS} files: PDF, image or Word, each at most 10 MB.", { MAX_DOCUMENTS: maxDocs })}</p>
         {docs.map((d, i) => (
           <div key={i} className="flex flex-wrap items-center gap-2">
             <Input
@@ -1432,7 +1687,7 @@ function OnlineApplicationForm({ options, siteKey }: { options: AdmissionOptions
               {tr("Remove")}</Button>
           </div>
         ))}
-        {docs.length < MAX_DOCUMENTS && (
+        {docs.length < maxDocs && (
           <div>
             <label className="border-input hover:bg-accent inline-flex h-8 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm">
               <PaperclipIcon className="size-4" />
@@ -1511,13 +1766,13 @@ export function PublicAdmissionPage() {
         }
       >
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button size="lg" variant={site?.theme === "ultimate" ? "secondary" : "default"} onClick={() => window.print()}>
+          <Button size="lg" className="bg-gold text-ink hover:bg-gold/90 rounded-full font-semibold" onClick={() => window.print()}>
             <PrinterIcon />
             {tr("Print form")}</Button>
-          <Button size="lg" variant="outline" className="bg-background text-foreground" onClick={() => window.print()}>
+          <Button size="lg" variant="outline" className="rounded-full border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white" onClick={() => window.print()}>
             <DownloadIcon />
             {tr("Save as PDF")}</Button>
-          <Button asChild size="lg" variant="ghost">
+          <Button asChild size="lg" variant="ghost" className="rounded-full text-white hover:bg-white/10 hover:text-white">
             <Link to="/contact">
               {tr("Questions? Contact us")}<ArrowRightIcon />
             </Link>
@@ -1533,6 +1788,19 @@ export function PublicAdmissionPage() {
               <CardDescription>{tr("You get a reference number right away. The school office will contact you.")}</CardDescription>
             </CardHeader>
             <CardContent>{site ? <OnlineApplicationForm options={online} siteKey={site.recaptcha_site_key || null} /> : <Skeleton className="h-96 w-full" />}</CardContent>
+          </Card>
+        )}
+        {options.data && !online && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarDaysIcon className="text-muted-foreground size-5" />
+                {tr("Online applications are closed")}
+              </CardTitle>
+              <CardDescription>
+                {tr("The school is not taking applications online right now. Print the form above and hand it in at the school office, or contact us to ask when applications open.")}
+              </CardDescription>
+            </CardHeader>
           </Card>
         )}
         <Card>

@@ -1,12 +1,14 @@
 import dayjs from "dayjs";
-import { ArrowRightLeftIcon, FileTextIcon, GraduationCapIcon, PencilIcon, PlusIcon, SearchIcon, Trash2Icon, UploadIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightLeftIcon, BadgeCheckIcon, ClockIcon, FileTextIcon, GraduationCapIcon, ImageIcon, PencilIcon, PlusIcon, PrinterIcon, SearchIcon, Trash2Icon, UploadIcon, WalletIcon } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../api/client";
-import { useAction, useClasses, useDebounced, useGet, usePagedList, useSections } from "../api/hooks";
-import type { AdmissionApplication, AdmissionStatus, Enquiry } from "../api/types";
+import { LIVE, useAction, useClasses, useDebounced, useGet, usePagedList, usePublicSettings, useSections } from "../api/hooks";
+import type { AdmissionApplication, AdmissionSettings, AdmissionStatus, Enquiry } from "../api/types";
 import { useUser } from "../auth/AuthContext";
+import { findPhoto, PHOTO_ACCEPT, PHOTO_LABEL } from "../components/admission-photo";
 import { Combobox } from "../components/combobox";
 import { confirmAction } from "../components/confirm";
 import { IconAction } from "../components/CrudPage";
@@ -14,8 +16,9 @@ import { DatePicker } from "../components/date-picker";
 import { Field } from "../components/field";
 import { FileButton } from "../components/file-button";
 import { PageHeader } from "../components/PageHeader";
+import { PAYMENT_METHODS, paymentMethodLabel } from "../components/payment-methods";
 import { Pager } from "../components/Pager";
-import { Dash, TableState } from "../components/states";
+import { Dash, EmptyState, TableState } from "../components/states";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
@@ -24,6 +27,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Separator } from "../components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../components/ui/sheet";
+import { Skeleton } from "../components/ui/skeleton";
 import { Switch } from "../components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -59,6 +63,29 @@ const GENDERS = [
   { value: "other", label: t("Other") },
 ];
 const INVALIDATE = [["/admissions"], ["/admissions/summary"], ["/enquiries"]];
+const PAYMENT_FILTER = [
+  { value: "unverified", label: t("Payment to verify") },
+  { value: "verified", label: t("Payment verified") },
+  { value: "none", label: t("No payment") },
+];
+const money = (v: string | number | null | undefined) => (v === null || v === undefined || v === "" ? "" : Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 }));
+
+/** Payment method, transaction ID and whether the office has checked it. */
+function PaymentCell({ a }: { a: AdmissionApplication }) {
+  if (!a.payment_reference) return <Dash />;
+  return (
+    <div className="min-w-0">
+      <div className="flex items-center gap-1.5">
+        {a.payment_verified ? <BadgeCheckIcon className="text-success size-4 shrink-0" /> : <ClockIcon className="size-4 shrink-0 text-amber-600" />}
+        <span className="truncate font-mono text-xs">{a.payment_reference}</span>
+      </div>
+      <div className="text-muted-foreground text-xs">
+        {paymentMethodLabel(a.payment_method)}
+        {a.payment_amount !== null && ` · ${money(a.payment_amount)}`}
+      </div>
+    </div>
+  );
+}
 
 const StatusBadge = ({ status }: { status: AdmissionStatus }) => (
   <Badge className={cn("border-transparent", STATUS[status]?.[1])}>{STATUS[status]?.[0] ?? status}</Badge>
@@ -67,10 +94,11 @@ const StatusBadge = ({ status }: { status: AdmissionStatus }) => (
 // --- settings strip -------------------------------------------------------------------
 
 function AdmissionSettingsBar({ isAdmin }: { isAdmin: boolean }) {
-  const settings = useGet<{ open: boolean; year: string }>("/admissions/settings");
+  const settings = useGet<AdmissionSettings>("/admissions/settings");
+  const [feeOpen, setFeeOpen] = useState(false);
   const years = useGet<{ years: string[] }>("/academic-years");
-  const summary = useGet<{ year: string; counts: Record<AdmissionStatus, number> }>("/admissions/summary");
-  const save = useAction((v: { open: boolean; year: string }) => api.put("/admissions/settings", v), {
+  const summary = useGet<{ year: string; counts: Record<AdmissionStatus, number> }>("/admissions/summary", undefined, LIVE);
+  const save = useAction((v: AdmissionSettings) => api.put("/admissions/settings", v), {
     success: t("Admission settings saved"),
     invalidate: [["/admissions/settings"], ["/admissions/summary"]],
   });
@@ -91,6 +119,11 @@ function AdmissionSettingsBar({ isAdmin }: { isAdmin: boolean }) {
               onChange={(year) => s && year && save.mutate({ ...s, year })}
             />
           </Field>
+          <Button variant="outline" disabled={!s} onClick={() => setFeeOpen(true)}>
+            <WalletIcon />
+            {s?.fee ? tn("Application fee: {value}", { value: money(s.fee) }) : t("Application fee")}
+            {s?.payment_required && <Badge variant="secondary" className="ml-1">{t("Required")}</Badge>}
+          </Button>
         </div>
         {summary.data && (
           <div className="flex flex-wrap gap-2">
@@ -102,7 +135,47 @@ function AdmissionSettingsBar({ isAdmin }: { isAdmin: boolean }) {
           </div>
         )}
       </CardContent>
+      <Dialog open={feeOpen} onOpenChange={setFeeOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("Application fee")}</DialogTitle>
+            <DialogDescription>{t("Shown on the online admission form. Applicants pay outside the system and enter the transaction ID; you verify it here.")}</DialogDescription>
+          </DialogHeader>
+          {s && <FeeForm settings={s} readOnly={!isAdmin} saving={save.isPending} onSave={(v) => save.mutate(v, { onSuccess: () => setFeeOpen(false) })} />}
+        </DialogContent>
+      </Dialog>
     </Card>
+  );
+}
+
+function FeeForm({ settings, readOnly, saving, onSave }: { settings: AdmissionSettings; readOnly: boolean; saving: boolean; onSave: (v: AdmissionSettings) => void }) {
+  const [fee, setFee] = useState(settings.fee === null ? "" : String(Number(settings.fee)));
+  const [required, setRequired] = useState(settings.payment_required);
+  const [instructions, setInstructions] = useState(settings.payment_instructions ?? "");
+  return (
+    <form
+      className="grid gap-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSave({ ...settings, fee: fee.trim() === "" ? null : fee.trim(), payment_required: required, payment_instructions: instructions.trim() || null });
+      }}
+    >
+      <Field label={t("Fee amount")} htmlFor="adm-fee" description={t("Empty: no fee")}>
+        <Input id="adm-fee" type="number" min={0} step="0.01" className="w-40" disabled={readOnly} value={fee} onChange={(e) => setFee(e.target.value)} />
+      </Field>
+      <Field label={t("How to pay")} htmlFor="adm-pay-how" description={t("For example: Send the fee to bKash 01700-000000 (Payment), then enter the TrxID.")}>
+        <Textarea id="adm-pay-how" rows={3} disabled={readOnly} value={instructions} onChange={(e) => setInstructions(e.target.value)} />
+      </Field>
+      <div className="flex items-center gap-2">
+        <Switch id="adm-pay-required" disabled={readOnly} checked={required} onCheckedChange={setRequired} />
+        <Label htmlFor="adm-pay-required">{t("Online applications must include a payment transaction ID")}</Label>
+      </div>
+      {!readOnly && (
+        <DialogFooter>
+          <Button type="submit" loading={saving}>{t("Save")}</Button>
+        </DialogFooter>
+      )}
+    </form>
   );
 }
 
@@ -111,7 +184,7 @@ function AdmissionSettingsBar({ isAdmin }: { isAdmin: boolean }) {
 type ApplicationValues = Record<
   "student_name" | "date_of_birth" | "previous_school" | "guardian_name" | "guardian_relation" | "guardian_phone" | "guardian_email" | "address" | "notes",
   string
-> & { class_id: string | null; gender: string | null };
+> & { class_id: string | null; gender: string | null; payment_method: string | null; payment_reference: string; payment_amount: string };
 
 const toValues = (a: AdmissionApplication | null): ApplicationValues => ({
   student_name: a?.student_name ?? "",
@@ -125,6 +198,9 @@ const toValues = (a: AdmissionApplication | null): ApplicationValues => ({
   guardian_email: a?.guardian_email ?? "",
   address: a?.address ?? "",
   notes: a?.notes ?? "",
+  payment_method: a?.payment_method ?? null,
+  payment_reference: a?.payment_reference ?? "",
+  payment_amount: a?.payment_amount === null || a?.payment_amount === undefined ? "" : String(Number(a.payment_amount)),
 });
 
 function ApplicationForm({ application, onDone }: { application: AdmissionApplication | null; onDone: (a: AdmissionApplication) => void }) {
@@ -167,6 +243,22 @@ function ApplicationForm({ application, onDone }: { application: AdmissionApplic
       </div>
       <Field label={t("Address")} htmlFor="app-address"><Textarea id="app-address" rows={2} {...form.register("address")} /></Field>
       <Field label={t("Notes")} htmlFor="app-notes"><Textarea id="app-notes" rows={2} {...form.register("notes")} /></Field>
+      <Separator />
+      <div className="grid gap-1">
+        <h3 className="flex items-center gap-2 text-sm font-semibold"><WalletIcon className="text-muted-foreground size-4" />{t("Application fee payment")}</h3>
+        <p className="text-muted-foreground text-xs">{t("Optional. Changing the payment clears its verification.")}</p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Controller control={form.control} name="payment_method" rules={{ validate: (v, all) => !!v === !!all.payment_reference.trim() || t("Give both the method and the transaction ID") }} render={({ field }) => (
+          <Field label={t("Payment method")} error={errors.payment_method?.message}>
+            <Combobox data={PAYMENT_METHODS} value={field.value} onChange={field.onChange} clearable />
+          </Field>
+        )} />
+        {text("payment_reference", t("Transaction ID / receipt no."))}
+        <Field label={t("Amount paid")} htmlFor="app-payment_amount">
+          <Input id="app-payment_amount" type="number" min={0} step="0.01" {...form.register("payment_amount")} />
+        </Field>
+      </div>
       <DialogFooter>
         <Button type="submit" loading={save.isPending}>{t("Save")}</Button>
       </DialogFooter>
@@ -245,7 +337,7 @@ function EnrollForm({ application, onDone }: { application: AdmissionApplication
 // --- application detail -----------------------------------------------------------------
 
 function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAdmin: boolean; onEdit: (a: AdmissionApplication) => void; onEnroll: (a: AdmissionApplication) => void }) {
-  const { data: a } = useGet<AdmissionApplication>(`/admissions/${id}`);
+  const { data: a } = useGet<AdmissionApplication>(`/admissions/${id}`, undefined, LIVE);
   const [status, setStatus] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [notify, setNotify] = useState(true);
@@ -256,18 +348,23 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
     { success: t("Status updated"), invalidate, onSuccess: () => setStatus(null) },
   );
   const upload = useAction(
-    (file: File) => {
+    ({ file, label }: { file: File; label: string }) => {
       const body = new FormData();
       body.append("file", file);
-      body.append("label", label.trim() || "Document");
+      body.append("label", label);
       return api.post(`/admissions/${id}/documents`, body);
     },
     { success: t("Document added"), invalidate, onSuccess: () => setLabel("") },
   );
   const removeDoc = useAction((docId: number) => api.delete(`/admissions/${id}/documents/${docId}`), { success: t("Document removed"), invalidate });
+  const verify = useAction((verified: boolean) => api.post(`/admissions/${id}/payment`, { verified }), {
+    success: t("Payment updated"),
+    invalidate,
+  });
 
   if (!a) return null;
   const enrolled = a.status === "enrolled";
+  const photo = findPhoto(a.documents);
   const rows: [string, React.ReactNode][] = [
     [t("Class"), `${a.class_name ?? a.class_id} · ${a.year}`],
     [t("Date of birth"), a.date_of_birth ? dayjs(a.date_of_birth).format("DD MMM YYYY") : null],
@@ -283,14 +380,38 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
 
   return (
     <div className="space-y-6 px-4 pb-6">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-sm font-semibold">{a.reference}</span>
-        <StatusBadge status={a.status} />
-        {isAdmin && !enrolled && (
-          <Button size="sm" variant="outline" className="ml-auto" onClick={() => onEdit(a)}>
-            <PencilIcon />
-            {t("Edit")}</Button>
-        )}
+      <div className="flex items-start gap-4">
+        <div className="bg-muted/50 flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+          {photo?.url ? <img src={photo.url} alt={t("Student photo")} className="size-full object-cover" /> : <ImageIcon className="text-muted-foreground size-7" />}
+        </div>
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="truncate text-base font-semibold">{a.student_name}</div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-sm font-semibold">{a.reference}</span>
+            <StatusBadge status={a.status} />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" asChild>
+              <Link to={`/app/admissions/${a.application_id}/form`}>
+                <PrinterIcon />
+                {t("View / print form")}</Link>
+            </Button>
+            {isAdmin && !enrolled && (
+              <FileButton accept={PHOTO_ACCEPT} onChange={(f) => f && upload.mutate({ file: f, label: PHOTO_LABEL })}>
+                {(props) => (
+                  <Button {...props} size="sm" variant="outline" loading={upload.isPending}>
+                    <ImageIcon />
+                    {photo ? t("Replace photo") : t("Upload photo")}</Button>
+                )}
+              </FileButton>
+            )}
+            {isAdmin && !enrolled && (
+              <Button size="sm" variant="outline" onClick={() => onEdit(a)}>
+                <PencilIcon />
+                {t("Edit")}</Button>
+            )}
+          </div>
+        </div>
       </div>
       <dl className="grid grid-cols-[8rem_1fr] gap-x-4 gap-y-2 text-sm">
         {rows.map(([k, v]) => (
@@ -300,6 +421,45 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
           </div>
         ))}
       </dl>
+      <div className="space-y-3 rounded-lg border p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="flex items-center gap-2 text-sm font-semibold"><WalletIcon className="text-muted-foreground size-4" />{t("Application fee payment")}</h3>
+          {a.payment_reference && (
+            <Badge className={cn("ml-auto border-transparent", a.payment_verified ? "bg-success/15 text-success" : "bg-warning/20 text-amber-700")}>
+              {a.payment_verified ? t("Verified") : t("Not verified")}
+            </Badge>
+          )}
+        </div>
+        {a.payment_reference ? (
+          <>
+            <dl className="grid grid-cols-[8rem_1fr] gap-x-4 gap-y-1.5 text-sm">
+              <dt className="text-muted-foreground">{t("Method")}</dt>
+              <dd>{paymentMethodLabel(a.payment_method)}</dd>
+              <dt className="text-muted-foreground">{t("Transaction ID")}</dt>
+              <dd className="font-mono break-all">{a.payment_reference}</dd>
+              <dt className="text-muted-foreground">{t("Amount")}</dt>
+              <dd>{a.payment_amount !== null ? money(a.payment_amount) : <Dash />}</dd>
+              {a.payment_verified && (
+                <>
+                  <dt className="text-muted-foreground">{t("Verified by")}</dt>
+                  <dd>{[a.payment_verified_by, a.payment_verified_at && dayjs(a.payment_verified_at).format("DD MMM YYYY HH:mm")].filter(Boolean).join(" · ")}</dd>
+                </>
+              )}
+            </dl>
+            {a.payment_verified ? (
+              <Button size="sm" variant="ghost" loading={verify.isPending} onClick={() => verify.mutate(false)}>
+                {t("Mark as not verified")}</Button>
+            ) : (
+              <Button size="sm" loading={verify.isPending} onClick={() => verify.mutate(true)}>
+                <BadgeCheckIcon />
+                {t("Mark payment as verified")}</Button>
+            )}
+          </>
+        ) : (
+          <p className="text-muted-foreground text-sm">{t("No payment recorded.")}</p>
+        )}
+      </div>
+
       {a.status_note && (
         <p className="bg-muted rounded-md p-3 text-sm">
           <span className="font-medium">{t("Note:")}{" "}</span>
@@ -325,7 +485,7 @@ function ApplicationDetail({ id, isAdmin, onEdit, onEnroll }: { id: number; isAd
         {isAdmin && !enrolled && (
           <div className="flex flex-wrap gap-2">
             <Input className="w-56" placeholder={t("Label, e.g. Birth certificate")} value={label} onChange={(e) => setLabel(e.target.value)} />
-            <FileButton accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" onChange={(f) => f && upload.mutate(f)}>
+            <FileButton accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" onChange={(f) => f && upload.mutate({ file: f, label: label.trim() || "Document" })}>
               {(props) => (
                 <Button {...props} variant="outline" loading={upload.isPending}>
                   <UploadIcon />
@@ -369,11 +529,12 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
   const classes = useClasses();
   const [status, setStatus] = useState<string | null>(null);
   const [classId, setClassId] = useState<string | null>(null);
+  const [payment, setPayment] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const q = useDebounced(search.trim());
   const { data, isLoading, page, setPage, pageSize } = usePagedList<AdmissionApplication>("/admissions", {
-    status: status ?? undefined, class_id: classId ?? undefined, q: q || undefined,
-  });  // prettier-ignore
+    status: status ?? undefined, class_id: classId ?? undefined, payment: payment ?? undefined, q: q || undefined,
+  }, 50, LIVE);  // prettier-ignore
   const [viewing, setViewing] = useState<number | null>(null);
   const [editing, setEditing] = useState<AdmissionApplication | "new" | null>(null);
   const [enrolling, setEnrolling] = useState<AdmissionApplication | null>(null);
@@ -382,12 +543,13 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
   return (
     <>
       <Card className="gap-0 overflow-hidden py-0">
-        <div className="grid gap-3 border-b p-3 sm:grid-cols-[1fr_1fr_2fr_auto]">
+        <div className="grid gap-3 border-b p-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_2fr_auto]">
           <Combobox data={STATUS_OPTIONS} value={status} onChange={setStatus} clearable placeholder={t("All statuses")} />
           <Combobox data={toOptions(classes.data?.items, "class_id", "name")} value={classId} onChange={setClassId} clearable placeholder={t("All classes")} />
+          <Combobox data={PAYMENT_FILTER} value={payment} onChange={setPayment} clearable placeholder={t("Any payment")} />
           <div className="relative">
             <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-            <Input placeholder={t("Reference, student, guardian or phone")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
+            <Input placeholder={t("Reference, student, guardian, phone or transaction ID")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
           </div>
           {isAdmin && (
             <Button onClick={() => setEditing("new")}>
@@ -395,19 +557,20 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
               {t("New application")}</Button>
           )}
         </div>
-        <Table className="min-w-[800px]">
+        <Table className="min-w-[960px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
               <TableHead>{t("Reference")}</TableHead>
               <TableHead>{t("Student")}</TableHead>
               <TableHead>{t("Class")}</TableHead>
               <TableHead>{t("Guardian")}</TableHead>
+              <TableHead>{t("Payment")}</TableHead>
               <TableHead>{t("Status")}</TableHead>
               <TableHead>{t("Received")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={6} emptyText={t("No applications")} />
+            <TableState loading={isLoading} empty={!isLoading && rows.length === 0} colSpan={7} emptyText={t("No applications")} />
             {rows.map((a) => (
               <TableRow key={a.application_id} className="cursor-pointer" onClick={() => setViewing(a.application_id)}>
                 <TableCell className="font-mono text-xs">{a.reference}</TableCell>
@@ -420,6 +583,7 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
                   <div>{a.guardian_name}</div>
                   <div className="text-muted-foreground text-xs">{a.guardian_phone}</div>
                 </TableCell>
+                <TableCell className="max-w-44"><PaymentCell a={a} /></TableCell>
                 <TableCell><StatusBadge status={a.status} /></TableCell>
                 <TableCell>
                   <div className="tabular-nums">{dayjs(a.created_at).format("DD MMM YYYY")}</div>
@@ -445,7 +609,7 @@ function Applications({ isAdmin }: { isAdmin: boolean }) {
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{editing === "new" ? t("New application") : t("Edit application")}</DialogTitle>
-            {editing === "new" && <DialogDescription>{t("For paper forms and walk-in applicants.")}</DialogDescription>}
+            {editing === "new" && <DialogDescription>{t("Register an applicant from the office: paper forms, phone calls and walk-ins.")}</DialogDescription>}
           </DialogHeader>
           {editing !== null && (
             <ApplicationForm
@@ -560,7 +724,7 @@ function Enquiries({ isAdmin }: { isAdmin: boolean }) {
   const q = useDebounced(search.trim());
   const { data, isLoading, page, setPage, pageSize } = usePagedList<Enquiry>("/enquiries", {
     due: due || undefined, status: due ? undefined : status ?? undefined, q: q || undefined,
-  });  // prettier-ignore
+  }, 50, LIVE);  // prettier-ignore
   const [editing, setEditing] = useState<Enquiry | "new" | null>(null);
   const [converting, setConverting] = useState<Enquiry | null>(null);
   const remove = useAction((id: number) => api.delete(`/enquiries/${id}`), { success: t("Deleted"), invalidate: [["/enquiries"]] });
@@ -676,6 +840,171 @@ export function AdmissionsPage() {
           <Enquiries isAdmin={isAdmin} />
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// --- printable application form -------------------------------------------------------
+
+function FormValue({ label, value, className, mono }: { label: string; value?: React.ReactNode; className?: string; mono?: boolean }) {
+  return (
+    <div className={cn("flex items-end gap-2 text-sm", className)}>
+      <span className="text-muted-foreground shrink-0 font-medium print:text-black">{label}:</span>
+      <span className={cn("border-foreground/30 min-h-6 flex-1 border-b border-dashed pb-0.5 font-semibold print:border-black", mono && "font-mono")}>
+        {value || " "}
+      </span>
+    </div>
+  );
+}
+
+function Tick({ label, checked }: { label: string; checked: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-sm">
+      <span className="border-foreground/60 inline-flex size-4 items-center justify-center rounded-sm border text-[11px] leading-none font-bold print:border-black">{checked ? "✓" : ""}</span>
+      {label}
+    </span>
+  );
+}
+
+function FormBlock({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="break-inside-avoid space-y-4">
+      <h2 className="bg-muted rounded-md px-3 py-1.5 text-sm font-bold tracking-wide uppercase print:bg-gray-100">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+/** One application laid out like the paper admission form, with the applicant's photo, ready to print. */
+export function ApplicationFormPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { data: a, isLoading, isError } = useGet<AdmissionApplication>(`/admissions/${id}`);
+  const settings = usePublicSettings().data;
+
+  if (isLoading) return <Skeleton className="mx-auto h-[60rem] w-full max-w-4xl" />;
+  if (isError || !a) return <EmptyState title={t("Application not found")}>{t("It may have been deleted.")}</EmptyState>;
+
+  const photo = findPhoto(a.documents);
+  const date = (d: string | null) => (d ? dayjs(d).format("DD MMM YYYY") : null);
+  const name = settings?.system_name ?? "";
+
+  return (
+    <div className="mx-auto max-w-4xl space-y-4">
+      <div className="no-print flex flex-wrap justify-between gap-2">
+        <Button variant="ghost" onClick={() => navigate(-1)}>
+          <ArrowLeftIcon />
+          {t("Back")}</Button>
+        <Button onClick={() => window.print()}>
+          <PrinterIcon />
+          {t("Print")}</Button>
+      </div>
+
+      <div className="bg-card space-y-8 rounded-xl border p-6 shadow-sm sm:p-10 print:rounded-none print:border-0 print:p-0 print:text-black print:shadow-none">
+        <div className="flex items-start justify-between gap-6 border-b-2 border-current pb-6">
+          <div className="flex items-center gap-4">
+            {settings?.logo_url && <img src={settings.logo_url} alt="" className="h-16 w-auto" />}
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">{name}</h1>
+              {settings?.address && <p className="text-sm">{settings.address}</p>}
+              <p className="text-sm">{[settings?.phone, settings?.system_email].filter(Boolean).join(" · ")}</p>
+              <p className="mt-3 text-lg font-semibold tracking-wide uppercase">{t("Admission form")}</p>
+              <p className="text-muted-foreground text-xs print:text-black">
+                {t("Academic year: {year}", { year: a.year })} · {t("Form no.:")} <span className="text-foreground font-mono font-semibold">{a.reference}</span>
+              </p>
+            </div>
+          </div>
+          <div className="border-foreground/50 flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-dashed text-center text-xs print:border-solid print:border-black">
+            {photo?.url ? <img src={photo.url} alt={t("Student photo")} className="size-full object-cover" /> : <span className="p-2">{t("Affix passport-size photo")}</span>}
+          </div>
+        </div>
+
+        <div className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-1 text-xs print:text-black">
+          <span>{t("Received")}: <b className="text-foreground">{dayjs(a.created_at).format("DD MMM YYYY HH:mm")}</b> ({SOURCE_LABEL[a.source] ?? a.source})</span>
+          <span>{t("Status")}: <b className="text-foreground">{STATUS[a.status]?.[0] ?? a.status}</b></span>
+        </div>
+
+        <FormBlock title={t("Student information")}>
+          <FormValue label={t("Full name")} value={<span className="uppercase">{a.student_name}</span>} />
+          <div className="grid gap-4 sm:grid-cols-2 print:grid-cols-2">
+            <FormValue label={t("Date of birth")} value={date(a.date_of_birth)} />
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span className="text-muted-foreground font-medium print:text-black">{t("Gender")}:</span>
+              {GENDERS.map((g) => <Tick key={g.value} label={g.label} checked={a.gender === g.value} />)}
+            </div>
+            <FormValue label={t("Class applying for")} value={a.class_name ?? a.class_id} />
+            <FormValue label={t("Admission year")} value={a.year} />
+          </div>
+          <FormValue label={t("Previous school")} value={a.previous_school} />
+          <FormValue label={t("Home address")} value={<span className="whitespace-pre-line">{a.address}</span>} />
+        </FormBlock>
+
+        <FormBlock title={t("Parent / guardian information")}>
+          <div className="grid gap-4 sm:grid-cols-2 print:grid-cols-2">
+            <FormValue label={t("Guardian")} value={a.guardian_name} />
+            <FormValue label={t("Relationship")} value={a.guardian_relation} />
+            <FormValue label={t("Mobile")} value={a.guardian_phone} />
+            <FormValue label={t("Email")} value={a.guardian_email} />
+          </div>
+        </FormBlock>
+
+        <FormBlock title={t("Application fee")}>
+          {a.payment_reference ? (
+            <div className="grid gap-4 sm:grid-cols-2 print:grid-cols-2">
+              <FormValue label={t("Paid with")} value={paymentMethodLabel(a.payment_method)} />
+              <FormValue label={t("Transaction ID")} value={a.payment_reference} mono />
+              <FormValue label={t("Amount")} value={a.payment_amount !== null ? money(a.payment_amount) : null} />
+              <FormValue
+                label={t("Payment")}
+                value={a.payment_verified ? `${t("Verified")}${a.payment_verified_by ? ` · ${a.payment_verified_by}` : ""}` : t("Not verified")}
+              />
+            </div>
+          ) : (
+            <p className="text-sm">{t("No payment recorded.")}</p>
+          )}
+        </FormBlock>
+
+        <FormBlock title={t("Documents attached")}>
+          {(a.documents ?? []).length ? (
+            <div className="grid gap-2 sm:grid-cols-2 print:grid-cols-2">
+              {(a.documents ?? []).map((d) => <Tick key={d.document_id} label={d.label} checked />)}
+            </div>
+          ) : (
+            <p className="text-sm">{t("No documents")}</p>
+          )}
+        </FormBlock>
+
+        {a.notes && (
+          <FormBlock title={t("Notes")}>
+            <p className="text-sm whitespace-pre-line">{a.notes}</p>
+          </FormBlock>
+        )}
+
+        <FormBlock title={t("Declaration")}>
+          <p className="text-sm leading-relaxed">
+            {tn("I declare that the information given above is true and complete. I agree to abide by the rules and regulations of {name}.", { name })}</p>
+          <div className="grid gap-8 pt-8 sm:grid-cols-3 print:grid-cols-3">
+            {[t("Signature of parent / guardian"), t("Signature of student"), t("Date")].map((s) => (
+              <div key={s} className="border-t border-current pt-1 text-center text-xs">
+                {s}
+              </div>
+            ))}
+          </div>
+        </FormBlock>
+
+        <div className="break-inside-avoid rounded-md border border-dashed p-4 print:border-black">
+          <p className="mb-4 text-xs font-bold tracking-wide uppercase">{t("For office use only")}</p>
+          <div className="grid gap-4 sm:grid-cols-3 print:grid-cols-3">
+            <FormValue label={t("Decision")} value={STATUS[a.status]?.[0]} />
+            <FormValue label={t("Reviewed by")} value={a.reviewed_by} />
+            <FormValue label={t("Student ID")} value={a.student_id} />
+            <FormValue label={t("Received by")} />
+            <FormValue label={t("Date")} />
+            <FormValue label={t("Principal")} />
+          </div>
+          {a.status_note && <p className="mt-4 text-sm"><span className="font-medium">{t("Note:")}</span> {a.status_note}</p>}
+        </div>
+      </div>
     </div>
   );
 }

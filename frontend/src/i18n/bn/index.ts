@@ -24,9 +24,10 @@ import { people } from "./people";
 import { profile } from "./profile";
 import { publicSite } from "./publicSite";
 import { reportCards } from "./reportCards";
+import { roles } from "./roles";
 import { settings } from "./settings";
 import { studentRecords } from "./studentRecords";
 import { students } from "./students";
 import { transport } from "./transport";
 
-export const bn = { ...academic, ...admissions, ...analytics, ...attendance, ...attendanceCapture, ...auth, ...calendar, ...campus, ...common, ...dashboard, ...exams, ...fees, ...finance, ...homework, ...hr, ...leave, ...meetings, ...messages, ...notifications, ...onlineExams, ...people, ...profile, ...publicSite, ...reportCards, ...settings, ...studentRecords, ...students, ...transport } as Record<MessageKey, string>;
+export const bn = { ...academic, ...admissions, ...analytics, ...attendance, ...attendanceCapture, ...auth, ...calendar, ...campus, ...common, ...dashboard, ...exams, ...fees, ...finance, ...homework, ...hr, ...leave, ...meetings, ...messages, ...notifications, ...onlineExams, ...people, ...profile, ...publicSite, ...reportCards, ...roles, ...settings, ...studentRecords, ...students, ...transport } as Record<MessageKey, string>;

@@ -30,7 +30,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { api, errorMessage } from "../api/client";
-import { useAction, useClasses, useGet, useList, usePublicSettings, useSections } from "../api/hooks";
+import { useAction, useClasses, useDebounced, useGet, useList, usePublicSettings, useSections } from "../api/hooks";
 import type { IdCardInfo, Invoice, Payment, Student } from "../api/types";
 import { useUser } from "../auth/AuthContext";
 import { Combobox, type Option } from "../components/combobox";
@@ -48,8 +48,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../components/ui/command";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../components/ui/sheet";
 import { Skeleton } from "../components/ui/skeleton";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "../components/ui/table";
@@ -945,6 +947,8 @@ function Barcode({ value }: { value: string }) {
   return <svg ref={ref} className={cn("h-[11mm] w-[44mm]", !ok && "hidden")} aria-label={tr("Barcode {value}", { value })} />;
 }
 
+const CARD_GRADIENT = { background: "linear-gradient(135deg, var(--primary), color-mix(in oklch, var(--primary), black 38%))" };
+
 function IdCard({ s, parentPhone, year, cardUid }: { s: Student; parentPhone?: string | null; year?: string | null; cardUid?: string }) {
   const settings = usePublicSettings().data;
   const rows: [string, ReactNode][] = [
@@ -952,45 +956,120 @@ function IdCard({ s, parentPhone, year, cardUid }: { s: Student; parentPhone?: s
     [tr("Roll"), s.roll ?? "—"],
     [tr("Blood group"), s.blood_group || tr("N/A")],
     [tr("Parent phone"), parentPhone || s.phone || "—"],
-    [tr("Session"), year || "—"],
   ];
   return (
-    <div className="flex h-[86mm] w-[54mm] shrink-0 break-inside-avoid flex-col overflow-hidden rounded-[3mm] border border-neutral-300 bg-white text-neutral-900 shadow-sm [-webkit-print-color-adjust:exact] [print-color-adjust:exact] print:m-[2mm] print:inline-flex print:align-top print:shadow-none">
-      <div className="bg-primary text-primary-foreground flex h-[19mm] shrink-0 items-start gap-[2mm] px-[3mm] pt-[2.5mm]">
-        <div className="flex size-[9mm] shrink-0 items-center justify-center overflow-hidden rounded-[1.5mm] bg-white">
-          {settings?.logo_url ? (
-            <img src={settings.logo_url} alt="" className="size-full object-contain" />
-          ) : (
-            <GraduationCapIcon className="text-primary size-[5mm]" />
-          )}
+    <div className="relative flex h-[86mm] w-[54mm] shrink-0 break-inside-avoid flex-col overflow-hidden rounded-[3mm] bg-white text-neutral-900 shadow-[0_1px_2px_rgb(0_0_0/0.06),0_10px_28px_-10px_rgb(0_0_0/0.25)] ring-1 ring-black/5 [-webkit-print-color-adjust:exact] [print-color-adjust:exact] print:m-[2mm] print:inline-flex print:align-top print:shadow-none print:ring-neutral-300">
+      <div className="relative h-[31mm] shrink-0 overflow-hidden text-white" style={CARD_GRADIENT}>
+        <div className="absolute -top-[12mm] -right-[9mm] size-[28mm] rounded-full bg-white/10" />
+        <div className="absolute top-[9mm] -left-[11mm] size-[20mm] rounded-full bg-white/[0.07]" />
+        <div className="relative flex items-center gap-[2mm] px-[3mm] pt-[3mm]">
+          <div className="flex size-[8.5mm] shrink-0 items-center justify-center overflow-hidden rounded-[1.8mm] bg-white shadow-sm">
+            {settings?.logo_url ? (
+              <img src={settings.logo_url} alt="" className="size-full object-contain p-[0.6mm]" />
+            ) : (
+              <GraduationCapIcon className="text-primary size-[5mm]" />
+            )}
+          </div>
+          <div className="min-w-0 leading-tight">
+            <div className="line-clamp-2 text-[7pt] font-bold tracking-wide uppercase">{settings?.system_name || tr("School")}</div>
+            {settings?.address && <div className="truncate text-[5pt] opacity-80">{settings.address}</div>}
+          </div>
         </div>
-        <div className="min-w-0 leading-tight">
-          <div className="line-clamp-2 text-[7.5pt] font-semibold">{settings?.system_name || tr("School")}</div>
-          {settings?.address && <div className="line-clamp-2 text-[5pt] opacity-85">{settings.address}</div>}
+        <div className="relative mt-[1.6mm] flex items-center justify-center gap-[1.5mm] text-[5.5pt] font-semibold tracking-[0.22em] uppercase">
+          <span className="h-px w-[5mm] bg-white/50" />
+          {tr("Student ID card")}
+          <span className="h-px w-[5mm] bg-white/50" />
         </div>
+        <svg viewBox="0 0 54 10" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-[7mm] w-full fill-white" aria-hidden>
+          <path d="M0 10 V5 Q27 -4 54 5 V10 Z" />
+        </svg>
       </div>
-      <div className="-mt-[6mm] flex justify-center">
-        <div className="flex size-[21mm] items-center justify-center overflow-hidden rounded-full border-[0.8mm] border-white bg-neutral-100 text-[14pt] font-semibold text-neutral-500">
+
+      <div className="relative z-10 -mt-[14mm] flex justify-center">
+        <div className="flex h-[24mm] w-[20mm] items-center justify-center overflow-hidden rounded-[2mm] border-[0.7mm] border-white bg-neutral-100 text-[13pt] font-semibold text-neutral-400 shadow-md">
           {s.image_url ? <img src={s.image_url} alt="" className="size-full object-cover" /> : initials(s.name)}
         </div>
       </div>
-      <div className="mt-[1.5mm] px-[3mm] text-center">
-        <div className="line-clamp-2 text-[9.5pt] leading-tight font-bold">{s.name}</div>
-        <div className="mt-[0.5mm] text-[6.5pt] text-neutral-600">{classLabel(s) ?? tr("Not enrolled")}</div>
+
+      <div className="mt-[1.6mm] px-[3mm] text-center">
+        <div className="line-clamp-2 text-[9pt] leading-tight font-bold">{s.name}</div>
+        <div className="bg-primary/10 text-primary mt-[1mm] inline-block rounded-full px-[2.2mm] py-[0.3mm] text-[6pt] font-semibold">
+          {classLabel(s) ?? tr("Not enrolled")}
+        </div>
       </div>
-      <dl className="mt-[2mm] grid grid-cols-[auto_1fr] gap-x-[2mm] gap-y-[0.7mm] px-[4mm] text-[6.5pt] leading-tight">
+
+      <dl className="mx-[4mm] mt-[2.2mm] grid grid-cols-2 gap-x-[2.5mm] gap-y-[1.4mm] border-t border-dashed border-neutral-200 pt-[1.8mm] leading-tight">
         {rows.map(([k, v]) => (
-          <div key={k} className="contents">
-            <dt className="text-neutral-500">{k}</dt>
-            <dd className="truncate font-medium">{v}</dd>
+          <div key={k} className="min-w-0">
+            <dt className="text-[4.6pt] font-medium tracking-wide text-neutral-500 uppercase">{k}</dt>
+            <dd className="truncate text-[6.5pt] font-semibold">{v}</dd>
           </div>
         ))}
       </dl>
-      <div className="mt-auto flex justify-center pb-[2mm]">
+
+      <div className="mt-auto flex justify-center pb-[1.4mm]">
         <Barcode value={cardUid || s.student_code || String(s.student_id)} />
       </div>
-      <div className="bg-primary h-[1.5mm] shrink-0" />
+      <div className="flex h-[4.2mm] shrink-0 items-center justify-center text-[5.5pt] font-medium tracking-wide text-white" style={CARD_GRADIENT}>
+        {year ? tr("Valid for session {year}", { year }) : tr("Student ID card")}
+      </div>
     </div>
+  );
+}
+
+/** Find one student by name, ID no. or email to print just their card. */
+function StudentSearch({ onPick }: { onPick: (s: Student) => void }) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const term = useDebounced(q.trim(), 250);
+  const found = useList<Student>(open && term.length >= 2 ? "/students" : null, { q: term, limit: 20 });
+  const items = found.data?.items ?? [];
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button type="button" variant="outline" className="text-muted-foreground w-full justify-start font-normal sm:w-72">
+          <SearchIcon />
+          {tr("Search a student…")}</Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="end">
+        <Command shouldFilter={false}>
+          <CommandInput value={q} onValueChange={setQ} placeholder={tr("Name, ID no. or email")} />
+          <CommandList>
+            {term.length < 2 ? (
+              <p className="text-muted-foreground p-3 text-center text-sm">{tr("Type at least 2 letters")}</p>
+            ) : found.isLoading ? (
+              <p className="text-muted-foreground p-3 text-center text-sm">{tr("Searching…")}</p>
+            ) : (
+              <CommandEmpty>{tr("No students found")}</CommandEmpty>
+            )}
+            <CommandGroup>
+              {items.map((st) => (
+                <CommandItem
+                  key={st.student_id}
+                  value={String(st.student_id)}
+                  onSelect={() => {
+                    onPick(st);
+                    setOpen(false);
+                    setQ("");
+                  }}
+                >
+                  <Avatar className="size-7">
+                    {st.image_url && <AvatarImage src={st.image_url} alt="" />}
+                    <AvatarFallback className="text-[10px]">{initials(st.name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <div className="truncate font-medium">{st.name}</div>
+                    <div className="text-muted-foreground truncate text-xs">
+                      {[st.student_code, classLabel(st)].filter(Boolean).join(" · ") || tr("Not enrolled")}
+                    </div>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -1012,6 +1091,7 @@ export function IdCardsPage() {
     holder_role: "student", holder_id: single || undefined, class_id: single ? undefined : sel.classId, section_id: single ? undefined : sel.sectionId || undefined, limit: 2000,
   });  // prettier-ignore
   const cardUids = useMemo(() => new Map((cards.data?.items ?? []).map((c) => [c.holder_id, c.card_uid])), [cards.data]);
+  const pick = (id: number) => setParams({ student_id: String(id) });
 
   return (
     <>
@@ -1024,36 +1104,54 @@ export function IdCardsPage() {
             {single && (
               <Button variant="outline" onClick={() => setParams({})}>
                 <ArrowLeftIcon />
-                {tr("Whole class")}</Button>
+                {sel.classId ? tr("Back to class") : tr("Whole class")}</Button>
             )}
             <Button onClick={() => window.print()} disabled={!students.length}>
               <PrinterIcon />
-              {tr("Print")}</Button>
+              {students.length > 1 ? tr("Print all ({count})", { count: students.length }) : tr("Print")}</Button>
           </>
         }
       />
-      {!single && (
-        <Card className="no-print mb-6 py-4">
-          <CardContent className="px-4">
+      <Card className="no-print mb-6 py-4">
+        <CardContent className="flex flex-wrap items-end justify-between gap-4 px-4">
+          {single ? (
+            <p className="text-muted-foreground self-center text-sm">{tr("Showing one student. Search for another, or go back to print a whole class.")}</p>
+          ) : (
             <ClassPicker value={sel} onChange={setSel} />
-          </CardContent>
-        </Card>
-      )}
+          )}
+          <div className="grid w-full gap-1.5 sm:w-auto">
+            <span className="text-sm font-medium">{tr("Single student")}</span>
+            <StudentSearch onPick={(st) => pick(st.student_id)} />
+          </div>
+        </CardContent>
+      </Card>
       {loading ? (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-5">
           {[0, 1, 2].map((i) => (
             <Skeleton key={i} className="h-[86mm] w-[54mm] rounded-[3mm]" />
           ))}
         </div>
       ) : students.length ? (
-        <div className="flex flex-wrap gap-4 print:block">
+        <div className={cn("flex flex-wrap gap-5 print:block", single && "justify-center")}>
           {students.map((s) => (
-            <IdCard key={s.student_id} s={s} parentPhone={s.parent_id ? phones.get(s.parent_id) : null} year={s.year ?? settings.data?.running_year} cardUid={cardUids.get(s.student_id)} />
+            <div key={s.student_id} className="group relative print:contents">
+              <IdCard s={s} parentPhone={s.parent_id ? phones.get(s.parent_id) : null} year={s.year ?? settings.data?.running_year} cardUid={cardUids.get(s.student_id)} />
+              {!single && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="no-print absolute inset-x-3 bottom-8 opacity-0 shadow-md transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                  onClick={() => pick(s.student_id)}
+                >
+                  <PrinterIcon />
+                  {tr("Only this card")}</Button>
+              )}
+            </div>
           ))}
         </div>
       ) : (
         <EmptyState icon={IdCardIcon} title={single ? tr("Student not found") : sel.classId ? tr("No students in this class") : tr("Choose a class")}>
-          {!single && !sel.classId && tr("Pick a class (and optionally a section) to generate cards.")}
+          {!single && !sel.classId && tr("Pick a class (and optionally a section), or search for one student.")}
         </EmptyState>
       )}
     </>

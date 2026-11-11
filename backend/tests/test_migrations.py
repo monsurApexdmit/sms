@@ -24,6 +24,7 @@ NEW_TABLES |= {"notification", "notification_preference", "push_subscription"}
 NEW_TABLES |= {"ai_request"}
 NEW_TABLES |= {"user_totp"}
 NEW_TABLES |= {"gateway_transaction"}
+NEW_TABLES |= {"access_role", "access_role_permission"}
 
 
 def _table_of(diff) -> str | None:

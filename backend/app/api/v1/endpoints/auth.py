@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from fastapi import APIRouter, BackgroundTasks, Cookie, File, HTTPException, Request, Response, UploadFile, status
+from sqlalchemy.orm import object_session
 
 from app.api.deps import DB, Me
 from app.core.config import get_settings
@@ -18,6 +19,7 @@ from app.services.accounts import email_taken, find_by_email, get_account
 from app.services.files import save_image, user_image_url
 from app.services.jobs import enqueue
 from app.services.notify import send_email
+from app.services.permissions import user_levels, user_role
 from app.services.ratelimit import throttle
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -39,7 +41,13 @@ def _throttle(key: str) -> None:
 
 def _user_out(role: str, row) -> UserOut:
     uid = getattr(row, f"{role}_id")
-    return UserOut(role=role, id=uid, name=row.name or "", email=row.email or "", image_url=user_image_url(role, uid))
+    out = UserOut(role=role, id=uid, name=row.name or "", email=row.email or "", image_url=user_image_url(role, uid))
+    db = object_session(row)
+    if db is not None:
+        access = user_role(db, role, uid)
+        out.permissions = user_levels(db, role, uid)
+        out.access_role = access.name if access is not None and not access.is_system else None
+    return out
 
 
 def _issue(response: Response, role: str, row) -> TokenOut:

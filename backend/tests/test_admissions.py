@@ -7,6 +7,7 @@ from sqlalchemy import select
 from app.db.session import SessionLocal
 from app.models import AdmissionApplication, Enroll, Parent, Student
 from tests.conftest import YEAR
+from tests.test_hr import _accountant
 
 FORM = {
     "class_id": "1",
@@ -208,3 +209,56 @@ def test_enquiry_follow_up_and_convert(client, as_role):
 
     no_phone = client.get("/api/enquiries", headers=admin, params={"q": "No phone"}).json()["items"][0]
     assert client.post(f"/api/enquiries/{no_phone['enquiry_id']}/convert", headers=admin, json={"student_name": "X", "class_id": 1}).status_code == 422
+
+
+# --- application fee payment ----------------------------------------------------------
+
+
+def test_public_form_shows_fee_and_requires_payment(client, as_role):
+    admin = as_role("admin")
+    r = client.put(
+        "/api/admissions/settings", headers=admin,
+        json={"open": True, "year": YEAR, "fee": "500", "payment_required": True, "payment_instructions": "Send to bKash 01700000000"},
+    )  # fmt: skip
+    assert r.status_code == 200, r.text
+    options = client.get("/api/public/admissions/options").json()
+    assert float(options["fee"]) == 500 and options["payment_required"] and "bKash" in options["payment_instructions"]
+
+    assert _apply(client).status_code == 422  # no transaction ID
+    assert _apply(client, payment_method="bkash").status_code == 422  # method without ID
+    r = _apply(client, payment_method="bkash", payment_reference=" 9AB3CD7EF ", payment_amount="500")
+    assert r.status_code == 201, r.text
+    # the same transaction cannot pay for a second application, in any letter case
+    assert _apply(client, payment_method="bkash", payment_reference="9ab3cd7ef").status_code == 409
+
+    found = client.get("/api/admissions", headers=admin, params={"q": "9AB3CD7EF"}).json()
+    assert found["total"] == 1
+    item = found["items"][0]
+    assert item["payment_method"] == "bkash" and item["payment_reference"] == "9AB3CD7EF" and float(item["payment_amount"]) == 500
+    assert item["payment_verified"] is False
+
+
+def test_office_records_and_verifies_payment(client, as_role):
+    admin = as_role("admin")
+    body = {**FORM, "class_id": 1, "payment_method": "cash", "payment_reference": "RCPT-0042", "payment_amount": "300"}
+    r = client.post("/api/admissions", headers=admin, json=body)
+    assert r.status_code == 201, r.text
+    app_id = r.json()["application_id"]
+    assert client.get("/api/admissions", headers=admin, params={"payment": "unverified"}).json()["total"] == 1
+
+    r = client.post(f"/api/admissions/{app_id}/payment", headers=_accountant(client), json={"verified": True})
+    assert r.status_code == 200, r.text
+    assert r.json()["payment_verified"] and r.json()["payment_verified_by"]
+    assert client.get("/api/admissions", headers=admin, params={"payment": "verified"}).json()["total"] == 1
+    assert client.post(f"/api/admissions/{app_id}/payment", headers=as_role("teacher"), json={"verified": False}).status_code == 403
+
+    # editing other fields keeps the check; changing the payment clears it
+    r = client.put(f"/api/admissions/{app_id}", headers=admin, json={**body, "notes": "Walk-in"})
+    assert r.json()["payment_verified"] is True
+    r = client.put(f"/api/admissions/{app_id}", headers=admin, json={**body, "payment_reference": "RCPT-0043"})
+    assert r.json()["payment_verified"] is False and r.json()["payment_verified_by"] is None
+
+    # no payment: nothing to verify
+    other = client.post("/api/admissions", headers=admin, json={**FORM, "class_id": 1, "student_name": "Unpaid"}).json()
+    assert client.post(f"/api/admissions/{other['application_id']}/payment", headers=admin, json={"verified": True}).status_code == 422
+    assert client.get("/api/admissions", headers=admin, params={"payment": "none"}).json()["total"] == 1

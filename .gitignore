@@ -7,3 +7,6 @@ frontend/dist/
 *.log
 frontend/tsconfig.tsbuildinfo
 backups/
+
+# Local database dumps (personal data): never commit
+databaseBackup/

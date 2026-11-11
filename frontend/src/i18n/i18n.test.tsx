@@ -56,9 +56,9 @@ describe("English (default)", () => {
   });
 
   it("puts elements into text", () => {
-    render(<p>{tn("Welcome, {name}", { name: <strong>Rina</strong> })}</p>);
+    render(<p>{tn("Good morning, {name}", { name: <strong>Rina</strong> })}</p>);
     expect(screen.getByText("Rina").tagName).toBe("STRONG");
-    expect(screen.getByText(/Welcome,/)).toHaveTextContent("Welcome, Rina");
+    expect(screen.getByText(/Good morning,/)).toHaveTextContent("Good morning, Rina");
   });
 
   it("formats numbers and money as before", () => {

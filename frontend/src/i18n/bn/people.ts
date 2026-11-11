@@ -8,5 +8,4 @@ export const people: Record<string, string> = {
   "Designation": "পদবি",
   "Librarians": "গ্রন্থাগারিক",
   "Profession": "পেশা",
-  "Upload photo": "ছবি আপলোড করুন",
 };

@@ -28,6 +28,7 @@ from app.models.leave import LeaveRequest
 from app.models.library import Book, BookRequest
 from app.models.meetings import MeetingBooking, MeetingSession, MeetingSlot
 from app.models.notifications import Notification, NotificationPreference, PushSubscription
+from app.models.permissions import AccessRole, AccessRolePermission
 from app.models.records import CertificateIssue, CertificateTemplate, StudentHealth, StudentRecord
 from app.models.report_cards import ExamSchedule, ExamWeight, ReportRemark
 from app.models.settings import (
@@ -46,6 +47,8 @@ from app.models.two_factor import UserTotp
 __all__ = [
     "AcademicSyllabus",
     "AcademicYear",
+    "AccessRole",
+    "AccessRolePermission",
     "Accountant",
     "Admin",
     "AdmissionApplication",

@@ -1,17 +1,25 @@
 """Request and response models for app/api/v1/endpoints/admissions.py."""
 
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 EnquirySource = Literal["walk-in", "phone", "website", "other"]
 EnquiryStatus = Literal["open", "converted", "closed"]
+PaymentMethod = Literal["bkash", "nagad", "rocket", "bank", "cash", "other"]
 
 
 class AdmissionSettings(BaseModel):
     open: bool
     year: str
+    # Application fee shown on the public form; empty when there is none.
+    fee: Decimal | None = Field(default=None, ge=0, max_digits=12, decimal_places=2)
+    # The public form refuses applications without a payment transaction ID.
+    payment_required: bool = False
+    # How to pay, e.g. "Send Tk 500 to bKash 01700-000000 (merchant), then enter the TrxID."
+    payment_instructions: str | None = Field(default=None, max_length=2000)
 
 
 class ApplicationIn(BaseModel):
@@ -26,6 +34,22 @@ class ApplicationIn(BaseModel):
     guardian_email: EmailStr | None = None
     address: str | None = Field(default=None, max_length=1000)
     notes: str | None = Field(default=None, max_length=5000)
+    payment_method: PaymentMethod | None = None
+    payment_reference: str | None = Field(default=None, max_length=100, description="Transaction ID, bank slip or receipt number")
+    payment_amount: Decimal | None = Field(default=None, ge=0, max_digits=12, decimal_places=2)
+
+    @field_validator("payment_reference")
+    @classmethod
+    def _clean_reference(cls, v: str | None) -> str | None:
+        return " ".join(v.split()) or None if v else None
+
+    @model_validator(mode="after")
+    def _payment_together(self) -> "ApplicationIn":
+        if (self.payment_method is None) != (self.payment_reference is None):
+            raise ValueError("Give both the payment method and the transaction ID, or neither")
+        if self.payment_amount is not None and self.payment_reference is None:
+            raise ValueError("Give the transaction ID for the amount paid")
+        return self
 
 
 class OfficeApplicationIn(ApplicationIn):
@@ -64,8 +88,18 @@ class ApplicationOut(BaseModel):
     updated_at: datetime
     student_id: int | None
     parent_id: int | None
+    payment_method: str | None = None
+    payment_reference: str | None = None
+    payment_amount: Decimal | None = None
+    payment_verified: bool = False
+    payment_verified_by: str | None = None
+    payment_verified_at: datetime | None = None
     document_count: int = 0
     documents: list[DocumentOut] | None = None
+
+
+class PaymentVerifyIn(BaseModel):
+    verified: bool
 
 
 class StatusIn(BaseModel):

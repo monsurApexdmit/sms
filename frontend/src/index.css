@@ -4,40 +4,45 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.625rem;
+  /* Staff app: deep emerald with a gold accent and an ink sidebar, the same family as the
+     public website and the sign-in page so the whole product reads as one brand. */
+  --radius: 0.7rem;
   --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.2 0.02 175);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
+  --card-foreground: oklch(0.2 0.02 175);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.511 0.262 276.966);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.962 0.018 272.314);
-  --accent-foreground: oklch(0.359 0.144 278.697);
-  --destructive: oklch(0.577 0.245 27.325);
-  --success: oklch(0.596 0.145 163.225);
-  --warning: oklch(0.769 0.188 70.08);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.585 0.233 277.117);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.511 0.262 276.966);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.962 0.018 272.314);
-  --sidebar-accent-foreground: oklch(0.359 0.144 278.697);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.585 0.233 277.117);
-  --chart-1: oklch(0.585 0.233 277.117);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.645 0.246 16.439);
-  --chart-5: oklch(0.627 0.265 303.9);
+  --popover-foreground: oklch(0.2 0.02 175);
+  --primary: oklch(0.52 0.12 163);
+  --primary-foreground: oklch(0.99 0.005 160);
+  --secondary: oklch(0.965 0.007 165);
+  --secondary-foreground: oklch(0.26 0.03 172);
+  --muted: oklch(0.966 0.006 165);
+  --muted-foreground: oklch(0.52 0.018 172);
+  --accent: oklch(0.955 0.03 163);
+  --accent-foreground: oklch(0.38 0.09 165);
+  --destructive: oklch(0.577 0.215 27.325);
+  --success: oklch(0.6 0.14 155);
+  --warning: oklch(0.78 0.16 75);
+  --border: oklch(0.915 0.008 165);
+  --input: oklch(0.9 0.01 165);
+  --ring: oklch(0.6 0.12 163);
+  --app-canvas: oklch(0.975 0.006 165);
+  --site-gold: oklch(0.82 0.14 82);
+  --site-ink: oklch(0.26 0.045 170);
+  --sidebar: oklch(0.225 0.035 172);
+  --sidebar-foreground: oklch(0.92 0.012 165);
+  --sidebar-primary: oklch(0.83 0.14 82);
+  --sidebar-primary-foreground: oklch(0.24 0.045 170);
+  --sidebar-accent: oklch(1 0 0 / 7%);
+  --sidebar-accent-foreground: oklch(0.99 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.83 0.14 82);
+  --chart-1: oklch(0.56 0.12 163);
+  --chart-2: oklch(0.58 0.13 240);
+  --chart-3: oklch(0.78 0.15 75);
+  --chart-4: oklch(0.64 0.2 25);
+  --chart-5: oklch(0.56 0.2 300);
 }
 
 .dark {
@@ -47,7 +52,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.006 285.885);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.673 0.182 276.935);
+  --primary: oklch(0.7 0.13 163);
   --primary-foreground: oklch(0.141 0.005 285.823);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
@@ -60,15 +65,15 @@
   --warning: oklch(0.828 0.189 84.429);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.585 0.233 277.117);
+  --ring: oklch(0.6 0.12 163);
   --sidebar: oklch(0.21 0.006 285.885);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.673 0.182 276.935);
+  --sidebar-primary: oklch(0.83 0.14 82);
   --sidebar-primary-foreground: oklch(0.141 0.005 285.823);
   --sidebar-accent: oklch(0.274 0.006 286.033);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.585 0.233 277.117);
+  --sidebar-ring: oklch(0.83 0.14 82);
 }
 
 /* English keeps its Latin font; Bangla glyphs (e.g. names) fall through to Noto Sans Bengali.
@@ -82,6 +87,10 @@
 
 @theme inline {
   --font-sans: var(--app-font);
+  --font-display: "Fraunces", Georgia, "Times New Roman", var(--app-font);
+  --color-gold: var(--site-gold);
+  --color-ink: var(--site-ink);
+  --color-canvas: var(--app-canvas);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -121,6 +130,29 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Public website: a warmer palette than the staff app (deep green, gold, warm paper),
+   applied only inside the public layout. Tailwind colour utilities read these variables,
+   so bg-primary and friends follow automatically. */
+.site-theme {
+  --background: oklch(0.992 0.005 90);
+  --card: oklch(1 0 0);
+  --primary: oklch(0.47 0.1 162);
+  --primary-foreground: oklch(0.985 0.01 95);
+  --ring: oklch(0.56 0.1 162);
+  --accent: oklch(0.955 0.025 162);
+  --accent-foreground: oklch(0.36 0.08 165);
+  --muted: oklch(0.966 0.012 90);
+  --muted-foreground: oklch(0.5 0.02 160);
+  --border: oklch(0.915 0.01 90);
+  --input: oklch(0.9 0.01 90);
+  --site-gold: oklch(0.82 0.14 82);
+  --site-ink: oklch(0.26 0.045 170);
+}
+.site-dots {
+  background-image: radial-gradient(currentColor 1px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -132,6 +164,12 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+}
+
+/* The dark sidebar keeps a quiet scrollbar. */
+[data-slot="sidebar-content"] {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(1 0 0 / 14%) transparent;
 }
 
 /* Marksheets, invoices, routines and reports print without the app chrome. */

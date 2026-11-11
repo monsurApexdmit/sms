@@ -79,6 +79,7 @@ TAGS: list[dict[str, str]] = [
     {"name": "analytics", "description": "At-risk students, fee collection, attendance, exam results and teacher workload."},
     {"name": "ai assistant", "description": "AI drafts of remarks, questions and progress summaries, plus usage limits."},
     {"name": "export", "description": "Excel downloads of lists and reports."},
+    {"name": "permissions", "description": "Roles & permissions: module access per role, custom roles for administrator accounts. Full administrators only."},
     {"name": "audit", "description": "Log of who changed what."},
     {"name": "website admin", "description": "Manage the public website: pages, news, events and gallery."},
     {"name": "public website", "description": "Public website content and forms. No sign-in needed."},

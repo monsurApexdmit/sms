@@ -66,7 +66,6 @@ export const finance: Record<string, string> = {
   "Total expenses": "মোট ব্যয়",
   "Total income": "মোট আয়",
   "Total received": "মোট প্রাপ্তি",
-  "View": "দেখুন",
   "View invoice": "ইনভয়েস দেখুন",
   "Your invoices and payments": "আপনার ইনভয়েস ও পেমেন্ট",
   "Your payment is being confirmed and the invoice will update in a moment.": "আপনার পেমেন্ট নিশ্চিত করা হচ্ছে, কিছুক্ষণের মধ্যে ইনভয়েস হালনাগাদ হবে।",

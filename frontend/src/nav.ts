@@ -40,6 +40,7 @@ import {
   ReceiptTextIcon,
   ScrollTextIcon,
   SettingsIcon,
+  ShieldCheckIcon,
   UserCheckIcon,
   UserCogIcon,
   UserIcon,
@@ -58,6 +59,8 @@ export interface NavItem {
   icon: LucideIcon;
   roles: Role[];
   group?: string;
+  /** only for administrators without a restricting custom role */
+  fullAdminOnly?: boolean;
 }
 
 const ALL: Role[] = ["admin", "teacher", "student", "parent", "librarian", "accountant"];
@@ -125,11 +128,44 @@ export const NAV: NavItem[] = [
 
   { label: t("Website"), path: "website", icon: GlobeIcon, roles: ["admin"], group: t("Settings") },
   { label: t("System settings"), path: "settings", icon: SettingsIcon, roles: ["admin"], group: t("Settings") },
+  { label: t("Roles & permissions"), path: "roles", icon: ShieldCheckIcon, roles: ["admin"], group: t("Settings"), fullAdminOnly: true },
   { label: t("Audit log"), path: "audit-log", icon: HistoryIcon, roles: ["admin"], group: t("Settings") },
   { label: t("Notifications"), path: "notifications", icon: BellIcon, roles: ALL, group: t("Settings") },
   { label: t("My profile"), path: "profile", icon: UserIcon, roles: ALL, group: t("Settings") },
   { label: t("Public website"), path: "/", icon: HouseIcon, roles: ALL, group: t("Settings") },
 ];
 
-export const navFor = (role: Role) => NAV.filter((n) => n.roles.includes(role));
-export const canAccess = (role: Role, path: string) => NAV.some((n) => n.path === path && n.roles.includes(role));
+/**
+ * Permission module (backend app/core/permissions.py) behind each page. Pages not listed are
+ * personal (profile, my payslips, notifications) and follow the role alone.
+ */
+export const PAGE_MODULE: Record<string, string> = {
+  analytics: "analytics", students: "students", promotion: "students", teachers: "teachers", parents: "parents",
+  staff: "staff", "id-cards": "id_cards", "cards-devices": "id_cards", certificates: "certificates",
+  "my-records": "student_profile", admissions: "admissions", "school-years": "classes", classes: "classes",
+  subjects: "subjects", routine: "routine", "my-routine": "routine", syllabus: "syllabus", "study-material": "syllabus",
+  homework: "homework", calendar: "calendar", exams: "exams", "exam-timetable": "exams", "exam-sms": "exams",
+  marks: "marks", marksheet: "marks", tabulation: "marks", "report-cards": "marks", "online-exams": "online_exams",
+  "my-online-exams": "online_exams", "question-papers": "online_exams", attendance: "attendance",
+  "attendance-report": "attendance", "period-attendance": "attendance", kiosk: "kiosk", leave: "leave",
+  invoices: "invoices", "my-invoices": "invoices", accounting: "accounting", "fee-setup": "fee_setup",
+  "staff-attendance": "hr", payroll: "hr", "salary-structures": "hr", library: "library", transport: "transport",
+  facilities: "transport", notices: "notices", messages: "messages", meetings: "meetings", "my-meetings": "meetings",
+  "book-meeting": "meetings", website: "website", settings: "settings", "audit-log": "audit_log",
+};  // prettier-ignore
+
+export type Level = "full" | "view" | "none";
+/** module -> level from /auth/me; null = full administrator; undefined = not known (allow by role) */
+export type Permissions = Record<string, Level> | null | undefined;
+
+export const levelFor = (path: string, permissions: Permissions): Level => {
+  const module = PAGE_MODULE[path];
+  if (!module || !permissions) return "full";
+  return permissions[module] ?? "none";
+};
+
+const allowed = (n: NavItem, role: Role, permissions: Permissions) =>
+  n.roles.includes(role) && !(n.fullAdminOnly && permissions) && levelFor(n.path, permissions) !== "none";
+
+export const navFor = (role: Role, permissions?: Permissions) => NAV.filter((n) => allowed(n, role, permissions));
+export const canAccess = (role: Role, path: string, permissions?: Permissions) => NAV.some((n) => n.path === path && allowed(n, role, permissions));

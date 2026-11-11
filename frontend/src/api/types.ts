@@ -8,6 +8,10 @@ export interface User {
   name: string;
   email: string;
   image_url: string | null;
+  /** module -> full | view | none; null for a full administrator */
+  permissions?: Record<string, "full" | "view" | "none"> | null;
+  /** custom role name for a restricted administrator */
+  access_role?: string | null;
 }
 
 export interface TokenResponse {
@@ -720,6 +724,14 @@ export interface StudentProfile {
 
 export type AdmissionStatus = "new" | "reviewing" | "accepted" | "rejected" | "enrolled" | "withdrawn";
 
+export interface AdmissionSettings {
+  open: boolean;
+  year: string;
+  fee: string | number | null;
+  payment_required: boolean;
+  payment_instructions: string | null;
+}
+
 export interface AdmissionApplication {
   application_id: number;
   reference: string;
@@ -744,6 +756,12 @@ export interface AdmissionApplication {
   updated_at: string;
   student_id: number | null;
   parent_id: number | null;
+  payment_method: string | null;
+  payment_reference: string | null;
+  payment_amount: string | number | null;
+  payment_verified: boolean;
+  payment_verified_by: string | null;
+  payment_verified_at: string | null;
   document_count: number;
   documents: { document_id: number; label: string; file_name: string; url: string | null; uploaded_at: string }[] | null;
 }

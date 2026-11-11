@@ -17,6 +17,8 @@ class Admin(Base):
     authentication_key: Txt = txt()
     phone: Txt = txt()
     address: Txt = txt()
+    # custom role (access_role); None = full administrator
+    access_role_id: Int = num()
 
 
 class Teacher(Base):
